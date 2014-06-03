@@ -32,7 +32,7 @@ def main(argv):
   dest_file=  path+ ".gclient"
   print "copy:" + src_file +" to "+dest_file
   shutil.copy  (src_file, dest_file)
-
+  
   #更新代码
 if __name__ == '__main__':
   sys.exit(main(sys.argv))
