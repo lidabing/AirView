@@ -356,6 +356,19 @@
             'app/chrome_main_delegate.cc',
             'app/chrome_main_delegate.h',
           ],
+		  'configurations': {
+                'Debug_Base': {
+                  'msvs_settings': {
+                    'VCLinkerTool': {
+					#airview patch{
+                     # 'LinkIncremental': '<(msvs_large_module_debug_link_mode)',
+					 #Debug模式关闭增量连接功能
+					'LinkIncremental': '1',  # 1 == No
+					#}
+                    },
+                  },
+                },
+              },
           'conditions': [
             ['OS=="win"', {
               'dependencies': [
