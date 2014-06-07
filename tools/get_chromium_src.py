@@ -15,7 +15,7 @@ def cur_file_dir():
          return path
      elif os.path.isfile(path):
          return os.path.dirname(path)
-
+ 
 def main(argv):
   root_path = cur_file_dir()
   root_path = os.path.dirname(root_path)
