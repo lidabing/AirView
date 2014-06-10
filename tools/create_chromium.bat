@@ -6,6 +6,8 @@
 cd %~dp0
 cd ../..
 cd chromium
+cd src
 set GYP_MSVS_VERSION=2013
 set GYP_GENERATORS=msvs-ninja,ninja
-gclient runhooks --force
+python build/gyp_chromium --depth=.
+
