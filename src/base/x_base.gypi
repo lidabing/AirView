@@ -3,6 +3,15 @@
 # found in the LICENSE file.
 
 {
+   'conditions': [
+   ['OS=="win" ',{
+   'dependencies': ['../third_party/detours/detours.gyp:detours',],
+   'sources': [
+   'hook_manager.h',
+   'hook_manager.cc',
+   ],
+   }],
+   ],
    'sources': [
         'patch.cc',
         'patch.h',

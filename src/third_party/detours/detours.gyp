@@ -4,14 +4,18 @@
 {
 'targets':
 	[
-{
+    {
 		'target_name': 'detours',
-		'type': 'none',	
-		'includes': [
-            'detours.gypi',
-          ],
+		'type': 'static_library',	
+		'includes': ['detours.gypi',],
+		'defines': [
+        'DETOURS_32BIT=1',
+        'DETOURS_X86=1',
+       ],
 		'sources/': [
-        ['exclude', '.*'],
+        ['exclude', 'Makefile'],
+		['exclude', 'detours.gypi'],
+		['exclude', 'uimports.cpp'],
        ],
 	},
 	]

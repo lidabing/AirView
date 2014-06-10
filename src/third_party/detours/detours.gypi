@@ -4,8 +4,15 @@
 {
       'sources': [
         'detours.h',
-		'detours.lib',
 		'detver.h',
 		'syelog.h',
+		'creatwth.cpp',
+		'detours.cpp',
+		'disasm.cpp',
+		'image.cpp',
+		'modules.cpp',
+		'uimports.cpp',
+		'Makefile',
+		'detours.gypi',
       ],
 }
