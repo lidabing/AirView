@@ -15,6 +15,8 @@
 			 'browser/mouse_gesture/mouse_gesture_commands.h',
 			 'browser/mouse_gesture/mouse_gesture_profile.cc',
 			 'browser/mouse_gesture/mouse_gesture_profile.h',
+			 'browser/chrome_browser_main_extra_parts_airview.cc',
+			 'browser/chrome_browser_main_extra_parts_airview.h',
                          ],
                       } ],
    ],

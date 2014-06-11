@@ -9,6 +9,8 @@
 #include "base/hook_manager.h"
 
 class MouseGestureHook : public base::HookItem{
+public:
+	MouseGestureHook(){}
 private:
 	virtual bool Install() OVERRIDE;
 	virtual void UnInstall() OVERRIDE;

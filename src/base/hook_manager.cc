@@ -7,7 +7,6 @@
 #include "base/hook_manager.h"
 #include "base/logging.h"
 #pragma comment(lib, "ws2_32.lib")
-#pragma comment(lib,".dir/../../third_party/detours/detours.lib")
 #include "third_party/detours/detours.h"
 namespace base{
 	void HookManager::Register(HookItem* item){

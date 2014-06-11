@@ -96,7 +96,7 @@ bool MouseGesture::DownEvent(const MSG*	msg){
 	return true;
 }
 bool MouseGesture::MoveEvent(const MSG*	msg){
-	if (!!MouseGestureProfile::GetInstance()->IsEnableMouseGesure())
+	if (!MouseGestureProfile::GetInstance()->IsEnableMouseGesure())
 		return true;
 
 	if (window_){
