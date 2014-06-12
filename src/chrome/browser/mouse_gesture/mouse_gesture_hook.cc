@@ -18,7 +18,7 @@ namespace {
 
 //== predef==============================
 LRESULT   WINAPI MainDispatchMessageW(const MSG* msg);
-LRESULT   WINAPI ExtensionDispatchMessageW(const MSG* msg);
+LRESULT   WINAPI PluginDispatchMessageW(const MSG* msg);
 LRESULT   WINAPI IEDispatchMessageW(const MSG* msg);
 //==predef end ==============================
 
@@ -30,7 +30,7 @@ static  LRESULT    WINAPI My_DispatchMessageW(const MSG *lpmsg){
 //plugin 进程
 static  LRESULT(WINAPI* RealPlugin_DispatchMessageW)(const MSG*) = NULL;
 static  LRESULT    WINAPI MyPlugin_DispatchMessageW(const MSG *lpmsg){
-	return RealPlugin_DispatchMessageW(lpmsg);
+	return PluginDispatchMessageW(lpmsg);
 }
 //hook define end=============================
 
@@ -160,7 +160,7 @@ LRESULT  WINAPI MainDispatchMessageW(const MSG* msg){
 	return Real_DispatchMessageW(msg);
 }
 //扩展进程
-LRESULT  WINAPI ExtensionDispatchMessageW(const MSG* msg){
+LRESULT  WINAPI PluginDispatchMessageW(const MSG* msg){
 	return RealPlugin_DispatchMessageW(msg);
 }
 
