@@ -8,7 +8,6 @@
 #include "ui/gfx/rect.h"
 #include "base/logging.h"
 #include "chrome/browser/mouse_gesture/mouse_gesture_window.h"
-#include "chrome/browser/mouse_gesture/mouse_gesture_client.h"
 #include "chrome/browser/mouse_gesture/mouse_gesture_profile.h"
 
 namespace {
