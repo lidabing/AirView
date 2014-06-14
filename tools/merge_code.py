@@ -84,9 +84,12 @@ def commit_chromium_code_to_mirror(chromium_src_path,mirror_path,backup_path,top
              for name in files:
                  mirror_file = os.path.join(root,name)
                  chromium_src_file = combine_path(chromium_src_path,mirror_file[mirror_path_len:])
-                 backup_file = backup_path + mirror_file[mirror_path_len:]
-                 shutil.copyfile(chromium_src_file,mirror_file)
-                 print "COPY FILE:"+chromium_src_file + ' ---> '+ mirror_file
+                 if os.path.exists(chromium_src_file):
+                    backup_file = backup_path + mirror_file[mirror_path_len:]
+                    shutil.copyfile(chromium_src_file,mirror_file)
+                    print "COPY FILE:"+chromium_src_file + ' ---> '+ mirror_file
+                 else:
+                   print chromium_src_file + 'not exist';
          print "===done revert_chromium_code_from_backup==="
 
 
