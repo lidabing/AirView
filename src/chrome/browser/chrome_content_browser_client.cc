@@ -41,12 +41,9 @@
 #include "chrome/browser/extensions/extension_webkit_preferences.h"
 #include "chrome/browser/extensions/suggest_permission_util.h"
 #include "chrome/browser/geolocation/chrome_access_token_store.h"
+#include "chrome/browser/geolocation/geolocation_permission_context.h"
+#include "chrome/browser/geolocation/geolocation_permission_context_factory.h"
 #include "chrome/browser/google/google_util.h"
-#include "chrome/browser/guest_view/ad_view/ad_view_guest.h"
-#include "chrome/browser/guest_view/guest_view_base.h"
-#include "chrome/browser/guest_view/guest_view_constants.h"
-#include "chrome/browser/guest_view/guest_view_manager.h"
-#include "chrome/browser/guest_view/web_view/web_view_guest.h"
 #include "chrome/browser/media/cast_transport_host_filter.h"
 #include "chrome/browser/media/media_capture_devices_dispatcher.h"
 #include "chrome/browser/metrics/chrome_browser_main_extra_parts_metrics.h"
@@ -231,6 +228,10 @@
 #endif
 
 #if defined(ENABLE_EXTENSIONS)
+#include "chrome/browser/guest_view/guest_view_base.h"
+#include "chrome/browser/guest_view/guest_view_constants.h"
+#include "chrome/browser/guest_view/guest_view_manager.h"
+#include "chrome/browser/guest_view/web_view/web_view_guest.h"
 #include "chrome/browser/renderer_host/chrome_extension_message_filter.h"
 #endif
 
@@ -777,7 +778,9 @@ void ChromeContentBrowserClient::GetStoragePartitionConfigForSite(
   partition_name->clear();
   *in_memory = false;
 
-  bool success = WebViewGuest::GetGuestPartitionConfigForSite(
+  bool success = false;
+#if defined(ENABLE_EXTENSIONS)
+  success = WebViewGuest::GetGuestPartitionConfigForSite(
       site, partition_domain, partition_name, in_memory);
 
   if (!success && site.SchemeIs(extensions::kExtensionScheme)) {
@@ -802,7 +805,11 @@ void ChromeContentBrowserClient::GetStoragePartitionConfigForSite(
       *in_memory = false;
       partition_name->clear();
     }
-  } else if (site.GetOrigin().spec() == kChromeUIChromeSigninURL) {
+    success = true;
+  }
+#endif
+
+  if (!success && (site.GetOrigin().spec() == kChromeUIChromeSigninURL)) {
     // Chrome signin page has an embedded iframe of extension and web content,
     // thus it must be isolated from other webUI pages.
     *partition_domain = chrome::kChromeUIChromeSigninHost;
@@ -828,6 +835,7 @@ void ChromeContentBrowserClient::GuestWebContentsCreated(
     WebContents* opener_web_contents,
     content::BrowserPluginGuestDelegate** guest_delegate,
     scoped_ptr<base::DictionaryValue> extra_params) {
+#if defined(ENABLE_EXTENSIONS)
   if (!guest_site_instance) {
     NOTREACHED();
     return;
@@ -855,10 +863,7 @@ void ChromeContentBrowserClient::GuestWebContentsCreated(
 
   if (opener_web_contents) {
     GuestViewBase* guest = GuestViewBase::FromWebContents(opener_web_contents);
-    if (!guest) {
-      NOTREACHED();
-      return;
-    }
+    DCHECK(guest);
 
     // Create a new GuestViewBase of the same type as the opener.
     *guest_delegate = GuestViewBase::Create(
@@ -884,12 +889,16 @@ void ChromeContentBrowserClient::GuestWebContentsCreated(
                             guest_web_contents,
                             extension_id,
                             api_type);
+#else
+  NOTREACHED();
+#endif  // defined(ENABLE_EXTENSIONS)
 }
 
 void ChromeContentBrowserClient::GuestWebContentsAttached(
     WebContents* guest_web_contents,
     WebContents* embedder_web_contents,
     const base::DictionaryValue& extra_params) {
+#if defined(ENABLE_EXTENSIONS)
   GuestViewBase* guest = GuestViewBase::FromWebContents(guest_web_contents);
   if (!guest) {
     // It's ok to return here, since we could be running a browser plugin
@@ -899,6 +908,9 @@ void ChromeContentBrowserClient::GuestWebContentsAttached(
     return;
   }
   guest->Attach(embedder_web_contents, extra_params);
+#else
+  NOTREACHED();
+#endif  // defined(ENABLE_EXTENSIONS)
 }
 
 void ChromeContentBrowserClient::RenderProcessWillLaunch(
@@ -958,8 +970,12 @@ void ChromeContentBrowserClient::RenderProcessWillLaunch(
 
   RendererContentSettingRules rules;
   if (host->IsIsolatedGuest()) {
+#if defined(ENABLE_EXTENSIONS)
     GuestViewBase::GetDefaultContentSettingRules(&rules,
                                                  profile->IsOffTheRecord());
+#else
+    NOTREACHED();
+#endif
   } else {
     GetRendererContentSettingRules(
         profile->GetHostContentSettingsMap(), &rules);
@@ -1663,7 +1679,6 @@ void ChromeContentBrowserClient::AppendExtraCommandLineSwitches(
       switches::kDisableExtensionsResourceWhitelist,
       switches::kDisablePnacl,
       switches::kDisableScriptedPrintThrottling,
-      switches::kEnableAdview,
       switches::kEnableAppWindowControls,
       switches::kEnableBenchmarking,
       switches::kEnableNaCl,
@@ -1750,9 +1765,9 @@ std::string ChromeContentBrowserClient::GetAcceptLangs(
   return profile->GetPrefs()->GetString(prefs::kAcceptLanguages);
 }
 
-gfx::ImageSkia* ChromeContentBrowserClient::GetDefaultFavicon() {
+const gfx::ImageSkia* ChromeContentBrowserClient::GetDefaultFavicon() {
   ResourceBundle& rb = ResourceBundle::GetSharedInstance();
-  return rb.GetImageSkiaNamed(IDR_DEFAULT_FAVICON);
+  return rb.GetNativeImageNamed(IDR_DEFAULT_FAVICON).ToImageSkia();
 }
 
 bool ChromeContentBrowserClient::AllowAppCache(
@@ -2132,6 +2147,20 @@ void ChromeContentBrowserClient::ShowDesktopNotification(
 #else
   NOTIMPLEMENTED();
 #endif
+}
+
+void ChromeContentBrowserClient::RequestGeolocationPermission(
+    content::WebContents* web_contents,
+    int bridge_id,
+    const GURL& requesting_frame,
+    bool user_gesture,
+    base::Callback<void(bool)> result_callback,
+    base::Closure* cancel_callback) {
+  GeolocationPermissionContextFactory::GetForProfile(
+      Profile::FromBrowserContext(web_contents->GetBrowserContext()))->
+          RequestGeolocationPermission(web_contents, bridge_id,
+                                       requesting_frame, user_gesture,
+                                       result_callback, cancel_callback);
 }
 
 bool ChromeContentBrowserClient::CanCreateWindow(
@@ -2645,6 +2674,18 @@ void ChromeContentBrowserClient::GetAdditionalMappedFilesForChildProcess(
     }
   }
 
+  base::FilePath app_data_path;
+  PathService::Get(base::DIR_ANDROID_APP_DATA, &app_data_path);
+  DCHECK(!app_data_path.empty());
+
+  flags = base::File::FLAG_OPEN | base::File::FLAG_READ;
+  base::FilePath icudata_path =
+      app_data_path.AppendASCII("icudtl.dat");
+  base::File icudata_file(icudata_path, flags);
+  DCHECK(icudata_file.IsValid());
+  mappings->push_back(FileDescriptorInfo(kAndroidICUDataDescriptor,
+                                         FileDescriptor(icudata_file.Pass())));
+
 #else
   int crash_signal_fd = GetCrashSignalFD(command_line);
   if (crash_signal_fd >= 0) {
@@ -2689,6 +2730,11 @@ void ChromeContentBrowserClient::PreSpawnRenderer(
 }
 #endif
 
+content::DevToolsManagerDelegate*
+ChromeContentBrowserClient::GetDevToolsManagerDelegate() {
+  return new ChromeDevToolsManagerDelegate();
+}
+
 bool ChromeContentBrowserClient::IsPluginAllowedToCallRequestOSFileHandle(
     content::BrowserContext* browser_context,
     const GURL& url) {
@@ -2726,11 +2772,6 @@ bool ChromeContentBrowserClient::IsPluginAllowedToUseDevChannelAPIs() {
 #else
   return false;
 #endif
-}
-
-content::DevToolsManagerDelegate*
-ChromeContentBrowserClient::GetDevToolsManagerDelegate() {
-  return new ChromeDevToolsManagerDelegate();
 }
 
 net::CookieStore*
