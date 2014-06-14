@@ -245,11 +245,11 @@ PBYTE CDetourDis::CopyInstruction(PBYTE pbDst, PBYTE pbSrc)
 PBYTE CDetourDis::CopyBytes(REFCOPYENTRY pEntry, PBYTE pbDst, PBYTE pbSrc)
 {
 #ifdef DETOURS_X64
-#error Feature not supported in this release.
-
-
-
-
+	LONG nBytesFixed = (pEntry->nFlagBits & ADDRESS)
+		? (m_bAddressOverride ? 5 : 9)      // For move A0-A3
+		: ((pEntry->nFlagBits & RAX)
+		? (m_bRaxOverride ? 9 : 5)      // For move B8
+		: (m_bOperandOverride ? pEntry->nFixedSize16 : pEntry->nFixedSize));
 #else
     LONG nBytesFixed = (pEntry->nFlagBits & ADDRESS)
         ? (m_bAddressOverride ? pEntry->nFixedSize16 : pEntry->nFixedSize)
@@ -283,9 +283,9 @@ PBYTE CDetourDis::CopyBytes(REFCOPYENTRY pEntry, PBYTE pbDst, PBYTE pbSrc)
         }
         else if (bFlags & RIP) {
 #ifdef DETOURS_X64
-#error Feature not supported in this release.
-
-
+			nBytesFixed = nBytes;
+			nRelOffset = nBytes - (4 + pEntry->nTargetBack);
+			cbTarget = 4;
 #endif
         }
     }
@@ -294,10 +294,10 @@ PBYTE CDetourDis::CopyBytes(REFCOPYENTRY pEntry, PBYTE pbDst, PBYTE pbSrc)
     if (nRelOffset) {
         *m_ppbTarget = AdjustTarget(pbDst, pbSrc, nBytesFixed, nRelOffset, cbTarget);
 #ifdef DETOURS_X64
-#error Feature not supported in this release.
-
-
-
+		if (pEntry->nRelOffset == 0) {
+			// This is a data target, not a code target, so we shoulnd't return it.
+			*m_ppbTarget = NULL;
+		}
 #endif
     }
     if (pEntry->nFlagBits & NOENLARGE) {
@@ -498,9 +498,9 @@ PBYTE CDetourDis::CopyFF(REFCOPYENTRY pEntry, PBYTE pbDst, PBYTE pbSrc)
 
     if (0x15 == pbSrc[1] || 0x25 == pbSrc[1]) {         // CALL [], JMP []
 #ifdef DETOURS_X64
-#error Feature not supported in this release.
-
-
+		INT32 offset = *(INT32 *)&pbSrc[2];
+		PBYTE *ppbTarget = (PBYTE *)(pbSrc + 6 + offset);
+		*m_ppbTarget = *ppbTarget;
 #else
         PBYTE *ppbTarget = *(PBYTE**)&pbSrc[2];
         *m_ppbTarget = *ppbTarget;
@@ -605,22 +605,22 @@ const CDetourDis::COPYENTRY CDetourDis::s_rceCopyTable[257] =
     { 0x3E, ENTRY_CopyBytesPrefix },                    // DS prefix
     { 0x3F, ENTRY_CopyBytes1 },                         // AAS
 #ifdef DETOURS_X64 // For Rax Prefix
-#error Feature not supported in this release.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+	{ 0x40, ENTRY_CopyBytesRax },                       // Rax
+	{ 0x41, ENTRY_CopyBytesRax },                       // Rax
+	{ 0x42, ENTRY_CopyBytesRax },                       // Rax
+	{ 0x43, ENTRY_CopyBytesRax },                       // Rax
+	{ 0x44, ENTRY_CopyBytesRax },                       // Rax
+	{ 0x45, ENTRY_CopyBytesRax },                       // Rax
+	{ 0x46, ENTRY_CopyBytesRax },                       // Rax
+	{ 0x47, ENTRY_CopyBytesRax },                       // Rax
+	{ 0x48, ENTRY_CopyBytesRax },                       // Rax
+	{ 0x49, ENTRY_CopyBytesRax },                       // Rax
+	{ 0x4A, ENTRY_CopyBytesRax },                       // Rax
+	{ 0x4B, ENTRY_CopyBytesRax },                       // Rax
+	{ 0x4C, ENTRY_CopyBytesRax },                       // Rax
+	{ 0x4D, ENTRY_CopyBytesRax },                       // Rax
+	{ 0x4E, ENTRY_CopyBytesRax },                       // Rax
+	{ 0x4F, ENTRY_CopyBytesRax },                       // Rax
 #else
     { 0x40, ENTRY_CopyBytes1 },                         // INC
     { 0x41, ENTRY_CopyBytes1 },                         // INC

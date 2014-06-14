@@ -6,7 +6,7 @@
 	[
     {
 		'target_name': 'detours',
-		'type': 'static_library',	
+		'type': 'static_library',
 		'includes': ['detours.gypi',],
 		'conditions': [
 		['target_arch == "ia32"', {
@@ -20,8 +20,13 @@
         'DETOURS_64BIT=1',
         'DETOURS_X64=1',
         ],
+		'configurations': {
+            'Common_Base': {
+              'msvs_target_platform': 'x64',
+            },
+          },
 		}],
-		]
+		],
 		'sources/': [
         ['exclude', 'Makefile'],
 		['exclude', 'detours.gypi'],

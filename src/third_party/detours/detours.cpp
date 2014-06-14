@@ -207,134 +207,122 @@ inline ULONG detour_is_code_filler(PBYTE pbCode)
 ///////////////////////////////////////////////////////////////////////// X64.
 //
 #ifdef DETOURS_X64
-#error Feature not supported in this release.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+struct _DETOUR_TRAMPOLINE
+{
+	// An X64 instuction can be 15 bytes long.
+	// In practice 11 seems to be the limit.
+	BYTE            rbCode[30];     // target code + jmp to pbRemain.
+	BYTE            cbCode;         // size of moved target code.
+	BYTE            cbCodeBreak;    // padding to make debugging easier.
+	BYTE            rbRestore[30];  // original target code.
+	BYTE            cbRestore;      // size of original target code.
+	BYTE            cbRestoreBreak; // padding to make debugging easier.
+	_DETOUR_ALIGN   rAlign[8];      // instruction alignment array.
+	PBYTE           pbRemain;       // first instruction after moved code. [free list]
+	PBYTE           pbDetour;       // first instruction of detour function.
+	BYTE            rbCodeIn[8];    // jmp [pbDetour]
+};
+
+C_ASSERT(sizeof(_DETOUR_TRAMPOLINE) == 96);
+
+enum {
+	SIZE_OF_JMP = 5
+};
+
+inline PBYTE detour_gen_jmp_immediate(PBYTE pbCode, PBYTE pbJmpVal)
+{
+	PBYTE pbJmpSrc = pbCode + 5;
+	*pbCode++ = 0xE9;   // jmp +imm32
+	*((INT32*&)pbCode)++ = (INT32)(pbJmpVal - pbJmpSrc);
+	return pbCode;
+}
+
+inline PBYTE detour_gen_jmp_indirect(PBYTE pbCode, PBYTE *ppbJmpVal)
+{
+	PBYTE pbJmpSrc = pbCode + 6;
+	*pbCode++ = 0xff;   // jmp [+imm32]
+	*pbCode++ = 0x25;
+	*((INT32*&)pbCode)++ = (INT32)((PBYTE)ppbJmpVal - pbJmpSrc);
+	return pbCode;
+}
+
+inline PBYTE detour_gen_brk(PBYTE pbCode, PBYTE pbLimit)
+{
+	while (pbCode < pbLimit) {
+		*pbCode++ = 0xcc;   // brk;
+	}
+	return pbCode;
+}
+
+inline PBYTE detour_skip_jmp(PBYTE pbCode, PVOID *ppGlobals)
+{
+	if (pbCode == NULL) {
+		return NULL;
+	}
+	if (ppGlobals != NULL) {
+		*ppGlobals = NULL;
+	}
+
+	// First, skip over the import vector if there is one.
+	if (pbCode[0] == 0xff && pbCode[1] == 0x25) {   // jmp [+imm32]
+		// Looks like an import alias jump, then get the code it points to.
+		PBYTE pbTarget = pbCode + 6 + *(INT32 *)&pbCode[2];
+		if (detour_is_imported(pbCode, pbTarget)) {
+			PBYTE pbNew = *(PBYTE *)pbTarget;
+			DETOUR_TRACE(("%p->%p: skipped over import table.\n", pbCode, pbNew));
+			pbCode = pbNew;
+		}
+	}
+
+	// Then, skip over a patch jump
+	if (pbCode[0] == 0xeb) {   // jmp +imm8
+		PBYTE pbNew = pbCode + 2 + *(CHAR *)&pbCode[1];
+		DETOUR_TRACE(("%p->%p: skipped over short jump.\n", pbCode, pbNew));
+		pbCode = pbNew;
+
+		// Finally, skip over a long jump if it is the target of the patch jump.
+		if (pbCode[0] == 0xe9) {   // jmp +imm32
+			PBYTE pbNew = pbCode + 5 + *(INT32 *)&pbCode[1];
+			DETOUR_TRACE(("%p->%p: skipped over long jump.\n", pbCode, pbNew));
+			pbCode = pbNew;
+		}
+	}
+	return pbCode;
+}
+
+inline BOOL detour_does_code_end_function(PBYTE pbCode)
+{
+	if (pbCode[0] == 0xeb ||    // jmp +imm8
+		pbCode[0] == 0xe9 ||    // jmp +imm32
+		pbCode[0] == 0xe0 ||    // jmp eax
+		pbCode[0] == 0xc2 ||    // ret +imm8
+		pbCode[0] == 0xc3 ||    // ret
+		pbCode[0] == 0xcc) {    // brk
+		return TRUE;
+	}
+	else if (pbCode[0] == 0xff && pbCode[1] == 0x25) {  // jmp [+imm32]
+		return TRUE;
+	}
+	else if ((pbCode[0] == 0x26 ||      // jmp es:
+		pbCode[0] == 0x2e ||      // jmp cs:
+		pbCode[0] == 0x36 ||      // jmp ss:
+		pbCode[0] == 0xe3 ||      // jmp ds:
+		pbCode[0] == 0x64 ||      // jmp fs:
+		pbCode[0] == 0x65) &&     // jmp gs:
+		pbCode[1] == 0xff &&       // jmp [+imm32]
+		pbCode[2] == 0x25) {
+		return TRUE;
+	}
+	return FALSE;
+}
+
+inline BOOL detour_is_code_filler(PBYTE pbCode)
+{
+	if (pbCode[0] == 0x90) {
+		return TRUE; //nop
+	}
+	return FALSE;
+}
 #endif // DETOURS_X64
 
 //////////////////////////////////////////////////////////////////////// IA64.
@@ -1128,11 +1116,11 @@ LONG WINAPI DetourTransactionCommitEx(PVOID **pppFailedPointer)
 #endif // DETOURS_X86
 
 #ifdef DETOURS_X64
-#error Feature not supported in this release.
+			*o->ppbPointer = o->pbTarget;
 #endif // DETOURS_X64
 
 #ifdef DETOURS_ARM
-#error Feature not supported in this release.
+*o->ppbPointer = o->pbTarget;
 #endif // DETOURS_ARM
         }
         else {
@@ -1158,10 +1146,10 @@ LONG WINAPI DetourTransactionCommitEx(PVOID **pppFailedPointer)
 #endif // DETOURS_IA64
 
 #ifdef DETOURS_X64
-#error Feature not supported in this release.
-
-
-
+			detour_gen_jmp_indirect(o->pTrampoline->rbCodeIn, &o->pTrampoline->pbDetour);
+			PBYTE pbCode = detour_gen_jmp_immediate(o->pbTarget, o->pTrampoline->rbCodeIn);
+			pbCode = detour_gen_brk(pbCode, o->pTrampoline->pbRemain);
+			*o->ppbPointer = o->pTrampoline->rbCode;
 #endif // DETOURS_X64
 
 #ifdef DETOURS_X86
@@ -1245,8 +1233,8 @@ LONG WINAPI DetourTransactionCommitEx(PVOID **pppFailedPointer)
 #endif // DETOURS_X86
 
 #ifdef DETOURS_X64
-#error Feature not supported in this release.
-
+#define DETOURS_EIP         Rip
+#define DETOURS_EIP_TYPE    DWORD64
 #endif // DETOURS_X64
 
 #ifdef DETOURS_IA64
@@ -1682,8 +1670,8 @@ LONG WINAPI DetourAttachEx(PVOID *ppPointer,
 
     pbTrampoline = pTrampoline->rbCode + pTrampoline->cbCode;
 #ifdef DETOURS_X64
-#error Feature not supported in this release.
-
+	pbTrampoline = detour_gen_jmp_indirect(pbTrampoline, &pTrampoline->pbRemain);
+	pbTrampoline = detour_gen_brk(pbTrampoline, pbPool);
 #endif // DETOURS_X64
 
 #ifdef DETOURS_X86
