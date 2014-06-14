@@ -9,16 +9,16 @@
 #include "ui/gfx/native_widget_types.h"
 #include "chrome/browser/mouse_gesture/mouse_gesture.h"
 
-class MouseGestureProfile{
-public:
-	static MouseGestureProfile* GetInstance() {
-		return Singleton<MouseGestureProfile>::get();
-	}
-	MouseGestureProfile();
-	~MouseGestureProfile(){}
+class MouseGestureProfile {
+ public:
+  static MouseGestureProfile* GetInstance() {
+    return Singleton<MouseGestureProfile>::get();
+  }
+  MouseGestureProfile();
+  ~MouseGestureProfile() {}
 
-	bool IsEnableMouseGesure();
-	gfx::NativeView CurrentTabWidgetWindow();
-	void OnMouseGestureAction(XMouseGestures& action);
+  bool IsEnableMouseGesure();
+  gfx::NativeView CurrentTabWidgetWindow();
+  void OnMouseGestureAction(XMouseGestures& action);
 };
-#endif//
+#endif  //

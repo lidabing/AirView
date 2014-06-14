@@ -8,40 +8,40 @@
 #include "base/logging.h"
 #pragma comment(lib, "ws2_32.lib")
 #include "third_party/detours/detours.h"
-namespace base{
-	void HookManager::Register(HookItem* item){
-		item_list_.push_back(item);
-	}
-	void HookManager::Install(){
-		if(item_list_.empty())
-			return;
-		DetourTransactionBegin();  
-		DetourUpdateThread( GetCurrentThread() );  
-		{
-			std::vector<HookItem*>::iterator iter = item_list_.begin();
-			for(;iter != item_list_.end(); iter++ ){
-				(*iter)->Install();
-			}
-		}
-		long res;
-		res = DetourTransactionCommit();  
-		if(res != NO_ERROR){
-			DLOG(ERROR)<< "hook  install error";
-		}
-	}
-	void HookManager::UnInstall(){
-		if(item_list_.empty())
-			return;
-		DetourTransactionBegin();  
-		DetourUpdateThread(GetCurrentThread());  
-		{
-			std::vector<HookItem*>::iterator iter = item_list_.begin();
-			for(;iter != item_list_.end(); iter++ ){
-				(*iter)->UnInstall();
-				delete (*iter);
-			}
-			item_list_.clear();
-		}
-		DetourTransactionCommit();  
-	}
+namespace base {
+void HookManager::Register(HookItem* item) {
+  item_list_.push_back(item);
+}
+void HookManager::Install() {
+  if (item_list_.empty())
+    return;
+  DetourTransactionBegin();
+  DetourUpdateThread(GetCurrentThread());
+  {
+    std::vector<HookItem*>::iterator iter = item_list_.begin();
+    for (; iter != item_list_.end(); iter++) {
+      (*iter)->Install();
+    }
+  }
+  long res;
+  res = DetourTransactionCommit();
+  if (res != NO_ERROR) {
+    DLOG(ERROR) << "hook  install error";
+  }
+}
+void HookManager::UnInstall() {
+  if (item_list_.empty())
+    return;
+  DetourTransactionBegin();
+  DetourUpdateThread(GetCurrentThread());
+  {
+    std::vector<HookItem*>::iterator iter = item_list_.begin();
+    for (; iter != item_list_.end(); iter++) {
+      (*iter)->UnInstall();
+      delete (*iter);
+    }
+    item_list_.clear();
+  }
+  DetourTransactionCommit();
+}
 }

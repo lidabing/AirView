@@ -1,11 +1,10 @@
-// Copyright (c) 2014 The AirView Authors. All rights reserved.
+Ôªø// Copyright (c) 2014 The AirView Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
 #ifndef AIR_VIEW_CONTENT_BROWSER_MOUSER_GESTURE_MOUSE_GESTURE_WINDOW_H_
 #define AIR_VIEW_CONTENT_BROWSER_MOUSER_GESTURE_MOUSE_GESTURE_WINDOW_H_
 
-#include "base/basictypes.h"
 #include <tchar.h>
 #include <atlcrack.h>
 #include <atltrace.h>
@@ -14,45 +13,47 @@
 #include <atlwin.h>
 #include <vector>
 #include <string>
-// Û±Í ÷ ∆ ¬º˛¥¶¿Ì
-typedef std::vector<POINT>   XMousePath; // Û±ÍπÏº£¬∑æ∂
+#include "base/basictypes.h"
 
-class MouseGestureWindow :
-	public CWindowImpl < MouseGestureWindow > {
-public:
-	MouseGestureWindow();
+//Èº†Ê†áÊâãÂäø‰∫ã‰ª∂Â§ÑÁêÜ
+typedef std::vector<POINT> XMousePath;  //Èº†Ê†áËΩ®ËøπË∑ØÂæÑ
 
-	DECLARE_WND_CLASS(L"MouseGestureWindowClass")
-	BEGIN_MSG_MAP(MouseGestureWindow)
-		MESSAGE_HANDLER(WM_DESTROY, OnDestroy)
-		MESSAGE_HANDLER(WM_CREATE, OnCreate)
-		MSG_WM_ERASEBKGND(OnEraseBkgnd)
-		MESSAGE_HANDLER(WM_PAINT, OnPaint)
-		MSG_WM_CAPTURECHANGED(OnCaptureChanged)
-	END_MSG_MAP()
+class MouseGestureWindow : public CWindowImpl<MouseGestureWindow> {
+ public:
+  MouseGestureWindow();
 
-	void		OnCaptureChanged(CWindow window);
-	BOOL		OnEraseBkgnd(CDCHandle dc);
-	LRESULT		OnPaint(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
-	LRESULT		OnDestroy(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
-	LRESULT		OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+  DECLARE_WND_CLASS(L"MouseGestureWindowClass")
+  BEGIN_MSG_MAP(MouseGestureWindow)
+  MESSAGE_HANDLER(WM_DESTROY, OnDestroy)
+  MESSAGE_HANDLER(WM_CREATE, OnCreate)
+  MSG_WM_ERASEBKGND(OnEraseBkgnd)
+  MESSAGE_HANDLER(WM_PAINT, OnPaint)
+  MSG_WM_CAPTURECHANGED(OnCaptureChanged)
+  END_MSG_MAP()
 
-	bool		OnRButtonDown(const MSG *msg);
-	bool		OnRButtonUp(const MSG *msg);
-	bool		OnMouseMove(const MSG *msg);
-	void		OnPaintSkia();
+  void OnCaptureChanged(CWindow window);
+  BOOL OnEraseBkgnd(CDCHandle dc);
+  LRESULT OnPaint(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+  LRESULT OnDestroy(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+  LRESULT OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 
-	int			Get2PointDistance(POINT& start_point, POINT& end_point);
-	void		Init(HWND event_window);
+  bool OnRButtonDown(const MSG* msg);
+  bool OnRButtonUp(const MSG* msg);
+  bool OnMouseMove(const MSG* msg);
+  void OnPaintSkia();
 
-	XMousePath& GetPath();
-private:
-	HWND				event_window_; // ¬º˛¥∞ø⁄
-	RECT				event_window_rect_;// ¬º˛¥∞ø⁄«¯”Ú
-	XMousePath			path_;//¬∑æ∂
-	bool				should_draw_line_;/// «∑Ò∏ƒªÆœﬂ
+  int Get2PointDistance(POINT& start_point, POINT& end_point);
+  void Init(HWND event_window);
 
-	DISALLOW_COPY_AND_ASSIGN(MouseGestureWindow);
+  XMousePath& GetPath();
+
+ private:
+  HWND event_window_;       //‰∫ã‰ª∂Á™óÂè£
+  RECT event_window_rect_;  //‰∫ã‰ª∂Á™óÂè£Âå∫Âüü
+  XMousePath path_;         //Ë∑ØÂæÑ
+  bool should_draw_line_;   ///ÊòØÂê¶ÊîπÂàíÁ∫ø
+
+  DISALLOW_COPY_AND_ASSIGN(MouseGestureWindow);
 };
 
-#endif //AIR_VIEW_CONTENT_BROWSER_MOUSER_GESTURE_MOUSE_GESTURE_WINDOW_H_
+#endif  // AIR_VIEW_CONTENT_BROWSER_MOUSER_GESTURE_MOUSE_GESTURE_WINDOW_H_

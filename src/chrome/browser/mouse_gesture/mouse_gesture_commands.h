@@ -7,4 +7,4 @@
 #include "base/basictypes.h"
 #include "base/memory/singleton.h"
 
-#endif//
+#endif  //

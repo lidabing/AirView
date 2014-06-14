@@ -11,31 +11,32 @@
 #include "content/public/browser/render_view_host.h"
 #include "content/public/browser/render_widget_host_view.h"
 
-MouseGestureProfile::MouseGestureProfile(){}
+MouseGestureProfile::MouseGestureProfile() {
+}
 
-
-bool MouseGestureProfile::IsEnableMouseGesure(){
+bool MouseGestureProfile::IsEnableMouseGesure() {
 #if 0
 	PrefService* prefs = prefs_util::GetLastUsedPrefService();
 	return prefs->GetBoolean(prefs::kXMouseGestureEnabled);
 #endif
-	return true;
+  return true;
 }
-gfx::NativeView MouseGestureProfile::CurrentTabWidgetWindow(){
-	Browser* browser = BrowserList::GetInstance(chrome::GetActiveDesktop())->GetLastActive();
-	if (browser){
-		content::WebContents* web_contents = browser->tab_strip_model()->GetActiveWebContents();
-		if (web_contents){
-			content::RenderViewHost* rvh = web_contents->GetRenderViewHost();
-			if (rvh){
-				content::RenderWidgetHostView* rwvh = rvh->GetView();
-				if (rwvh)
-					return rwvh->GetNativeView();
-			}
-		}
-	}
-	return NULL;
+gfx::NativeView MouseGestureProfile::CurrentTabWidgetWindow() {
+  Browser* browser =
+      BrowserList::GetInstance(chrome::GetActiveDesktop())->GetLastActive();
+  if (browser) {
+    content::WebContents* web_contents =
+        browser->tab_strip_model()->GetActiveWebContents();
+    if (web_contents) {
+      content::RenderViewHost* rvh = web_contents->GetRenderViewHost();
+      if (rvh) {
+        content::RenderWidgetHostView* rwvh = rvh->GetView();
+        if (rwvh)
+          return rwvh->GetNativeView();
+      }
+    }
+  }
+  return NULL;
 }
-void MouseGestureProfile::OnMouseGestureAction(XMouseGestures& action){
-
+void MouseGestureProfile::OnMouseGestureAction(XMouseGestures& action) {
 }

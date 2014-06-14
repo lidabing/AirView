@@ -4,6 +4,7 @@
 {
  'conditions': [
       ['OS=="win" ',{
+	         'dependencies': ['../third_party/detours/detours.gyp:detours',],
              'sources': [
              'browser/mouse_gesture/mouse_gesture.cc',
              'browser/mouse_gesture/mouse_gesture.h',

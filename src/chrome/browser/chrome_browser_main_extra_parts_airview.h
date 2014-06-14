@@ -11,27 +11,26 @@
 #endif
 #include "chrome/browser/chrome_browser_main_extra_parts.h"
 
-
 class ChromeBrowserMainParts;
 
 namespace chrome {
-	void AddAirViewExtraParts(ChromeBrowserMainParts* main_parts);
+void AddAirViewExtraParts(ChromeBrowserMainParts* main_parts);
 }
 
 class BrowserMainExtraPartsAirView : public ChromeBrowserMainExtraParts {
-public:
-	BrowserMainExtraPartsAirView(){}
-	virtual ~BrowserMainExtraPartsAirView(){}
+ public:
+  BrowserMainExtraPartsAirView() {}
+  virtual ~BrowserMainExtraPartsAirView() {}
 
-	// Overridden from ChromeBrowserMainExtraParts:
-	virtual void PreEarlyInitialization() OVERRIDE;
-	virtual void PostEarlyInitialization() OVERRIDE;
-	virtual void PostMainMessageLoopRun() OVERRIDE;
+  // Overridden from ChromeBrowserMainExtraParts:
+  virtual void PreEarlyInitialization() OVERRIDE;
+  virtual void PostEarlyInitialization() OVERRIDE;
+  virtual void PostMainMessageLoopRun() OVERRIDE;
 
-private:
+ private:
 #if defined(OS_WIN)
-	base::HookManager hook_manager_;
+  base::HookManager hook_manager_;
 #endif
-	DISALLOW_COPY_AND_ASSIGN(BrowserMainExtraPartsAirView);
+  DISALLOW_COPY_AND_ASSIGN(BrowserMainExtraPartsAirView);
 };
 #endif
