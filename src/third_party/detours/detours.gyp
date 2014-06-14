@@ -8,10 +8,20 @@
 		'target_name': 'detours',
 		'type': 'static_library',	
 		'includes': ['detours.gypi',],
+		'conditions': [
+		['target_arch == "ia32"', {
 		'defines': [
         'DETOURS_32BIT=1',
         'DETOURS_X86=1',
-       ],
+        ],
+		}],
+		['target_arch == "x64"', {
+		'defines': [
+        'DETOURS_64BIT=1',
+        'DETOURS_X64=1',
+        ],
+		}],
+		]
 		'sources/': [
         ['exclude', 'Makefile'],
 		['exclude', 'detours.gypi'],
