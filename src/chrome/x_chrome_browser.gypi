@@ -16,6 +16,8 @@
 			 'browser/mouse_gesture/mouse_gesture_commands.h',
 			 'browser/mouse_gesture/mouse_gesture_profile.cc',
 			 'browser/mouse_gesture/mouse_gesture_profile.h',
+			 'browser/hotkey/bosskey_handler.cc',
+			 'browser/hotkey/bosskey_handler.h',
 			 'browser/chrome_browser_main_extra_parts_airview.cc',
 			 'browser/chrome_browser_main_extra_parts_airview.h',
                          ],
