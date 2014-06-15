@@ -3,9 +3,9 @@
 #found in the LICENSE file.
 {
   'sources' :[
-               'commom/x_chrome_switches.cc',
-               'commom/x_chrome_switches.h',
-               'commom/x_pref_names.cc',
-               'commom/x_pref_names.h',
+               'common/x_chrome_switches.cc',
+               'common/x_chrome_switches.h',
+               'common/x_pref_names.cc',
+               'common/x_pref_names.h',
              ],
 }

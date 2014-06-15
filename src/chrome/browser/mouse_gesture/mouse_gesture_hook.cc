@@ -75,8 +75,13 @@ bool RightButtonUpHandler(const MSG* msg, LRESULT& result) {
         break;
       }
 
-      //如果手势没被处理，传递双击消息给窗口
-      if (0 == GetWindowLong(g_hwnd, GWL_WNDPROC)) {
+//如果手势没被处理，传递双击消息给窗口
+#if defined(_WIN64)
+      int value = GWLP_WNDPROC;
+#else
+      int value = GWL_WNDPROC;
+#endif
+      if (0 == GetWindowLong(g_hwnd, value)) {
         result = 0;
         break;
       }
