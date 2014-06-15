@@ -7,6 +7,7 @@
 #include "base/threading/thread_local.h"
 #include "ui/base/accelerators/accelerator.h"
 #include "ui/events/keycodes/keyboard_code_conversion_win.h"
+#include "chrome/browser/hotkey/bosskey_profile.h"
 
 base::LazyInstance<base::ThreadLocalPointer<BossKeyHandler> > lazy_tls_ptr =
     LAZY_INSTANCE_INITIALIZER;
@@ -26,23 +27,23 @@ BossKeyHandler::~BossKeyHandler() {
 
 bool BossKeyHandler::Start() {
   has_hotkey_ = false;
-#if 0
-		ContentBrowserClient* browser_client = GetContentClient()->browser();
-		if(!browser_client || !browser_client->GetHotkeyClient())
-			return false;
-		if(browser_client->GetHotkeyClient()->IsEnableHotkey()){
-			ui::Accelerator accelertor = browser_client->GetHotkeyClient()->GetHotkey();
-			int modifiers = 0;
-			if(accelertor.IsAltDown())
-				modifiers = modifiers | MOD_ALT;
-			if(accelertor.IsCtrlDown())
-				modifiers = modifiers |MOD_CONTROL;
-			if(accelertor.IsShiftDown())
-				modifiers = modifiers |MOD_SHIFT;
-			if(modifiers)
-				has_hotkey_ = RegisterHotKey(hwnd(), hotkey_id, modifiers, ui::WindowsKeyCodeForKeyboardCode(accelertor.key_code())) == TRUE;
-		}
-#endif
+  if (BosskeyProfile::GetInstance()->IsEnableHotkey()) {
+    ui::Accelerator accelertor = BosskeyProfile::GetInstance()->GetHotkey();
+    int modifiers = 0;
+    if (accelertor.IsAltDown())
+      modifiers = modifiers | MOD_ALT;
+    if (accelertor.IsCtrlDown())
+      modifiers = modifiers | MOD_CONTROL;
+    if (accelertor.IsShiftDown())
+      modifiers = modifiers | MOD_SHIFT;
+    if (modifiers)
+      has_hotkey_ =
+          RegisterHotKey(
+              hwnd(),
+              hotkey_id,
+              modifiers,
+              ui::WindowsKeyCodeForKeyboardCode(accelertor.key_code())) == TRUE;
+  }
   return has_hotkey_;
 }
 
@@ -65,10 +66,10 @@ bool BossKeyHandler::UpdateBossKeyState() {
 // Handle the registered Hotkey being pressed.
 void BossKeyHandler::OnHotKey(int id, UINT vcode, UINT modifiers) {
 #if 0
-		ContentBrowserClient* browser_client = GetContentClient()->browser();
-		if(!browser_client || !browser_client->GetHotkeyClient())
-			return false;
-		browser_client->GetHotkeyClient()->OnBosskeyCommand();
+  ContentBrowserClient* browser_client = GetContentClient()->browser();
+  if (!browser_client || !browser_client->GetHotkeyClient())
+    return false;
+  browser_client->GetHotkeyClient()->OnBosskeyCommand();
 #endif
 }
 

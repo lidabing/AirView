@@ -30,8 +30,11 @@ class BossKeyHandler : public gfx::WindowImpl {
   void OnHotKey(int id, UINT vcode, UINT modifiers);
 
   bool has_hotkey_;
+
+ private:
+  //DISALLOW_COPY_AND_ASSIGN(BossKeyHandler);
 };
 
 bool BossKeyHandler_UpdateBossKeyState();
 
-#endif //CHROME_BROWSER_HOTKEY_HOTKEY_HANDLER_H_
+#endif  // CHROME_BROWSER_HOTKEY_HOTKEY_HANDLER_H_
