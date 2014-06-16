@@ -8,6 +8,12 @@
 #include "ui/base/accelerators/accelerator.h"
 #include "ui/events/keycodes/keyboard_code_conversion_win.h"
 #include "chrome/browser/hotkey/bosskey_profile.h"
+#include "content/public/browser/web_contents.h"
+#include "content/public/browser/render_view_host.h"
+#include "content/public/browser/render_widget_host_view.h"
+#include "chrome/browser/ui/browser_window.h"
+#include "chrome/browser/ui/browser.h"
+#include "chrome/browser/ui/browser_list.h"
 
 base::LazyInstance<base::ThreadLocalPointer<BossKeyHandler> > lazy_tls_ptr =
     LAZY_INSTANCE_INITIALIZER;
@@ -76,8 +82,6 @@ void BossKeyHandler::OnWndProc(HWND hwnd,
   if (accelerator == boss_accelerator) {
     OnBossKey();
   }
-
-  // NotifyKeyPressed(accelerator);
 }
 
 // static
@@ -93,17 +97,30 @@ bool BossKeyHandler::UpdateBossKeyState() {
 
 // Handle the registered OnBossKey being pressed.
 void BossKeyHandler::OnBossKey() {
-#if 0
-  ContentBrowserClient* browser_client = GetContentClient()->browser();
-  if (!browser_client || !browser_client->GetHotkeyClient())
-    return false;
-  browser_client->GetHotkeyClient()->OnBosskeyCommand();
-#endif
+  static bool all_browser_hide = false;
+  BrowserList* browser_list =
+      BrowserList::GetInstance(chrome::GetActiveDesktop());
+  if (!browser_list)
+    return;
+  if (!all_browser_hide) {
+    all_browser_hide = true;
+    //在这里隐藏所有窗口
+    BrowserList::const_iterator iter = browser_list->begin();
+    for (; iter != browser_list->end(); iter++) {
+      (*iter)->window()->Show();
+      // (*iter)->window()->OnBossKeyShow(false);
+    }
+  } else {
+    all_browser_hide = false;
+    //在这里显示所有窗口
+    BrowserList::const_iterator iter = browser_list->begin();
+    for (; iter != browser_list->end(); iter++) {
+      (*iter)->window()->Hide();
+      // (*iter)->window()->OnBossKeyShow(true);
+    }
+  }
 }
 
 bool BossKeyHandler_UpdateBossKeyState() {
-#if 0
-  return content::BossKeyHandler::current()->UpdateBossKeyState();
-#endif
-  return false;
+  return BossKeyHandler::current()->UpdateBossKeyState();
 }
