@@ -5,15 +5,27 @@
 #ifndef BASE_PATCH_H_
 #define BASE_PATCH_H_
 //给class打补丁的基础代码
-#define PATCH_CLASS(X) public:
-X##Patch* patch() {
-  return &patch_;
-}
 
-private:
-friend class X##Patch;
-X##Patch patch_;
+#define X_PATCH_THIS(C)                \
+ public:                                \
+  C##Patch* patch() { return &patch_; } \
+                                        \
+ private:                               \
+  friend class C##Patch;                \
+  C##Patch patch_;
 
-#define PATCH_CLASS_INIT(X) patch_(this),
+//#define X_CLASS_PATCH_INIT(C) patch_(this),
+
+#define X_START_CLASS_PATCH(C)        \
+  class C;                            \
+  class C##Patch {                    \
+    C##Patch(X* that) : that_(that) { 
+
+
+#define X_END_PATCH(C) \
+ private:              \
+  C* that_;            \
+  }                    \
+  ;
 
 #endif

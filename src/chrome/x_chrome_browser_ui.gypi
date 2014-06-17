@@ -5,5 +5,7 @@
        'sources' :[
                     'browser/ui/views/frame/browser_view_patch.h',
                     'browser/ui/views/frame/browser_view_patch.cc',
+					'browser/ui/views/tabs/tab_patch.cc',
+					'browser/ui/views/tabs/tab_patch.h',
                   ]
 }
