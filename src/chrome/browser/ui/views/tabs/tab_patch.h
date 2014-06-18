@@ -19,6 +19,6 @@ void Constructor(Profile* profile) {
 bool  OnMousePressed(const ui::MouseEvent& event,bool& handle);
 private:
 Profile* profile_;
-X_END_PATCH(Tab)
+X_END_CLASS_PATCH(Tab)
 
 #endif

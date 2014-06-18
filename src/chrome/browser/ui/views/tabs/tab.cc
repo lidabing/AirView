@@ -396,6 +396,9 @@ Tab::Tab(TabController* controller)
       showing_icon_(false),
       showing_media_indicator_(false),
       showing_close_button_(false),
+	  ///airview patch{
+	  X_PATCH_CLASS_INIT(Tab),
+	  ///}
       close_button_color_(0) {
   DCHECK(controller);
   InitTabResources();

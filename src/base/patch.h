@@ -4,27 +4,32 @@
 
 #ifndef BASE_PATCH_H_
 #define BASE_PATCH_H_
+#include "base/basictypes.h"
+#include "base/compiler_specific.h"
+
 //给class打补丁的基础代码
 
 #define X_PATCH_THIS(C)                \
  public:                                \
-  C##Patch* patch() { return &patch_; } \
+ C##Patch* patch_##C() { return &patch_; } \
                                         \
  private:                               \
   friend class C##Patch;                \
   C##Patch patch_;
 
-//#define X_CLASS_PATCH_INIT(C) patch_(this),
+#define X_PATCH_CLASS_INIT(C) patch_(this)
 
 #define X_START_CLASS_PATCH(C)        \
   class C;                            \
   class C##Patch {                    \
-    C##Patch(X* that) : that_(that) { 
+  C##Patch(C* that) : that_(that) { }
 
 
-#define X_END_PATCH(C) \
+#define X_END_CLASS_PATCH(C) \
  private:              \
+ friend class C;\
   C* that_;            \
+  DISALLOW_COPY_AND_ASSIGN(C##Patch);\
   }                    \
   ;
 

@@ -18,6 +18,9 @@
 #include "ui/views/controls/button/button.h"
 #include "ui/views/controls/glow_hover_controller.h"
 #include "ui/views/view.h"
+///airview patch{
+#include "chrome/browser/ui/views/tabs/tab_patch.h"
+///}
 
 class TabController;
 
@@ -363,6 +366,10 @@ class Tab : public gfx::AnimationDelegate,
   // As the majority of the tabs are inactive, and painting tabs is slowish,
   // we cache a handful of the inactive tab backgrounds here.
   static ImageCache* image_cache_;
+
+  ///airview patch{
+  X_PATCH_THIS(Tab);
+  ///}
 
   DISALLOW_COPY_AND_ASSIGN(Tab);
 };
