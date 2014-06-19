@@ -9,28 +9,27 @@
 
 //给class打补丁的基础代码
 
-#define X_PATCH_THIS(C)                \
- public:                                \
- C##Patch* patch_##C() { return &patch_; } \
-                                        \
- private:                               \
-  friend class C##Patch;                \
+#define X_PATCH_THIS(C)                     \
+ public:                                    \
+  C##Patch* patch_##C() { return &patch_; } \
+                                            \
+ private:                                   \
+  friend class C##Patch;                    \
   C##Patch patch_;
 
 #define X_PATCH_CLASS_INIT(C) patch_(this)
 
-#define X_START_CLASS_PATCH(C)        \
-  class C;                            \
-  class C##Patch {                    \
-  C##Patch(C* that) : that_(that) { }
+#define X_START_CLASS_PATCH(C) \
+  class C;                     \
+  class C##Patch {             \
+    C##Patch(C* that) : that_(that) {}
 
-
-#define X_END_CLASS_PATCH(C) \
- private:              \
- friend class C;\
-  C* that_;            \
-  DISALLOW_COPY_AND_ASSIGN(C##Patch);\
-  }                    \
+#define X_END_CLASS_PATCH(C)          \
+ private:                             \
+  friend class C;                     \
+  C* that_;                           \
+  DISALLOW_COPY_AND_ASSIGN(C##Patch); \
+  }                                   \
   ;
 
 #endif

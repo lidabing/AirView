@@ -396,9 +396,9 @@ Tab::Tab(TabController* controller)
       showing_icon_(false),
       showing_media_indicator_(false),
       showing_close_button_(false),
-	  ///airview patch{
-	  X_PATCH_CLASS_INIT(Tab),
-	  ///}
+      /// airview patch{
+      X_PATCH_CLASS_INIT(Tab),
+      ///}
       close_button_color_(0) {
   DCHECK(controller);
   InitTabResources();
@@ -664,6 +664,10 @@ void Tab::ButtonPressed(views::Button* sender, const ui::Event& event) {
 void Tab::ShowContextMenuForView(views::View* source,
                                  const gfx::Point& point,
                                  ui::MenuSourceType source_type) {
+  /// airview patch{
+  if (!patch_.ShouldShowContextMenu())
+    return;
+  ///}
   if (!closing())
     controller_->ShowContextMenuForTab(this, point, source_type);
 }
@@ -857,6 +861,12 @@ bool Tab::GetTooltipTextOrigin(const gfx::Point& p, gfx::Point* origin) const {
 }
 
 bool Tab::OnMousePressed(const ui::MouseEvent& event) {
+  /// airview patch{
+  bool handled = false;
+  bool ret = patch_.OnMousePressed(event, handled);
+  if (handled)
+    return ret;
+  ///}
   controller_->OnMouseEventInTab(this, event);
 
   // Allow a right click from touch to drag, which corresponds to a long click.
@@ -899,6 +909,12 @@ bool Tab::OnMouseDragged(const ui::MouseEvent& event) {
 }
 
 void Tab::OnMouseReleased(const ui::MouseEvent& event) {
+  /// airview patch{
+  bool handled = false;
+  patch_.OnMouseReleased(event, handled);
+  if (handled)
+    return;
+  ///}
   controller_->OnMouseEventInTab(this, event);
 
   // Notify the drag helper that we're done with any potential drag operations.

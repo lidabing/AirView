@@ -17,7 +17,8 @@ void Constructor(Profile* profile) {
 // handle 是否处理了该消息，如果处理了，那么不需要继续往下处理
 //这里用来处理双击关闭消息
 bool OnMousePressed(const ui::MouseEvent& event, bool& handle);
-
+bool ShouldShowContextMenu();
+bool OnMouseReleased(const ui::MouseEvent& event, bool& handle);
  private:
 Profile* profile_;
 X_END_CLASS_PATCH(Tab)
