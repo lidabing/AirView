@@ -1948,6 +1948,9 @@ void BrowserView::InitViews() {
       new BrowserTabStripController(browser_.get(),
                                     browser_->tab_strip_model());
   tabstrip_ = new TabStrip(tabstrip_controller);
+  ///airview patch{
+  tabstrip_->patch_TabStrip()->Constructor(browser_->profile());
+  ///}
   top_container_->AddChildView(tabstrip_);
   tabstrip_controller->InitFromModel(tabstrip_);
 

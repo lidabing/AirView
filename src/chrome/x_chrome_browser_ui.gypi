@@ -7,5 +7,7 @@
                     'browser/ui/views/frame/browser_view_patch.cc',
 					'browser/ui/views/tabs/tab_patch.cc',
 					'browser/ui/views/tabs/tab_patch.h',
+					'browser/ui/views/tabs/tab_strip_patch.h',
+					'browser/ui/views/tabs/tab_strip_patch.cc',
                   ]
 }
