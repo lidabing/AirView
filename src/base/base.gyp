@@ -659,6 +659,9 @@
         '../third_party/icu/icu.gyp:icuuc',
       ],
       'includes': ['../build/nocompile.gypi'],
+	   #airview patch{
+	  'includes': [ 'x_base_unittest.gypi' ],
+	  #}
       'variables': {
          # TODO(ajwong): Is there a way to autodetect this?
         'module_dir': 'base'
