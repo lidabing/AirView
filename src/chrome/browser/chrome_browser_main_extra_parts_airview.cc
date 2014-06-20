@@ -35,7 +35,7 @@ void BrowserMainExtraPartsAirView::PreMainMessageLoopStart() {
 
 void BrowserMainExtraPartsAirView::PostMainMessageLoopStart() {
 #if defined(OS_WIN)
-  DCHECK(bosskey_handler_.get());
+  DCHECK(!bosskey_handler_.get());
   bosskey_handler_.reset(new BossKeyHandler());
 #endif
 }
