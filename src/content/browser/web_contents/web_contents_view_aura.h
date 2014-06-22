@@ -17,7 +17,9 @@
 #include "ui/aura/window_observer.h"
 #include "ui/compositor/layer_animation_observer.h"
 #include "ui/wm/public/drag_drop_delegate.h"
-
+///airview patch{
+#include "content/browser/web_contents/web_contents_view_aura_patch.h"
+///}
 namespace aura {
 class Window;
 }
@@ -225,7 +227,9 @@ class WebContentsViewAura
 
   scoped_ptr<TouchEditableImplAura> touch_editable_;
   scoped_ptr<GestureNavSimple> gesture_nav_simple_;
-
+  ///airview patch{
+  X_PATCH_THIS(WebContentsViewAura);
+  ///}
   DISALLOW_COPY_AND_ASSIGN(WebContentsViewAura);
 };
 

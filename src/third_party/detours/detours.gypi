@@ -5,7 +5,6 @@
   'sources' :[
                'detours.h',
                'detver.h',
-               'syelog.h',
                'creatwth.cpp',
                'detours.cpp',
                'disasm.cpp',

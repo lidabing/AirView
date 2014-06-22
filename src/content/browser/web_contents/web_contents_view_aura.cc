@@ -720,6 +720,9 @@ WebContentsViewAura::WebContentsViewAura(
       overscroll_change_brightness_(false),
       current_overscroll_gesture_(OVERSCROLL_NONE),
       completed_overscroll_gesture_(OVERSCROLL_NONE),
+     ///airview patch{
+     X_PATCH_CLASS_INIT(WebContentsViewAura),
+     ///}
       touch_editable_(TouchEditableImplAura::Create()) {
 }
 
@@ -1501,6 +1504,9 @@ void WebContentsViewAura::OnDragEntered(const ui::DropTargetEvent& event) {
     drag_dest_delegate_->OnReceiveDragData(event.data());
     drag_dest_delegate_->OnDragEnter();
   }
+  ///airview patch{
+  patch_.OnDragEntered(event);
+  ///}
 }
 
 int WebContentsViewAura::OnDragUpdated(const ui::DropTargetEvent& event) {
@@ -1521,6 +1527,9 @@ int WebContentsViewAura::OnDragUpdated(const ui::DropTargetEvent& event) {
   if (drag_dest_delegate_)
     drag_dest_delegate_->OnDragOver();
 
+  ///airview patch{
+  patch_.OnDragUpdated(event);
+  ///}
   return ConvertFromWeb(current_drag_op_);
 }
 
@@ -1536,6 +1545,9 @@ void WebContentsViewAura::OnDragExited() {
   if (drag_dest_delegate_)
     drag_dest_delegate_->OnDragLeave();
 
+  ///airview patch{
+  patch_.OnDragExited();
+  ///}
   current_drop_data_.reset();
 }
 
@@ -1553,6 +1565,9 @@ int WebContentsViewAura::OnPerformDrop(const ui::DropTargetEvent& event) {
       ConvertAuraEventFlagsToWebInputEventModifiers(event.flags()));
   if (drag_dest_delegate_)
     drag_dest_delegate_->OnDrop();
+  ///airview patch{
+  patch_.OnPerformDrop(event);
+  ///}
   current_drop_data_.reset();
   return ConvertFromWeb(current_drag_op_);
 }
