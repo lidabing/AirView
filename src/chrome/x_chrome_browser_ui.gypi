@@ -8,6 +8,8 @@
 					'browser/ui/views/tabs/tab_patch.cc',
 					'browser/ui/views/tabs/tab_patch.h',
 					'browser/ui/views/tabs/tab_strip_patch.h',
+					'browser/ui/views/tab_contents/chrome_web_contents_view_delegate_views_patch.h',
+					'browser/ui/views/tab_contents/chrome_web_contents_view_delegate_views_patch.cc',
 					'browser/ui/aura/tab_contents/web_drag_handler_aura.cc',
 					'browser/ui/aura/tab_contents/web_drag_handler_aura.h',
                   ]

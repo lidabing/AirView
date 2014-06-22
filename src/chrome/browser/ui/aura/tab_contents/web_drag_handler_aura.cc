@@ -4,13 +4,19 @@
 
 #include "chrome/browser/ui/aura/tab_contents/web_drag_handler_aura.h"
 
-void WebDragHanderAura::OnDragEntered(const ui::DropTargetEvent& event) {
+WebDragHanlderAura::WebDragHanlderAura(content::WebContents* contents){
+
 }
-int WebDragHanderAura::OnDragUpdated(const ui::DropTargetEvent& event) {
-	return 0;
+WebDragHanlderAura::~WebDragHanlderAura(){
+
 }
-void WebDragHanderAura::OnDragExited() {
+void WebDragHanlderAura::OnDragEntered(const ui::DropTargetEvent& event) {
 }
-int WebDragHanderAura::OnPerformDrop(const ui::DropTargetEvent& event) {
-	return 0;
+int WebDragHanlderAura::OnDragUpdated(const ui::DropTargetEvent& event) {
+return 0;
+}
+void WebDragHanlderAura::OnDragExited() {
+}
+int WebDragHanlderAura::OnPerformDrop(const ui::DropTargetEvent& event) {
+return 0;
 }

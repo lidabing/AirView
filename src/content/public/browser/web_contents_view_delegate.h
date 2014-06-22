@@ -11,6 +11,9 @@
 
 #include "content/common/content_export.h"
 #include "ui/gfx/native_widget_types.h"
+///airview patch{
+#include "content/public/browser/web_contents_view_delegate_patch.h"
+///}
 
 #if defined(OS_MACOSX)
 @protocol RenderWidgetHostViewMacDelegate;
@@ -59,6 +62,9 @@ class CONTENT_EXPORT WebContentsViewDelegate {
       CreateRenderWidgetHostViewDelegate(
           RenderWidgetHost* render_widget_host) = 0;
 #endif
+  ///airview patch{
+  X_PATCH_INTERFACE(WebContentsViewDelegate)
+  ///}
 };
 
 }  // namespace content
