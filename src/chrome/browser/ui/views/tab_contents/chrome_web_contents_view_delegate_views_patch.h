@@ -10,13 +10,16 @@
 #include "base/compiler_specific.h"
 #include "base/memory/scoped_ptr.h"
 #include "ui/wm/public/drag_drop_delegate.h"
+#include "content/public/browser/web_contents_view_delegate_patch.h"
 
-X_START_CLASS_PATCH_(ChromeWebContentsViewDelegateViews, X_INTERFACE_PATCH_NAME(WebContentsViewDelegate))
-public:
-//X_INTERFACE_PATCH_NAME(WebContentsViewDelegate)
+X_START_CLASS_PATCH_(ChromeWebContentsViewDelegateViews,
+                     X_INTERFACE_PATCH_NAME_(content, WebContentsViewDelegate))
+ public:
+// X_INTERFACE_PATCH_NAME(WebContentsViewDelegate)
 virtual aura::client::DragDropDelegate* WebDragDropDelegate() OVERRIDE;
-private:
-scoped_ptr<aura::client::DragDropDelegate> web_drag_drop_delegate_;
+
+ private:
+//scoped_ptr<aura::client::DragDropDelegate> web_drag_drop_delegate_;
 
 X_END_CLASS_PATCH(ChromeWebContentsViewDelegateViews)
 

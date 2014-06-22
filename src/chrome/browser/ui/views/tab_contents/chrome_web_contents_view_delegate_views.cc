@@ -28,6 +28,9 @@ using web_modal::WebContentsModalDialogManager;
 ChromeWebContentsViewDelegateViews::ChromeWebContentsViewDelegateViews(
     content::WebContents* web_contents)
     : ContextMenuDelegate(web_contents),
+    ///airview patch{
+    X_PATCH_CLASS_INIT(ChromeWebContentsViewDelegateViews),
+    ///}
       web_contents_(web_contents) {
   last_focused_view_storage_id_ =
       views::ViewStorage::GetInstance()->CreateStorageID();

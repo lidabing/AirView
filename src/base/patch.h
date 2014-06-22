@@ -8,6 +8,8 @@
 #include "base/compiler_specific.h"
 
 // PATCH CLASS
+#define X_CLASS_PATCH_NAME(C) C##Patch
+
 #define X_PATCH_THIS(C)                     \
  public:                                    \
   C##Patch* patch_##C() { return &patch_; } \
@@ -39,6 +41,7 @@
 
 // PATCH INTERFACE
 #define X_INTERFACE_PATCH_NAME(iface) iface##Patch
+#define X_INTERFACE_PATCH_NAME_(nspace,iface) nspace::iface##Patch
 
 #define X_PATCH_INTERFACE(iface) \
  public:                         \

@@ -10,6 +10,9 @@
 #include "base/memory/scoped_ptr.h"
 #include "chrome/browser/renderer_context_menu/context_menu_delegate.h"
 #include "content/public/browser/web_contents_view_delegate.h"
+///airview patch{
+#include "chrome/browser/ui/views/tab_contents/chrome_web_contents_view_delegate_views_patch.h"
+///}
 
 class RenderViewContextMenu;
 class RenderViewContextMenuViews;
@@ -73,6 +76,9 @@ class ChromeWebContentsViewDelegateViews
   scoped_ptr<content::WebDragDestDelegate> bookmark_handler_;
 
   content::WebContents* web_contents_;
+  ///airview patch{
+  X_PATCH_THIS(ChromeWebContentsViewDelegateViews)
+  ///}
 
   DISALLOW_COPY_AND_ASSIGN(ChromeWebContentsViewDelegateViews);
 };

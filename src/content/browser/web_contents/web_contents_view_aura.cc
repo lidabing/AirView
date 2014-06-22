@@ -1089,6 +1089,11 @@ void WebContentsViewAura::CreateView(
   // platforms as well.
   if (delegate_)
     drag_dest_delegate_ = delegate_->GetDragDestDelegate();
+  ///airview patch{
+  if(delegate_->patch_WebContentsViewDelegate())
+    patch_.Constructor(
+     delegate_->patch_WebContentsViewDelegate()->WebDragDropDelegate());
+  ///}
 }
 
 RenderWidgetHostViewBase* WebContentsViewAura::CreateViewForWidget(

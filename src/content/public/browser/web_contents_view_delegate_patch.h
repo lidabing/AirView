@@ -13,8 +13,10 @@
 #include "content/common/content_export.h"
 #include "ui/gfx/native_widget_types.h"
 
+namespace content {
 X_START_INTERFACE_PATCH(CONTENT_EXPORT, WebContentsViewDelegate)
 virtual aura::client::DragDropDelegate* WebDragDropDelegate() = 0;
 X_END_INTERFACE_PATCH(WebContentsViewDelegate)
+}
 
 #endif

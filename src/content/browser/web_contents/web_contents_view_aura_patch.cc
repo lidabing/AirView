@@ -6,15 +6,22 @@
 #include "content/browser/web_contents/web_contents_view_aura.h"
 
 namespace content {
-void WebContentsViewAuraPatch::OnDragEntered(const ui::DropTargetEvent& event) {
+void X_CLASS_PATCH_NAME(WebContentsViewAura)::Constructor(
+    aura::client::DragDropDelegate* dest) {
+  web_drag_dest_delegate_ = dest;
 }
-int WebContentsViewAuraPatch::OnDragUpdated(const ui::DropTargetEvent& event) {
-	//that_->current_drag_op_ = blink::WebDragOperationMove;
+void X_CLASS_PATCH_NAME(WebContentsViewAura)::OnDragEntered(
+    const ui::DropTargetEvent& event) {
+}
+int X_CLASS_PATCH_NAME(WebContentsViewAura)::OnDragUpdated(
+    const ui::DropTargetEvent& event) {
+  // that_->current_drag_op_ = blink::WebDragOperationMove;
   return 1;
 }
-void WebContentsViewAuraPatch::OnDragExited() {
+void X_CLASS_PATCH_NAME(WebContentsViewAura)::OnDragExited() {
 }
-int WebContentsViewAuraPatch::OnPerformDrop(const ui::DropTargetEvent& event) {
-	return 1;
+int X_CLASS_PATCH_NAME(WebContentsViewAura)::OnPerformDrop(
+    const ui::DropTargetEvent& event) {
+  return 1;
 }
 }
