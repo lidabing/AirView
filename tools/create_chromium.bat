@@ -8,6 +8,6 @@ cd ../..
 cd chromium
 cd src
 set GYP_MSVS_VERSION=2013
-set GYP_GENERATORS=msvs-ninja,ninja
+set GYP_GENERATORS=msvs-ninja,ninja incremental_chrome_dll=1 disable_nacl=1
 python build/gyp_chromium --depth=.
 
