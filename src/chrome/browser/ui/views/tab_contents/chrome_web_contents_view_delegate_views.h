@@ -77,6 +77,7 @@ class ChromeWebContentsViewDelegateViews
 
   content::WebContents* web_contents_;
   ///airview patch{
+  X_PATCH_INTERFACE_IMPL(content, WebContentsViewDelegate)
   X_PATCH_THIS(ChromeWebContentsViewDelegateViews)
   ///}
 

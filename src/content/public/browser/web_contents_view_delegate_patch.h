@@ -9,13 +9,13 @@
 #include "base/basictypes.h"
 #include "base/compiler_specific.h"
 #include "base/memory/scoped_ptr.h"
-#include "ui/wm/public/drag_drop_delegate.h"
 #include "content/common/content_export.h"
 #include "ui/gfx/native_widget_types.h"
 
 namespace content {
+	class 		 XWebDragDropDelegate;
 X_START_INTERFACE_PATCH(CONTENT_EXPORT, WebContentsViewDelegate)
-virtual aura::client::DragDropDelegate* WebDragDropDelegate() = 0;
+virtual content::XWebDragDropDelegate* WebDragDropDelegate() = 0;
 X_END_INTERFACE_PATCH(WebContentsViewDelegate)
 }
 

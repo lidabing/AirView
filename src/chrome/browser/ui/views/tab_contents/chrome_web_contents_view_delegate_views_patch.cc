@@ -4,7 +4,9 @@
 
 #include "chrome/browser/ui/views/tab_contents/chrome_web_contents_view_delegate_views_patch.h"
 #include "chrome/browser/ui/aura/tab_contents/web_drag_handler_aura.h"
-aura::client::DragDropDelegate* X_CLASS_PATCH_NAME(
+content::XWebDragDropDelegate* X_CLASS_PATCH_NAME(
     ChromeWebContentsViewDelegateViews)::WebDragDropDelegate() {
+  web_drag_drop_delegate_.reset(new WebDragHanlderAura());
+  return web_drag_drop_delegate_.get();
   return NULL;
 }

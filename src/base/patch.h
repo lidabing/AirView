@@ -39,9 +39,14 @@
   }                                   \
   ;
 
+//[TODO](lidabing):interface and class has some complex,make it simple!
 // PATCH INTERFACE
 #define X_INTERFACE_PATCH_NAME(iface) iface##Patch
 #define X_INTERFACE_PATCH_NAME_(nspace,iface) nspace::iface##Patch
+
+#define X_PATCH_INTERFACE_IMPL(nspace,base) \
+   public:                                    \
+ virtual nspace::base##Patch* patch_##base() { return &patch_; }
 
 #define X_PATCH_INTERFACE(iface) \
  public:                         \
