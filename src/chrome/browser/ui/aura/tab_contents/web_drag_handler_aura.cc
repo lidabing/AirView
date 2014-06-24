@@ -7,6 +7,9 @@
 #include "chrome/browser/autocomplete/autocomplete_classifier_factory.h"
 #include "chrome/browser/autocomplete/autocomplete_input.h"
 #include "chrome/browser/autocomplete/autocomplete_match.h"
+#include "chrome/browser/ui/browser_commands_patch.h"
+#include "chrome/browser/ui/browser.h"
+#include "chrome/browser/ui/browser_list.h"
 #include "chrome/browser/profiles/profile.h"
 #include "ui/base/dragdrop/drag_drop_types.h"
 #include "ui/base/dragdrop/os_exchange_data.h"
@@ -45,6 +48,25 @@ int WebDragHanlderAura::OnPerformDrop(const ui::DropTargetEvent& event) {
   } else {
     mapped_data.SetURL(url, base::string16());
   }
+  BrowserList* browser_list =
+      BrowserList::GetInstance(chrome::GetActiveDesktop());
+
+  chrome::OpenDragDropUrl(browser_list->GetLastActive(), web_contents_, url);
+  /*
+  chrome::NavigateParams params(browser_, url, content::PAGE_TRANSITION_LINK);
+  params.tabstrip_index = index;
+
+  if (drop_before) {
+    content::RecordAction(UserMetricsAction("Tab_DropURLBetweenTabs"));
+    params.disposition = NEW_FOREGROUND_TAB;
+  } else {
+    content::RecordAction(UserMetricsAction("Tab_DropURLOnTab"));
+    params.disposition = CURRENT_TAB;
+    params.source_contents = model_->GetWebContentsAt(index);
+  }
+  params.window_action = chrome::NavigateParams::SHOW_WINDOW;
+  chrome::Navigate(&params);
+  */
   return 1;
 }
 
@@ -59,11 +81,10 @@ bool WebDragHanlderAura::GetPasteAndGoURL(const ui::OSExchangeData& data,
   text = AutocompleteMatch::SanitizeString(text);
 
   AutocompleteMatch match;
-  Profile* profile = Profile::FromBrowserContext(
-      web_contents_->GetBrowserContext());
-  AutocompleteClassifierFactory::GetForProfile(profile)
-      ->Classify(
-          text, false, false, AutocompleteInput::INVALID_SPEC, &match, NULL);
+  Profile* profile =
+      Profile::FromBrowserContext(web_contents_->GetBrowserContext());
+  AutocompleteClassifierFactory::GetForProfile(profile)->Classify(
+      text, false, false, AutocompleteInput::INVALID_SPEC, &match, NULL);
   if (!match.destination_url.is_valid())
     return false;
 
