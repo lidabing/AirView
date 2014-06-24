@@ -60,6 +60,14 @@ class TabStrip : public views::View,
  public:
   static const char kViewClassName[];
 
+  // Horizontal offset for the new tab button to bring it closer to the
+  // rightmost tab.
+  static const int kNewTabButtonHorizontalOffset;
+
+  // The vertical offset of the tab strip button. This offset applies only to
+  // restored windows.
+  static const int kNewTabButtonVerticalOffset;
+
   explicit TabStrip(TabStripController* controller);
   virtual ~TabStrip();
 
@@ -109,6 +117,13 @@ class TabStrip : public views::View,
   // Sets the tab data at the specified model index.
   void SetTabData(int model_index, const TabRendererData& data);
 
+  // Returns true if the tab is not partly or fully clipped (due to overflow),
+  // and the tab couldn't become partly clipped due to changing the selected tab
+  // (for example, if currently the strip has the last tab selected, and
+  // changing that to the first tab would cause |tab| to be pushed over enough
+  // to clip).
+  bool ShouldTabBeVisible(const Tab* tab) const;
+
   // Invoked from the controller when the close initiates from the TabController
   // (the user clicked the tab close button or middle clicked the tab). This is
   // invoked from Close. Because of unload handlers Close is not always
@@ -129,7 +144,9 @@ class TabStrip : public views::View,
   }
 
   // Returns the Tab at |index|.
-  Tab* tab_at(int index) const;
+  Tab* tab_at(int index) const {
+    return static_cast<Tab*>(tabs_.view_at(index));
+  }
 
   // Returns the index of the specified tab in the model coordinate system, or
   // -1 if tab is closing or not valid.
@@ -175,9 +192,6 @@ class TabStrip : public views::View,
 
   // Set the background offset used by inactive tabs to match the frame image.
   void SetBackgroundOffset(const gfx::Point& offset);
-
-  // Returns the new tab button. This is never NULL.
-  views::View* newtab_button();
 
   // Sets a painting style with miniature "tab indicator" rectangles at the top.
   void SetImmersiveStyle(bool enable);
@@ -244,35 +258,11 @@ class TabStrip : public views::View,
   // Returns preferred height in immersive style.
   static int GetImmersiveHeight();
 
- protected:
-  // Horizontal gap between mini and non-mini-tabs.
-  static const int kMiniToNonMiniGap;
-
-  void set_ideal_bounds(int index, const gfx::Rect& bounds) {
-    tabs_.set_ideal_bounds(index, bounds);
-  }
-
-  // Returns the number of mini-tabs.
-  int GetMiniTabCount() const;
-
-  // views::ButtonListener implementation:
-  virtual void ButtonPressed(views::Button* sender,
-                             const ui::Event& event) OVERRIDE;
-
-  // View overrides.
-  virtual const views::View* GetViewByID(int id) const OVERRIDE;
-  virtual bool OnMousePressed(const ui::MouseEvent& event) OVERRIDE;
-  virtual bool OnMouseDragged(const ui::MouseEvent& event) OVERRIDE;
-  virtual void OnMouseReleased(const ui::MouseEvent& event) OVERRIDE;
-  virtual void OnMouseCaptureLost() OVERRIDE;
-  virtual void OnMouseMoved(const ui::MouseEvent& event) OVERRIDE;
-  virtual void OnMouseEntered(const ui::MouseEvent& event) OVERRIDE;
-
-  // ui::EventHandler overrides.
-  virtual void OnGestureEvent(ui::GestureEvent* event) OVERRIDE;
-
  private:
-  typedef std::map<int, std::vector<Tab*> > TabsClosingMap;
+  typedef std::vector<Tab*> Tabs;
+  typedef std::map<int, Tabs> TabsClosingMap;
+  typedef std::pair<TabsClosingMap::iterator,
+                    Tabs::iterator> FindClosingTabResult;
 
   class RemoveTabDelegate;
 
@@ -318,6 +308,16 @@ class TabStrip : public views::View,
     DISALLOW_COPY_AND_ASSIGN(DropInfo);
   };
 
+  // Horizontal gap between mini and non-mini-tabs.
+  static const int kMiniToNonMiniGap;
+
+  // The size of the new tab button must be hardcoded because we need to be
+  // able to lay it out before we are able to get its image from the
+  // ui::ThemeProvider.  It also makes sense to do this, because the size of the
+  // new tab button should not need to be calculated dynamically.
+  static const int kNewTabButtonAssetWidth;
+  static const int kNewTabButtonAssetHeight;
+
   void Init();
 
   // Creates and returns a new tab. The caller owners the returned tab.
@@ -348,6 +348,9 @@ class TabStrip : public views::View,
   // Invoked from Layout if the size changes or layout is really needed.
   void DoLayout();
 
+  // Sets the visibility state of all tabs based on ShouldTabBeVisible().
+  void SetTabVisibility();
+
   // Drags the active tab by |delta|. |initial_positions| is the x-coordinates
   // of the tabs when the drag started.
   void DragActiveTab(const std::vector<int>& initial_positions, int delta);
@@ -356,7 +359,7 @@ class TabStrip : public views::View,
   void SetIdealBoundsFromPositions(const std::vector<int>& positions);
 
   // Stacks the dragged tabs. This is used if the drag operation is
-  // MOVE_VISIBILE_TABS and the tabs don't fill the tabstrip. When this happens
+  // MOVE_VISIBLE_TABS and the tabs don't fill the tabstrip. When this happens
   // the active tab follows the mouse and the other tabs stack around it.
   void StackDraggedTabs(int delta);
 
@@ -366,19 +369,26 @@ class TabStrip : public views::View,
   // Invoked during drag to layout the tabs being dragged in |tabs| at
   // |location|. If |initial_drag| is true, this is the initial layout after the
   // user moved the mouse far enough to trigger a drag.
-  void LayoutDraggedTabsAt(const std::vector<Tab*>& tabs,
+  void LayoutDraggedTabsAt(const Tabs& tabs,
                            Tab* active_tab,
                            const gfx::Point& location,
                            bool initial_drag);
 
   // Calculates the bounds needed for each of the tabs, placing the result in
   // |bounds|.
-  void CalculateBoundsForDraggedTabs(const std::vector<Tab*>& tabs,
+  void CalculateBoundsForDraggedTabs(const Tabs& tabs,
                                      std::vector<gfx::Rect>* bounds);
 
   // Returns the size needed for the specified tabs. This is invoked during drag
   // and drop to calculate offsets and positioning.
-  int GetSizeNeededForTabs(const std::vector<Tab*>& tabs);
+  int GetSizeNeededForTabs(const Tabs& tabs);
+
+  // Returns the number of mini-tabs.
+  int GetMiniTabCount() const;
+
+  // Returns the last tab in the strip that's actually visible.  This will be
+  // the actual last tab unless the strip is in the overflow state.
+  const Tab* GetLastVisibleTab() const;
 
   // Adds the tab at |index| to |tabs_closing_map_| and removes the tab from
   // |tabs_|.
@@ -393,7 +403,7 @@ class TabStrip : public views::View,
   void UpdateTabsClosingMap(int index, int delta);
 
   // Used by TabDragController when the user starts or stops dragging tabs.
-  void StartedDraggingTabs(const std::vector<Tab*>& tabs);
+  void StartedDraggingTabs(const Tabs& tabs);
 
   // Invoked when TabDragController detaches a set of tabs.
   void DraggedTabsDetached();
@@ -402,7 +412,7 @@ class TabStrip : public views::View,
   // true if the move behavior is TabDragController::MOVE_VISIBILE_TABS.
   // |completed| is true if the drag operation completed successfully, false if
   // it was reverted.
-  void StoppedDraggingTabs(const std::vector<Tab*>& tabs,
+  void StoppedDraggingTabs(const Tabs& tabs,
                            const std::vector<int>& initial_positions,
                            bool move_only,
                            bool completed);
@@ -420,6 +430,10 @@ class TabStrip : public views::View,
 
   // Releases ownership of the current TabDragController.
   TabDragController* ReleaseDragController();
+
+  // Finds |tab| in the |tab_closing_map_| and returns a pair of iterators
+  // indicating precisely where it is.
+  FindClosingTabResult FindClosingTab(const Tab* tab);
 
   // Paints all the tabs in |tabs_closing_map_[index]|.
   void PaintClosingTabs(gfx::Canvas* canvas,
@@ -502,15 +516,13 @@ class TabStrip : public views::View,
   int GenerateIdealBoundsForMiniTabs(int* first_non_mini_index);
 
   // Returns the width needed for the new tab button (and padding).
-  static int new_tab_button_width();
-
-  // Returns the vertical offset of the tab strip button. This offset applies
-  // only to restored windows.
-  static int button_v_offset();
+  static int new_tab_button_width() {
+    return kNewTabButtonAssetWidth + kNewTabButtonHorizontalOffset;
+  }
 
   // Returns the width of the area that contains tabs. This does not include
   // the width of the new tab button.
-  int tab_area_width() const;
+  int tab_area_width() const { return width() - new_tab_button_width(); }
 
   // Starts various types of TabStrip animations.
   void StartResizeLayoutAnimation();
@@ -554,6 +566,22 @@ class TabStrip : public views::View,
   // used to track when the mouse truly exits the tabstrip and the stacked
   // layout is reset.
   void SetResetToShrinkOnExit(bool value);
+
+  // views::ButtonListener implementation:
+  virtual void ButtonPressed(views::Button* sender,
+                             const ui::Event& event) OVERRIDE;
+
+  // View overrides.
+  virtual const views::View* GetViewByID(int id) const OVERRIDE;
+  virtual bool OnMousePressed(const ui::MouseEvent& event) OVERRIDE;
+  virtual bool OnMouseDragged(const ui::MouseEvent& event) OVERRIDE;
+  virtual void OnMouseReleased(const ui::MouseEvent& event) OVERRIDE;
+  virtual void OnMouseCaptureLost() OVERRIDE;
+  virtual void OnMouseMoved(const ui::MouseEvent& event) OVERRIDE;
+  virtual void OnMouseEntered(const ui::MouseEvent& event) OVERRIDE;
+
+  // ui::EventHandler overrides.
+  virtual void OnGestureEvent(ui::GestureEvent* event) OVERRIDE;
 
   // -- Member Variables ------------------------------------------------------
 

@@ -59,6 +59,11 @@ class Tab : public gfx::AnimationDelegate,
   void set_dragging(bool dragging) { dragging_ = dragging; }
   bool dragging() const { return dragging_; }
 
+  // Used to mark the tab as having been detached.  Once this has happened, the
+  // tab should be invisibly closed.  This is irreversible.
+  void set_detached() { detached_ = true; }
+  bool detached() const { return detached_; }
+
   // Sets the container all animations run from.
   void set_animation_container(gfx::AnimationContainer* container);
 
@@ -101,6 +106,17 @@ class Tab : public gfx::AnimationDelegate,
   views::GlowHoverController* hover_controller() {
     return &hover_controller_;
   }
+
+  // Returns the inset within the first dragged tab to use when calculating the
+  // "drag insertion point".  If we simply used the x-coordinate of the tab,
+  // we'd be calculating based on a point well before where the user considers
+  // the tab to "be".  The value here is chosen to "feel good" based on the
+  // widths of the tab images and the tab overlap.
+  //
+  // Note that this must return a value smaller than the midpoint of any tab's
+  // width, or else the user won't be able to drag a tab to the left of the
+  // first tab in the strip.
+  static int leading_width_for_drag() { return 16; }
 
   // Returns the minimum possible size of a single unselected Tab.
   static gfx::Size GetMinimumUnselectedSize();
@@ -297,6 +313,9 @@ class Tab : public gfx::AnimationDelegate,
   // True if the tab is being dragged.
   bool dragging_;
 
+  // True if the tab has been detached.
+  bool detached_;
+
   // The offset used to animate the favicon location. This is used when the tab
   // crashes.
   int favicon_hiding_offset_;
@@ -370,7 +389,6 @@ class Tab : public gfx::AnimationDelegate,
   ///airview patch{
   X_PATCH_THIS(Tab);
   ///}
-
   DISALLOW_COPY_AND_ASSIGN(Tab);
 };
 

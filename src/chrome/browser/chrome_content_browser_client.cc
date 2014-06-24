@@ -32,7 +32,6 @@
 #include "chrome/browser/defaults.h"
 #include "chrome/browser/devtools/chrome_devtools_manager_delegate.h"
 #include "chrome/browser/download/download_prefs.h"
-#include "chrome/browser/extensions/api/web_request/web_request_api.h"
 #include "chrome/browser/extensions/browser_permissions_policy_delegate.h"
 #include "chrome/browser/extensions/extension_renderer_state.h"
 #include "chrome/browser/extensions/extension_service.h"
@@ -43,9 +42,10 @@
 #include "chrome/browser/geolocation/chrome_access_token_store.h"
 #include "chrome/browser/geolocation/geolocation_permission_context.h"
 #include "chrome/browser/geolocation/geolocation_permission_context_factory.h"
-#include "chrome/browser/google/google_util.h"
 #include "chrome/browser/media/cast_transport_host_filter.h"
 #include "chrome/browser/media/media_capture_devices_dispatcher.h"
+#include "chrome/browser/media/midi_permission_context.h"
+#include "chrome/browser/media/midi_permission_context_factory.h"
 #include "chrome/browser/metrics/chrome_browser_main_extra_parts_metrics.h"
 #include "chrome/browser/nacl_host/nacl_browser_delegate_impl.h"
 #include "chrome/browser/net/chrome_net_log.h"
@@ -99,6 +99,7 @@
 #include "chromeos/chromeos_constants.h"
 #include "components/cdm/browser/cdm_message_filter_android.h"
 #include "components/cloud_devices/common/cloud_devices_switches.h"
+#include "components/google/core/browser/google_util.h"
 #include "components/nacl/browser/nacl_browser.h"
 #include "components/nacl/browser/nacl_host_message_filter.h"
 #include "components/nacl/browser/nacl_process_host.h"
@@ -177,6 +178,8 @@
 #include "chrome/browser/android/new_tab_page_url_handler.h"
 #include "chrome/browser/android/webapps/single_tab_mode_tab_helper.h"
 #include "chrome/browser/chrome_browser_main_android.h"
+#include "chrome/browser/media/protected_media_identifier_permission_context.h"
+#include "chrome/browser/media/protected_media_identifier_permission_context_factory.h"
 #include "chrome/common/descriptors_android.h"
 #include "components/breakpad/browser/crash_dump_manager_android.h"
 #elif defined(OS_POSIX)
@@ -228,6 +231,7 @@
 #endif
 
 #if defined(ENABLE_EXTENSIONS)
+#include "chrome/browser/extensions/api/web_request/web_request_api.h"
 #include "chrome/browser/guest_view/guest_view_base.h"
 #include "chrome/browser/guest_view/guest_view_constants.h"
 #include "chrome/browser/guest_view/guest_view_manager.h"
@@ -250,8 +254,8 @@
 #include "chrome/browser/chrome_browser_main_extra_parts_airview.h"
 ///}
 
-using blink::WebWindowFeatures;
 using base::FileDescriptor;
+using blink::WebWindowFeatures;
 using content::AccessTokenStore;
 using content::BrowserChildProcessHostIterator;
 using content::BrowserThread;
@@ -279,6 +283,14 @@ namespace {
 base::LazyInstance<std::string> g_io_thread_application_locale;
 
 #if defined(ENABLE_PLUGINS)
+// TODO(teravest): Add renderer-side API-specific checking for these APIs so
+// that blanket permission isn't granted to all dev channel APIs for these.
+// http://crbug.com/386743
+const char* const kPredefinedAllowedDevChannelOrigins[] = {
+  "6EAED1924DB611B6EEF2A664BD077BE7EAD33B8F",  // see crbug.com/383937
+  "4EB74897CB187C7633357C2FE832E0AD6A44883A"   // see crbug.com/383937
+};
+
 const char* const kPredefinedAllowedFileHandleOrigins[] = {
   "6EAED1924DB611B6EEF2A664BD077BE7EAD33B8F",  // see crbug.com/234789
   "4EB74897CB187C7633357C2FE832E0AD6A44883A"   // see crbug.com/234789
@@ -641,6 +653,8 @@ namespace chrome {
 ChromeContentBrowserClient::ChromeContentBrowserClient()
     : prerender_tracker_(NULL) {
 #if defined(ENABLE_PLUGINS)
+  for (size_t i = 0; i < arraysize(kPredefinedAllowedDevChannelOrigins); ++i)
+    allowed_dev_channel_origins_.insert(kPredefinedAllowedDevChannelOrigins[i]);
   for (size_t i = 0; i < arraysize(kPredefinedAllowedFileHandleOrigins); ++i)
     allowed_file_handle_origins_.insert(kPredefinedAllowedFileHandleOrigins[i]);
   for (size_t i = 0; i < arraysize(kPredefinedAllowedSocketOrigins); ++i)
@@ -664,6 +678,9 @@ void ChromeContentBrowserClient::RegisterProfilePrefs(
   registry->RegisterBooleanPref(
       prefs::kEnableHyperlinkAuditing,
       true,
+      user_prefs::PrefRegistrySyncable::UNSYNCABLE_PREF);
+  registry->RegisterListPref(
+      prefs::kEnableDeprecatedWebPlatformFeatures,
       user_prefs::PrefRegistrySyncable::UNSYNCABLE_PREF);
 }
 
@@ -732,7 +749,6 @@ content::BrowserMainParts* ChromeContentBrowserClient::CreateBrowserMainParts(
   ///airview patch{
   chrome::AddAirViewExtraParts(main_parts);
   ///}
-
   return main_parts;
 }
 
@@ -828,91 +844,6 @@ content::WebContentsViewDelegate*
   return chrome::CreateWebContentsViewDelegate(web_contents);
 }
 
-void ChromeContentBrowserClient::GuestWebContentsCreated(
-    int guest_instance_id,
-    SiteInstance* guest_site_instance,
-    WebContents* guest_web_contents,
-    WebContents* opener_web_contents,
-    content::BrowserPluginGuestDelegate** guest_delegate,
-    scoped_ptr<base::DictionaryValue> extra_params) {
-#if defined(ENABLE_EXTENSIONS)
-  if (!guest_site_instance) {
-    NOTREACHED();
-    return;
-  }
-  GURL guest_site_url = guest_site_instance->GetSiteURL();
-  const std::string& extension_id = guest_site_url.host();
-
-  Profile* profile = Profile::FromBrowserContext(
-      guest_web_contents->GetBrowserContext());
-  ExtensionService* service =
-      extensions::ExtensionSystem::Get(profile)->extension_service();
-  if (!service) {
-    NOTREACHED();
-    return;
-  }
-
-  /// TODO(fsamuel): In the future, certain types of GuestViewBases won't
-  // require extension bindings. At that point, we should clear |extension_id|
-  // instead of exiting early.
-  if (!extension_id.empty() &&
-      !service->GetExtensionById(extension_id, false)) {
-    NOTREACHED();
-    return;
-  }
-
-  if (opener_web_contents) {
-    GuestViewBase* guest = GuestViewBase::FromWebContents(opener_web_contents);
-    DCHECK(guest);
-
-    // Create a new GuestViewBase of the same type as the opener.
-    *guest_delegate = GuestViewBase::Create(
-        guest_instance_id,
-        guest_web_contents,
-        extension_id,
-        guest->GetViewType());
-    return;
-  }
-
-  if (!extra_params) {
-    NOTREACHED();
-    return;
-  }
-  std::string api_type;
-  extra_params->GetString(guestview::kParameterApi, &api_type);
-
-  if (api_type.empty())
-    return;
-
-  *guest_delegate =
-      GuestViewBase::Create(guest_instance_id,
-                            guest_web_contents,
-                            extension_id,
-                            api_type);
-#else
-  NOTREACHED();
-#endif  // defined(ENABLE_EXTENSIONS)
-}
-
-void ChromeContentBrowserClient::GuestWebContentsAttached(
-    WebContents* guest_web_contents,
-    WebContents* embedder_web_contents,
-    const base::DictionaryValue& extra_params) {
-#if defined(ENABLE_EXTENSIONS)
-  GuestViewBase* guest = GuestViewBase::FromWebContents(guest_web_contents);
-  if (!guest) {
-    // It's ok to return here, since we could be running a browser plugin
-    // outside an extension, and don't need to attach a
-    // BrowserPluginGuestDelegate in that case;
-    // e.g. running with flag --enable-browser-plugin-for-all-view-types.
-    return;
-  }
-  guest->Attach(embedder_web_contents, extra_params);
-#else
-  NOTREACHED();
-#endif  // defined(ENABLE_EXTENSIONS)
-}
-
 void ChromeContentBrowserClient::RenderProcessWillLaunch(
     content::RenderProcessHost* host) {
   int id = host->GetID();
@@ -966,7 +897,9 @@ void ChromeContentBrowserClient::RenderProcessWillLaunch(
   host->Send(new ChromeViewMsg_SetIsIncognitoProcess(
       profile->IsOffTheRecord()));
 
+#if defined(ENABLE_EXTENSIONS)
   SendExtensionWebRequestStatusToHost(host);
+#endif
 
   RendererContentSettingRules rules;
   if (host->IsIsolatedGuest()) {
@@ -1501,6 +1434,43 @@ std::string ChromeContentBrowserClient::GetCanonicalEncodingNameByAliasName(
   return CharacterEncoding::GetCanonicalEncodingNameByAliasName(alias_name);
 }
 
+namespace {
+
+bool IsAutoReloadEnabled() {
+  std::string group = base::FieldTrialList::FindFullName(
+      "AutoReloadExperiment");
+  const CommandLine& browser_command_line = *CommandLine::ForCurrentProcess();
+  if (browser_command_line.HasSwitch(switches::kEnableOfflineAutoReload))
+    return true;
+  if (browser_command_line.HasSwitch(switches::kDisableOfflineAutoReload))
+    return false;
+#if !defined(OS_ANDROID) && !defined(OS_IOS)
+  chrome::VersionInfo::Channel channel = chrome::VersionInfo::GetChannel();
+  chrome::VersionInfo::Channel kForceChannel =
+      chrome::VersionInfo::CHANNEL_CANARY;
+  return (channel <= kForceChannel || group == "Enabled");
+#else
+  return group == "Enabled";
+#endif
+}
+
+bool IsAutoReloadVisibleOnlyEnabled() {
+  std::string group = base::FieldTrialList::FindFullName(
+      "AutoReloadVisibleOnlyExperiment");
+  const CommandLine& browser_command_line = *CommandLine::ForCurrentProcess();
+  if (browser_command_line.HasSwitch(
+      switches::kEnableOfflineAutoReloadVisibleOnly)) {
+    return true;
+  }
+  if (browser_command_line.HasSwitch(
+      switches::kDisableOfflineAutoReloadVisibleOnly)) {
+    return false;
+  }
+  return group == "Enabled";
+}
+
+}  // namespace
+
 void ChromeContentBrowserClient::AppendExtraCommandLineSwitches(
     CommandLine* command_line, int child_process_id) {
 #if defined(OS_POSIX)
@@ -1575,6 +1545,18 @@ void ChromeContentBrowserClient::AppendExtraCommandLineSwitches(
         command_line->AppendSwitch(switches::kDisable3DAPIs);
       }
 
+      const base::ListValue* switches =
+          prefs->GetList(prefs::kEnableDeprecatedWebPlatformFeatures);
+      if (switches) {
+        // Enable any deprecated features that have been re-enabled by policy.
+        for (base::ListValue::const_iterator it = switches->begin();
+             it != switches->end(); ++it) {
+          std::string switch_to_enable;
+          if ((*it)->GetAsString(&switch_to_enable))
+            command_line->AppendSwitch(switch_to_enable);
+        }
+      }
+
       // Disable client-side phishing detection in the renderer if it is
       // disabled in the Profile preferences or the browser process.
       if (!prefs->GetBoolean(prefs::kSafeBrowsingEnabled) ||
@@ -1600,29 +1582,11 @@ void ChromeContentBrowserClient::AppendExtraCommandLineSwitches(
 #endif
     }
 
-    {
-      // Enable auto-reload if this session is in the field trial or the user
-      // explicitly enabled it.
-      bool hard_enabled =
-          browser_command_line.HasSwitch(switches::kEnableOfflineAutoReload);
-      bool hard_disabled =
-          browser_command_line.HasSwitch(switches::kDisableOfflineAutoReload);
-      if (hard_enabled) {
-        command_line->AppendSwitch(switches::kEnableOfflineAutoReload);
-      } else if (!hard_disabled) {
-        std::string group =
-            base::FieldTrialList::FindFullName("AutoReloadExperiment");
-#if !defined(OS_ANDROID) && !defined(OS_IOS)
-        chrome::VersionInfo::Channel channel =
-          chrome::VersionInfo::GetChannel();
-        chrome::VersionInfo::Channel kForceChannel =
-            chrome::VersionInfo::CHANNEL_CANARY;
-        if (channel <= kForceChannel || group == "Enabled")
-#else
-        if (group == "Enabled")
-#endif
-          command_line->AppendSwitch(switches::kEnableOfflineAutoReload);
-      }
+    if (IsAutoReloadEnabled())
+      command_line->AppendSwitch(switches::kEnableOfflineAutoReload);
+    if (IsAutoReloadVisibleOnlyEnabled()) {
+      command_line->AppendSwitch(
+          switches::kEnableOfflineAutoReloadVisibleOnly);
     }
 
     {
@@ -1676,7 +1640,6 @@ void ChromeContentBrowserClient::AppendExtraCommandLineSwitches(
       switches::kCloudPrintURL,
       switches::kCloudPrintXmppEndpoint,
       switches::kDisableBundledPpapiFlash,
-      switches::kDisableExtensionsResourceWhitelist,
       switches::kDisablePnacl,
       switches::kDisableScriptedPrintThrottling,
       switches::kEnableAppWindowControls,
@@ -1685,10 +1648,10 @@ void ChromeContentBrowserClient::AppendExtraCommandLineSwitches(
       switches::kEnableNaClDebug,
       switches::kEnableNaClNonSfiMode,
       switches::kEnableNetBenchmarking,
+      switches::kEnableShowModalDialog,
       switches::kEnableStreamlinedHostedApps,
       switches::kEnableWatchdog,
       switches::kEnableWebBasedSignin,
-      switches::kMemoryProfiling,
       switches::kMessageLoopHistogrammer,
       switches::kOutOfProcessPdf,
       switches::kPlaybackMode,
@@ -1699,7 +1662,6 @@ void ChromeContentBrowserClient::AppendExtraCommandLineSwitches(
       switches::kProfilingFile,
       switches::kProfilingFlush,
       switches::kRecordMode,
-      switches::kSilentDumpOnDCHECK,
       translate::switches::kTranslateSecurityOrigin,
     };
 
@@ -1716,16 +1678,14 @@ void ChromeContentBrowserClient::AppendExtraCommandLineSwitches(
     command_line->CopySwitchesFrom(browser_command_line, kSwitchNames,
                                    arraysize(kSwitchNames));
   } else if (process_type == switches::kPluginProcess) {
-    static const char* const kSwitchNames[] = {
 #if defined(OS_CHROMEOS)
+    static const char* const kSwitchNames[] = {
       chromeos::switches::kLoginProfile,
-#endif
-      switches::kMemoryProfiling,
-      switches::kSilentDumpOnDCHECK,
     };
 
     command_line->CopySwitchesFrom(browser_command_line, kSwitchNames,
                                    arraysize(kSwitchNames));
+#endif
   } else if (process_type == switches::kZygoteProcess) {
     static const char* const kSwitchNames[] = {
       // Load (in-process) Pepper plugins in-process in the zygote pre-sandbox.
@@ -2161,6 +2121,40 @@ void ChromeContentBrowserClient::RequestGeolocationPermission(
           RequestGeolocationPermission(web_contents, bridge_id,
                                        requesting_frame, user_gesture,
                                        result_callback, cancel_callback);
+}
+
+void ChromeContentBrowserClient::RequestMidiSysExPermission(
+    content::WebContents* web_contents,
+    int bridge_id,
+    const GURL& requesting_frame,
+    bool user_gesture,
+    base::Callback<void(bool)> result_callback,
+    base::Closure* cancel_callback) {
+  MidiPermissionContext* context =
+      MidiPermissionContextFactory::GetForProfile(
+          Profile::FromBrowserContext(web_contents->GetBrowserContext()));
+  context->RequestMidiSysExPermission(web_contents, bridge_id, requesting_frame,
+                                      user_gesture, result_callback,
+                                      cancel_callback);
+}
+
+void ChromeContentBrowserClient::RequestProtectedMediaIdentifierPermission(
+    content::WebContents* web_contents,
+    const GURL& origin,
+    base::Callback<void(bool)> result_callback,
+    base::Closure* cancel_callback) {
+#if defined(OS_ANDROID)
+  ProtectedMediaIdentifierPermissionContext* context =
+      ProtectedMediaIdentifierPermissionContextFactory::GetForProfile(
+          Profile::FromBrowserContext(web_contents->GetBrowserContext()));
+  context->RequestProtectedMediaIdentifierPermission(web_contents,
+                                                     origin,
+                                                     result_callback,
+                                                     cancel_callback);
+#else
+  NOTIMPLEMENTED();
+  result_callback.Run(false);
+#endif  // defined(OS_ANDROID)
 }
 
 bool ChromeContentBrowserClient::CanCreateWindow(
@@ -2745,8 +2739,6 @@ bool ChromeContentBrowserClient::IsPluginAllowedToCallRequestOSFileHandle(
     extension_set = extensions::ExtensionSystem::Get(profile)->
         extension_service()->extensions();
   }
-  // TODO(teravest): Populate allowed_file_handle_origins_ when FileIO is moved
-  // from the renderer to the browser.
   return IsExtensionOrSharedModuleWhitelisted(url, extension_set,
                                               allowed_file_handle_origins_) ||
          IsHostAllowedByCommandLine(url, extension_set,
@@ -2756,12 +2748,28 @@ bool ChromeContentBrowserClient::IsPluginAllowedToCallRequestOSFileHandle(
 #endif
 }
 
-bool ChromeContentBrowserClient::IsPluginAllowedToUseDevChannelAPIs() {
+bool ChromeContentBrowserClient::IsPluginAllowedToUseDevChannelAPIs(
+    content::BrowserContext* browser_context,
+    const GURL& url) {
 #if defined(ENABLE_PLUGINS)
   // Allow access for tests.
   if (CommandLine::ForCurrentProcess()->HasSwitch(
           switches::kEnablePepperTesting)) {
     return true;
+  }
+
+  Profile* profile = Profile::FromBrowserContext(browser_context);
+  const extensions::ExtensionSet* extension_set = NULL;
+  if (profile) {
+    extension_set = extensions::ExtensionSystem::Get(profile)->
+        extension_service()->extensions();
+  }
+
+  // Allow access for whitelisted applications.
+  if (IsExtensionOrSharedModuleWhitelisted(url,
+                                           extension_set,
+                                           allowed_dev_channel_origins_)) {
+      return true;
   }
 
   chrome::VersionInfo::Channel channel = chrome::VersionInfo::GetChannel();

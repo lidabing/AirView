@@ -32,6 +32,8 @@
     # have to export the blink header settings so that relative paths in these
     # headers resolve correctly.
     '../third_party/WebKit/public/blink_headers.gyp:blink_headers',
+    # The public render_widget_host.h needs to re-export skia defines.
+    '../skia/skia.gyp:skia',
   ],
   'include_dirs': [
     '..',
@@ -71,6 +73,7 @@
       'public/browser/browser_main_runner.h',
       'public/browser/browser_message_filter.cc',
       'public/browser/browser_message_filter.h',
+      'public/browser/browser_plugin_guest_delegate.cc',
       'public/browser/browser_plugin_guest_delegate.h',
       'public/browser/browser_plugin_guest_manager.cc',
       'public/browser/browser_plugin_guest_manager.h',
@@ -779,6 +782,10 @@
       'browser/media/media_internals_proxy.h',
       'browser/media/media_internals_ui.cc',
       'browser/media/media_internals_ui.h',
+      'browser/media/midi_dispatcher_host.cc',
+      'browser/media/midi_dispatcher_host.h',
+      'browser/media/midi_host.cc',
+      'browser/media/midi_host.h',
       'browser/media/webrtc_identity_store.cc',
       'browser/media/webrtc_identity_store.h',
       'browser/media/webrtc_identity_store_backend.cc',
@@ -943,10 +950,6 @@
       'browser/renderer_host/media/media_stream_track_metrics_host.h',
       'browser/renderer_host/media/media_stream_ui_proxy.cc',
       'browser/renderer_host/media/media_stream_ui_proxy.h',
-      'browser/renderer_host/media/midi_dispatcher_host.cc',
-      'browser/renderer_host/media/midi_dispatcher_host.h',
-      'browser/renderer_host/media/midi_host.cc',
-      'browser/renderer_host/media/midi_host.h',
       'browser/renderer_host/media/video_capture_buffer_pool.cc',
       'browser/renderer_host/media/video_capture_buffer_pool.h',
       'browser/renderer_host/media/video_capture_controller.cc',
@@ -1196,6 +1199,8 @@
       'browser/tracing/tracing_controller_impl.h',
       'browser/tracing/tracing_ui.cc',
       'browser/tracing/tracing_ui.h',
+      'browser/transition_request_manager.cc',
+      'browser/transition_request_manager.h',
       'browser/udev_linux.cc',
       'browser/udev_linux.h',
       'browser/user_metrics.cc',
@@ -1281,7 +1286,10 @@
       '<(SHARED_INTERMEDIATE_DIR)/content/browser/devtools/devtools_protocol_constants.h',
     ],
     'android_browser_sources': [
+      'browser/renderer_host/java/gin_java_bound_object.cc',
       'browser/renderer_host/java/gin_java_bound_object.h',
+      'browser/renderer_host/java/gin_java_bound_object_delegate.cc',
+      'browser/renderer_host/java/gin_java_bound_object_delegate.h',
       'browser/renderer_host/java/gin_java_method_invocation_helper.cc',
       'browser/renderer_host/java/gin_java_method_invocation_helper.h',
       'browser/renderer_host/java/gin_java_script_to_java_types_coercion.cc',
@@ -1441,9 +1449,6 @@
       'public/browser/plugin_service.h',
     ],
   },
- #airview patch{
-'includes': [ 'x_content_browser.gypi' ],
-#}
   'sources': [
     '<@(public_browser_sources)',
     '<@(private_browser_sources)',

@@ -28,10 +28,9 @@
 #include "config.h"
 #include "core/page/EventHandler.h"
 
-#include "HTMLNames.h"
-#include "RuntimeEnabledFeatures.h"
-#include "SVGNames.h"
 #include "bindings/v8/ExceptionStatePlaceholder.h"
+#include "core/HTMLNames.h"
+#include "core/SVGNames.h"
 #include "core/clipboard/Clipboard.h"
 #include "core/clipboard/DataObject.h"
 #include "core/dom/Document.h"
@@ -84,11 +83,11 @@
 #include "core/rendering/RenderWidget.h"
 #include "core/rendering/style/RenderStyle.h"
 #include "core/svg/SVGDocumentExtensions.h"
-#include "core/svg/SVGUseElement.h"
 #include "platform/PlatformGestureEvent.h"
 #include "platform/PlatformKeyboardEvent.h"
 #include "platform/PlatformTouchEvent.h"
 #include "platform/PlatformWheelEvent.h"
+#include "platform/RuntimeEnabledFeatures.h"
 #include "platform/TraceEvent.h"
 #include "platform/WindowsKeyboardCodes.h"
 #include "platform/geometry/FloatPoint.h"
@@ -104,7 +103,6 @@
 namespace WebCore {
 
 using namespace HTMLNames;
-using namespace SVGNames;
 
 // The link drag hysteresis is much larger than the others because there
 // needs to be enough space to cancel the link press without starting a link drag,
@@ -457,7 +455,7 @@ void EventHandler::selectClosestWordOrLinkFromMouseEvent(const MouseEventWithHit
 
 bool EventHandler::handleMousePressEventDoubleClick(const MouseEventWithHitTestResults& event)
 {
-    TRACE_EVENT0("webkit", "EventHandler::handleMousePressEventDoubleClick");
+    TRACE_EVENT0("blink", "EventHandler::handleMousePressEventDoubleClick");
 
     if (event.event().button() != LeftButton)
         return false;
@@ -477,7 +475,7 @@ bool EventHandler::handleMousePressEventDoubleClick(const MouseEventWithHitTestR
 
 bool EventHandler::handleMousePressEventTripleClick(const MouseEventWithHitTestResults& event)
 {
-    TRACE_EVENT0("webkit", "EventHandler::handleMousePressEventTripleClick");
+    TRACE_EVENT0("blink", "EventHandler::handleMousePressEventTripleClick");
 
     if (event.event().button() != LeftButton)
         return false;
@@ -504,7 +502,7 @@ static int textDistance(const Position& start, const Position& end)
 
 bool EventHandler::handleMousePressEventSingleClick(const MouseEventWithHitTestResults& event)
 {
-    TRACE_EVENT0("webkit", "EventHandler::handleMousePressEventSingleClick");
+    TRACE_EVENT0("blink", "EventHandler::handleMousePressEventSingleClick");
 
     m_frame->document()->updateLayoutIgnorePendingStylesheets();
     Node* innerNode = event.targetNode();
@@ -583,7 +581,7 @@ static inline bool canMouseDownStartSelect(Node* node)
 
 bool EventHandler::handleMousePressEvent(const MouseEventWithHitTestResults& event)
 {
-    TRACE_EVENT0("webkit", "EventHandler::handleMousePressEvent");
+    TRACE_EVENT0("blink", "EventHandler::handleMousePressEvent");
 
     // Reset drag state.
     dragState().m_dragSrc = nullptr;
@@ -649,7 +647,7 @@ bool EventHandler::handleMousePressEvent(const MouseEventWithHitTestResults& eve
 
 bool EventHandler::handleMouseDraggedEvent(const MouseEventWithHitTestResults& event)
 {
-    TRACE_EVENT0("webkit", "EventHandler::handleMouseDraggedEvent");
+    TRACE_EVENT0("blink", "EventHandler::handleMouseDraggedEvent");
 
     if (!m_mousePressed)
         return false;
@@ -850,13 +848,13 @@ bool EventHandler::panScrollInProgress() const
 
 HitTestResult EventHandler::hitTestResultAtPoint(const LayoutPoint& point, HitTestRequest::HitTestRequestType hitType, const LayoutSize& padding)
 {
-    TRACE_EVENT0("webkit", "EventHandler::hitTestResultAtPoint");
+    TRACE_EVENT0("blink", "EventHandler::hitTestResultAtPoint");
 
     // We always send hitTestResultAtPoint to the main frame if we have one,
     // otherwise we might hit areas that are obscured by higher frames.
     if (Page* page = m_frame->page()) {
-        LocalFrame* mainFrame = page->mainFrame();
-        if (m_frame != mainFrame) {
+        LocalFrame* mainFrame = page->mainFrame()->isLocalFrame() ? page->deprecatedLocalMainFrame() : 0;
+        if (mainFrame && m_frame != mainFrame) {
             FrameView* frameView = m_frame->view();
             FrameView* mainView = mainFrame->view();
             if (frameView && mainView) {
@@ -1216,7 +1214,7 @@ static LayoutPoint documentPointForWindowPoint(LocalFrame* frame, const IntPoint
 
 bool EventHandler::handleMousePressEvent(const PlatformMouseEvent& mouseEvent)
 {
-    TRACE_EVENT0("webkit", "EventHandler::handleMousePressEvent");
+    TRACE_EVENT0("blink", "EventHandler::handleMousePressEvent");
 
     RefPtr<FrameView> protector(m_frame->view());
 
@@ -1360,7 +1358,7 @@ ScrollableArea* EventHandler::associatedScrollableArea(const RenderLayer* layer)
 
 bool EventHandler::handleMouseMoveEvent(const PlatformMouseEvent& event)
 {
-    TRACE_EVENT0("webkit", "EventHandler::handleMouseMoveEvent");
+    TRACE_EVENT0("blink", "EventHandler::handleMouseMoveEvent");
 
     RefPtr<FrameView> protector(m_frame->view());
     MaximumDurationTracker maxDurationTracker(&m_maxMouseMovedDuration);
@@ -1389,7 +1387,7 @@ bool EventHandler::handleMouseMoveEvent(const PlatformMouseEvent& event)
 
 void EventHandler::handleMouseLeaveEvent(const PlatformMouseEvent& event)
 {
-    TRACE_EVENT0("webkit", "EventHandler::handleMouseLeaveEvent");
+    TRACE_EVENT0("blink", "EventHandler::handleMouseLeaveEvent");
 
     RefPtr<FrameView> protector(m_frame->view());
     handleMouseMoveOrLeaveEvent(event);
@@ -1517,7 +1515,7 @@ static Node* parentForClickEvent(const Node& node)
 
 bool EventHandler::handleMouseReleaseEvent(const PlatformMouseEvent& mouseEvent)
 {
-    TRACE_EVENT0("webkit", "EventHandler::handleMouseReleaseEvent");
+    TRACE_EVENT0("blink", "EventHandler::handleMouseReleaseEvent");
 
     RefPtr<FrameView> protector(m_frame->view());
 
@@ -3018,18 +3016,17 @@ void EventHandler::defaultKeyboardEventHandler(KeyboardEvent* event)
     }
 }
 
-bool EventHandler::dragHysteresisExceeded(const IntPoint& floatDragViewportLocation) const
+bool EventHandler::dragHysteresisExceeded(const FloatPoint& floatDragViewportLocation) const
 {
-    FloatPoint dragViewportLocation(floatDragViewportLocation.x(), floatDragViewportLocation.y());
-    return dragHysteresisExceeded(dragViewportLocation);
+    return dragHysteresisExceeded(flooredIntPoint(floatDragViewportLocation));
 }
 
-bool EventHandler::dragHysteresisExceeded(const FloatPoint& dragViewportLocation) const
+bool EventHandler::dragHysteresisExceeded(const IntPoint& dragViewportLocation) const
 {
     FrameView* view = m_frame->view();
     if (!view)
         return false;
-    IntPoint dragLocation = view->windowToContents(flooredIntPoint(dragViewportLocation));
+    IntPoint dragLocation = view->windowToContents(dragViewportLocation);
     IntSize delta = dragLocation - m_mouseDownPos;
 
     int threshold = GeneralDragHysteresis;
@@ -3259,9 +3256,9 @@ void EventHandler::defaultBackspaceEventHandler(KeyboardEvent* event)
         return;
 
     Page* page = m_frame->page();
-    if (!page)
+    if (!page || !page->mainFrame()->isLocalFrame())
         return;
-    bool handledEvent = page->mainFrame()->loader().client()->navigateBackForward(event->shiftKey() ? 1 : -1);
+    bool handledEvent = page->deprecatedLocalMainFrame()->loader().client()->navigateBackForward(event->shiftKey() ? 1 : -1);
     if (handledEvent)
         event->setDefaultHandled();
 }
@@ -3407,7 +3404,7 @@ HitTestResult EventHandler::hitTestResultInFrame(LocalFrame* frame, const Layout
 
 bool EventHandler::handleTouchEvent(const PlatformTouchEvent& event)
 {
-    TRACE_EVENT0("webkit", "EventHandler::handleTouchEvent");
+    TRACE_EVENT0("blink", "EventHandler::handleTouchEvent");
 
     const Vector<PlatformTouchPoint>& points = event.touchPoints();
 
@@ -3490,7 +3487,7 @@ bool EventHandler::handleTouchEvent(const PlatformTouchEvent& event)
             // See http://crbug.com/345372.
             m_targetForTouchID.set(point.id(), node);
 
-            TouchAction effectiveTouchAction = computeEffectiveTouchAction(pagePoint);
+            TouchAction effectiveTouchAction = computeEffectiveTouchAction(*node);
             if (effectiveTouchAction != TouchActionAuto)
                 m_frame->page()->chrome().client().setTouchAction(effectiveTouchAction);
         }
@@ -3565,13 +3562,11 @@ bool EventHandler::handleTouchEvent(const PlatformTouchEvent& event)
             // differentiate between a one and two finger gesture), but we won't
             // actually dispatch any events for it. Set the target to the
             // Document so that there's some valid node here. Perhaps this
-            // should really be DOMWindow, but in all other cases the target of
+            // should really be LocalDOMWindow, but in all other cases the target of
             // a Touch is a Node so using the window could be a breaking change.
             // Since we know there was no handler invoked, the specific target
             // should be completely irrelevant to the application.
-            // FIXME: Oilpan: We can remove the following .get() if EventTarget
-            // is on-heap.
-            touchTarget = m_touchSequenceDocument.get();
+            touchTarget = m_touchSequenceDocument;
             targetFrame = m_touchSequenceDocument->frame();
             knownTarget = false;
         }
@@ -3660,25 +3655,20 @@ TouchAction EventHandler::intersectTouchAction(TouchAction action1, TouchAction 
     return action1 & action2;
 }
 
-TouchAction EventHandler::computeEffectiveTouchAction(const LayoutPoint& point)
+TouchAction EventHandler::computeEffectiveTouchAction(const Node& node)
 {
     // Optimization to minimize risk of this new feature (behavior should be identical
     // since there's no way to get non-default touch-action values).
     if (!RuntimeEnabledFeatures::cssTouchActionEnabled())
         return TouchActionAuto;
 
-    HitTestResult taResult = hitTestResultAtPoint(point, HitTestRequest::TouchEvent | HitTestRequest::ReadOnly | HitTestRequest::Active | HitTestRequest::TouchAction);
-    Node* node = taResult.innerNode();
-    if (!node)
-        return TouchActionAuto;
-
     // Start by permitting all actions, then walk the elements supporting
     // touch-action from the target node up to the nearest scrollable ancestor
     // and exclude any prohibited actions.
     TouchAction effectiveTouchAction = TouchActionAuto;
-    for (const Node* curNode = node; curNode; curNode = NodeRenderingTraversal::parent(curNode)) {
+    for (const Node* curNode = &node; curNode; curNode = NodeRenderingTraversal::parent(curNode)) {
         if (RenderObject* renderer = curNode->renderer()) {
-            if (renderer->visibleForTouchAction()) {
+            if (renderer->supportsTouchAction()) {
                 TouchAction action = renderer->style()->touchAction();
                 effectiveTouchAction = intersectTouchAction(action, effectiveTouchAction);
                 if (effectiveTouchAction == TouchActionNone)

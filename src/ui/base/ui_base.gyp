@@ -110,6 +110,8 @@
         'cocoa/nib_loading.mm',
         'cocoa/nsgraphics_context_additions.h',
         'cocoa/nsgraphics_context_additions.mm',
+        'cocoa/remote_layer_api.h',
+        'cocoa/remote_layer_api.mm',
         'cocoa/tracking_area.h',
         'cocoa/tracking_area.mm',
         'cocoa/underlay_opengl_hosting_window.h',
@@ -139,8 +141,6 @@
         'cursor/image_cursors.h',
         'cursor/ozone/bitmap_cursor_factory_ozone.cc',
         'cursor/ozone/bitmap_cursor_factory_ozone.h',
-        'cursor/ozone/cursor_factory_ozone.cc',
-        'cursor/ozone/cursor_factory_ozone.h',
         'default_theme_provider.cc',
         'default_theme_provider.h',
         'default_theme_provider_mac.mm',
@@ -172,6 +172,7 @@
         'dragdrop/os_exchange_data_provider_aura.h',
         'dragdrop/os_exchange_data_provider_aurax11.cc',
         'dragdrop/os_exchange_data_provider_aurax11.h',
+        'dragdrop/os_exchange_data_provider_mac.h',
         'dragdrop/os_exchange_data_provider_mac.mm',
         'dragdrop/os_exchange_data_provider_win.cc',
         'dragdrop/os_exchange_data_provider_win.h',
@@ -212,6 +213,8 @@
         'models/menu_model.h',
         'models/menu_model_delegate.h',
         'models/menu_separator_types.h',
+        'models/simple_combobox_model.cc',
+        'models/simple_combobox_model.h',
         'models/simple_menu_model.cc',
         'models/simple_menu_model.h',
         'models/table_model.cc',
@@ -371,6 +374,11 @@
         ['use_aura==0 or OS!="linux"', {
           'sources!': [
             'resource/resource_bundle_auralinux.cc',
+          ],
+        }],
+        ['use_ozone==1', {
+          'dependencies': [
+            '../ozone/ozone.gyp:ozone_base',
           ],
         }],
         ['use_aura==1 and OS=="win"', {
