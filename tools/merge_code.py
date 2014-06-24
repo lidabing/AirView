@@ -92,6 +92,23 @@ def commit_chromium_code_to_mirror(chromium_src_path,mirror_path,backup_path,top
                    print chromium_src_file + 'not exist';
          print "===done revert_chromium_code_from_backup==="
 
+# 删除chromium源码中补丁部分代码，可以方便同步最新代码
+def clear_patch_chromium_code(chromium_src_path,mirror_path,backup_path,topdown=True):
+         print "===start clear_patch_chromium_code==="
+         check_file_path(chromium_src_path,mirror_path,backup_path)
+         mirror_path_len = len(mirror_path)
+         for root, dirs, files in os.walk(mirror_path, topdown):
+             for name in files:
+                 mirror_file = os.path.join(root,name)
+                 chromium_src_file = combine_path(chromium_src_path,mirror_file[mirror_path_len:])
+                 if os.path.exists(chromium_src_file):
+                    os.remove(chromium_src_file)
+                    print "Delete FILE:"+chromium_src_file
+                 else:
+                   print chromium_src_file + 'not exist';
+         print "===done clear_patch_chromium_code==="
+        
+
 
 def main(argv):
      chromium_src_path = cur_file_dir()
@@ -118,6 +135,9 @@ def main(argv):
             
      if 'commit'==argv[1]:
             commit_chromium_code_to_mirror(chromium_src_path,mirror_path,backup_path)
+
+     if 'clear'==argv[1]:
+            clear_patch_chromium_code(chromium_src_path,mirror_path,backup_path)
 
 if __name__ == '__main__':
   sys.exit(main(sys.argv))
