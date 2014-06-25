@@ -83,8 +83,13 @@ bool WebDragHanlderAura::GetPasteAndGoURL(const ui::OSExchangeData& data,
   AutocompleteMatch match;
   Profile* profile =
       Profile::FromBrowserContext(web_contents_->GetBrowserContext());
-  AutocompleteClassifierFactory::GetForProfile(profile)->Classify(
-      text, false, false, AutocompleteInput::INVALID_SPEC, &match, NULL);
+  AutocompleteClassifierFactory::GetForProfile(profile)
+      ->Classify(text,
+                 false,
+                 false,
+                 metrics::OmniboxEventProto::INVALID_SPEC,
+                 &match,
+                 NULL);
   if (!match.destination_url.is_valid())
     return false;
 

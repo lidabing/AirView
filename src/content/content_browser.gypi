@@ -1449,6 +1449,9 @@
       'public/browser/plugin_service.h',
     ],
   },
+  #airview patch{
+  'includes': [ 'x_content_browser.gypi' ],
+ #}
   'sources': [
     '<@(public_browser_sources)',
     '<@(private_browser_sources)',
