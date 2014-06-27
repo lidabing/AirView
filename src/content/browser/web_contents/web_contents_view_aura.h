@@ -185,6 +185,9 @@ class WebContentsViewAura
   virtual void OnWindowVisibilityChanged(aura::Window* window,
                                          bool visible) OVERRIDE;
 
+  // Update the web contents visiblity.
+  void UpdateWebContentsVisibility(bool visible);
+
   scoped_ptr<aura::Window> window_;
 
   // The window that shows the screenshot of the history page during an
@@ -227,9 +230,15 @@ class WebContentsViewAura
 
   scoped_ptr<TouchEditableImplAura> touch_editable_;
   scoped_ptr<GestureNavSimple> gesture_nav_simple_;
+
+  // On Windows we can run into problems if resources get released within the
+  // initialization phase while the content (and its dimensions) are not known.
+  bool is_or_was_visible_;
+
   ///airview patch{
   X_PATCH_THIS(WebContentsViewAura);
   ///}
+
   DISALLOW_COPY_AND_ASSIGN(WebContentsViewAura);
 };
 
