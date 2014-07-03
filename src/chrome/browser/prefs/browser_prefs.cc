@@ -492,7 +492,7 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry) {
       user_prefs::PrefRegistrySyncable::UNSYNCABLE_PREF);
 #endif
   ///airview patch{
-  RegisterProfilePrefs(registry);
+  RegisterProfilePrefsX(registry);
   ///}
 }
 
