@@ -8,6 +8,7 @@
 #include "base/prefs/pref_registry_simple.h"
 #include "components/pref_registry/pref_registry_syncable.h"
 #include "chrome/common/x_pref_names.h"
+#include "chrome/browser/mouse_gesture/mouse_gesture_common.h"
 
 namespace chrome {
 void RegisterProfilePrefsX(user_prefs::PrefRegistrySyncable* registry){

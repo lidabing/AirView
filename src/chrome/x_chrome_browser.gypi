@@ -32,5 +32,7 @@
                     'browser/chrome_browser_main_extra_parts_airview.h',
 					'browser/prefs/x_browser_prefs.h',
 					'browser/prefs/x_browser_prefs.cc',
+					'browser/mouse_gesture/mouse_gesture_common.h',
+					'browser/mouse_gesture/mouse_gesture_common.cc',
                   ]
 }
