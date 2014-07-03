@@ -138,9 +138,9 @@ void RegisterProfilePrefsX(user_prefs::PrefRegistrySyncable* registry){
 	registry->RegisterIntegerPref(prefs::kXMouseActionLeftDown,
 		MGACTION_GOPAGETOP,
 		user_prefs::PrefRegistrySyncable::UNSYNCABLE_PREF);
-
-	registry->RegisterIntegerPref(prefs::kXDefaultDownloader,
-		kDownloaderChrome, //使用默认下载器
-		user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
+ 
+	//registry->RegisterIntegerPref(prefs::kXDefaultDownloader,
+	//	kDownloaderChrome, //使用默认下载器
+	//	user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
 }
 }
