@@ -30,5 +30,7 @@
        'sources' :[
                     'browser/chrome_browser_main_extra_parts_airview.cc',
                     'browser/chrome_browser_main_extra_parts_airview.h',
+					'browser/prefs/x_browser_prefs.h',
+					'browser/prefs/x_browser_prefs.cc',
                   ]
 }
