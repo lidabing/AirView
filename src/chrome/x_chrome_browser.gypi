@@ -28,8 +28,8 @@
          ],
        ],
        'sources' :[
-                    'browser/chrome_browser_main_extra_parts_airview.cc',
-                    'browser/chrome_browser_main_extra_parts_airview.h',
+                    'browser/x_chrome_browser_main_extra_parts.cc',
+                    'browser/x_chrome_browser_main_extra_parts.h',
 					'browser/prefs/x_browser_prefs.h',
 					'browser/prefs/x_browser_prefs.cc',
 					'browser/mouse_gesture/mouse_gesture_common.h',

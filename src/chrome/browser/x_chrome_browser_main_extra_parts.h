@@ -17,13 +17,13 @@ class ChromeBrowserMainParts;
 class BossKeyHandler;
 
 namespace chrome {
-void AddAirViewExtraParts(ChromeBrowserMainParts* main_parts);
+void AddXExtraParts(ChromeBrowserMainParts* main_parts);
 }
 
-class BrowserMainExtraPartsAirView : public ChromeBrowserMainExtraParts {
+class XBrowserMainExtraParts : public ChromeBrowserMainExtraParts {
  public:
-  BrowserMainExtraPartsAirView() {}
-  virtual ~BrowserMainExtraPartsAirView() {}
+  XBrowserMainExtraParts() {}
+  virtual ~XBrowserMainExtraParts() {}
 
   // Overridden from ChromeBrowserMainExtraParts:
   virtual void PreEarlyInitialization() OVERRIDE;
@@ -37,6 +37,6 @@ class BrowserMainExtraPartsAirView : public ChromeBrowserMainExtraParts {
   scoped_ptr<BossKeyHandler> bosskey_handler_;
   base::HookManager hook_manager_;
 #endif
-  DISALLOW_COPY_AND_ASSIGN(BrowserMainExtraPartsAirView);
+  DISALLOW_COPY_AND_ASSIGN(XBrowserMainExtraParts);
 };
 #endif

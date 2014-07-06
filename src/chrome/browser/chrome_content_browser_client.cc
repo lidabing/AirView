@@ -251,7 +251,7 @@
 #include "chrome/browser/media/webrtc_logging_handler_host.h"
 #endif
 ///airview patch{
-#include "chrome/browser/chrome_browser_main_extra_parts_airview.h"
+#include "chrome/browser/x_chrome_browser_main_extra_parts.h"
 ///}
 
 using base::FileDescriptor;
@@ -747,7 +747,7 @@ content::BrowserMainParts* ChromeContentBrowserClient::CreateBrowserMainParts(
   chrome::AddMetricsExtraParts(main_parts);
 
   ///airview patch{
-  chrome::AddAirViewExtraParts(main_parts);
+  chrome::AddXExtraParts(main_parts);
   ///}
   return main_parts;
 }
