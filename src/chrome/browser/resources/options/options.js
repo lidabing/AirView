@@ -43,7 +43,9 @@ var SearchPage = options.SearchPage;
 var StartupOverlay = options.StartupOverlay;
 var SyncSetupOverlay = options.SyncSetupOverlay;
 var ThirdPartyImeConfirmOverlay = options.ThirdPartyImeConfirmOverlay;
-
+//airview patch{
+var MouseGestureManager = options.MouseGestureManager;
+//}
 /**
  * DOMContentLoaded handler, sets up the page.
  */
@@ -162,6 +164,11 @@ function load() {
                               [$('manage-default-search-engines')]);
   OptionsPage.registerOverlay(StartupOverlay.getInstance(),
                               BrowserOptions.getInstance());
+   //airview patch{
+  OptionsPage.registerOverlay(MouseGestureManager.getInstance(),
+                            BrowserOptions.getInstance(),
+                             [$('defaultMouseGestureManageButton')]);
+    //}
   OptionsPage.registerOverlay(SyncSetupOverlay.getInstance(),
                               BrowserOptions.getInstance(),
                               [$('customize-sync')]);

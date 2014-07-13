@@ -460,6 +460,26 @@ void BrowserOptionsHandler::GetLocalizedValues(base::DictionaryValue* values) {
     { "cloudPrintEnableNotificationsLabel",
       IDS_LOCAL_DISCOVERY_NOTIFICATIONS_ENABLE_CHECKBOX_LABEL },
 #endif
+	  ///airview patch{
+	{ "toolbarShowRestoreButton", IDS_X_TOOLBAR_SHOW_RESTORE_BUTTON },
+	{ "toolbarShowBookmarksButton", IDS_X_TOOLBAR_SHOW_BOOKMARKS_BUTTON },
+	{ "tabbarGroupName", IDS_X_TABBAR_GROUP_NAME },
+	{ "tabbarOpenBookMarksInNewTab", IDS_X_TABBAR_OPEN_BOOKMARKS_INNEWTAB },
+	{ "tabbarOpenAddressInNewTab", IDS_X_TABBAR_OPEN_ADDRESS_INNEWTAB },
+	{ "tabbarCloseTabWhenLDoubleClick", IDS_X_TABBAR_CLOSE_TAB_WHEN_RIGHT_DOUBLE_CLICK },
+	{ "tabbarCloseTabWhenRightClick", IDS_X_TABBAR_CLOSE_TAB_WHEN_RIGHT_CLICK },
+	{ "tabbarNewtabForeground", IDS_X_TABBAR_NEWTAB_FOREGROUND },
+	{ "mouseControl", IDS_X_MOUSE_CONTROL },
+	{ "superDragDropEnabled", IDS_X_SUPER_DRAG_DROP_ENABLED },
+	{ "openDragDropBackend", IDS_X_OPEN_DRAG_DROP_BACKEND },
+	{ "mouseGestureEnabled", IDS_X_MOUSE_GESTURE_ENABLED },
+	{ "defaultMouseGestureManage", IDS_X_DEFAULT_MOUSE_GESTURE_MANAGE },
+	{ "clearEnabledWhenCloseBrowserText", IDS_X_REMOVE_DATA_WHEN_CLOSE_BROWSER },
+	{ "clearEnabledWhenCloseBrowserButton", IDS_X_REMOVE_DATA_WHEN_CLOSE_BROWSER_BUTTON },
+	{ "BossKey", IDS_X_BOSS_KEY_OPTION },
+	{ "enableBossKey", IDS_X_ENABLE_BOSS_KEY },
+	{ "selectDefaultDownloader", IDS_X_SELECT_DEFAULT_DOWNLOADER },
+	///}
   };
 
 #if defined(ENABLE_SETTINGS_APP)
@@ -473,26 +493,6 @@ void BrowserOptionsHandler::GetLocalizedValues(base::DictionaryValue* values) {
       IDS_SETTINGS_APP_LAUNCHER_PRODUCT_NAME },
     { "proxiesLabelSystem", IDS_OPTIONS_SYSTEM_PROXIES_LABEL,
       IDS_SETTINGS_APP_LAUNCHER_PRODUCT_NAME },
-	  ///airview patch{
-	  { "toolbarShowRestoreButton", IDS_X_TOOLBAR_SHOW_RESTORE_BUTTON },
-	  { "toolbarShowBookmarksButton", IDS_X_TOOLBAR_SHOW_BOOKMARKS_BUTTON },
-	  { "tabbarGroupName", IDS_X_TABBAR_GROUP_NAME },
-	  { "tabbarOpenBookMarksInNewTab", IDS_X_TABBAR_OPEN_BOOKMARKS_INNEWTAB },
-	  { "tabbarOpenAddressInNewTab", IDS_X_TABBAR_OPEN_ADDRESS_INNEWTAB },
-	  { "tabbarCloseTabWhenLDoubleClick", IDS_X_TABBAR_CLOSE_TAB_WHEN_RIGHT_DOUBLE_CLICK },
-	  { "tabbarCloseTabWhenRightClick", IDS_X_TABBAR_CLOSE_TAB_WHEN_RIGHT_CLICK },
-	  { "tabbarNewtabForeground", IDS_X_TABBAR_NEWTAB_FOREGROUND },
-	  { "mouseControl", IDS_X_MOUSE_CONTROL },
-	  { "superDragDropEnabled", IDS_X_SUPER_DRAG_DROP_ENABLED },
-	  { "openDragDropBackend", IDS_X_OPEN_DRAG_DROP_BACKEND },
-	  { "mouseGestureEnabled", IDS_X_MOUSE_GESTURE_ENABLED },
-	  { "defaultMouseGestureManage", IDS_X_DEFAULT_MOUSE_GESTURE_MANAGE },
-	  { "clearEnabledWhenCloseBrowserText", IDS_X_REMOVE_DATA_WHEN_CLOSE_BROWSER },
-	  { "clearEnabledWhenCloseBrowserButton", IDS_X_REMOVE_DATA_WHEN_CLOSE_BROWSER_BUTTON },
-	  { "BossKey", IDS_X_BOSS_KEY_OPTION },
-	  { "enableBossKey", IDS_X_ENABLE_BOSS_KEY },
-	  { "selectDefaultDownloader", IDS_X_SELECT_DEFAULT_DOWNLOADER },
-	  ///}
   };
   base::DictionaryValue* app_values = NULL;
   CHECK(values->GetDictionary(kSettingsAppKey, &app_values));

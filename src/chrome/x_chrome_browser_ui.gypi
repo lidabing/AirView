@@ -13,5 +13,7 @@
 					'browser/ui/aura/tab_contents/web_drag_handler_aura.cc',
 					'browser/ui/browser_commands_patch.cc',
 					'browser/ui/browser_commands_patch.h',
+					'browser/ui/webui/options/mouse_gesture_handler.cc',
+					'browser/ui/webui/options/mouse_gesture_handler.h',
                   ]
 }
