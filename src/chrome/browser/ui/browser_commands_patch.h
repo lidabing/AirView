@@ -25,6 +25,24 @@ namespace chrome {
 void OpenDragDropUrl(Browser* browser,
                      content::WebContents* web_contents,
                      const GURL& url);
+
+void PageUp();
+void PageDown();
+void GoPageTop();
+void GoPageBottom();
+void CloseCurrentTab();
+void CloseOtherTabs();
+void CloseLeftTabs();
+void CloseRightTabs();
+void GoBack();
+void GoForward();
+void SelectPreviousTab();
+void SelectNextTab();
+void RefreshCurrentTab();
+void RestoreTab();
+void NewTab();
+void StopLoading();
+void MinimizeWindow();
 }
 
 #endif  // CHROME_BROWSER_UI_BROWSER_COMMANDS_PATCH_H_
