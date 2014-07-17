@@ -1260,9 +1260,9 @@
       <structure type="chrome_scaled_image" name="IDR_RESTORE_BUTTON" file="common/browser_restore.png" />
       <structure type="chrome_scaled_image" name="IDR_RESTORE_BUTTON_H" file="common/browser_restore_hover.png" />
       <structure type="chrome_scaled_image" name="IDR_RESTORE_BUTTON_P" file="common/browser_restore_press.png" />
-      <structure type="chrome_scaled_image" name="IDR_X_BOOKMARK" file="x_image/av_bookmark.png" />
-      <structure type="chrome_scaled_image" name="IDR_X_BOOKMARK_H" file="x_image/av_bookmark_h.png" />
-      <structure type="chrome_scaled_image" name="IDR_X_BOOKMARK_P" file="x_image/av_bookmark_p.png" />
+      <structure type="chrome_scaled_image" name="IDR_X_BOOKMARK" file="x_image/x_bookmark.png" />
+      <structure type="chrome_scaled_image" name="IDR_X_BOOKMARK_H" file="x_image/x_bookmark_h.png" />
+      <structure type="chrome_scaled_image" name="IDR_X_BOOKMARK_P" file="x_image/x_bookmark_p.png" />
       <structure type="chrome_scaled_image" name="IDR_X_RESTORE_WINDOW_ITEM"  file="x_image/x_restore_window.png" />
       
       <if expr="not pp_ifdef('_google_chrome')">
