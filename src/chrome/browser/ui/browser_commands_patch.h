@@ -25,6 +25,7 @@ namespace chrome {
 void OpenDragDropUrl(Browser* browser,
                      content::WebContents* web_contents,
                      const GURL& url);
+void ClearRestoreList(Browser* browser);
 
 void PageUp();
 void PageDown();

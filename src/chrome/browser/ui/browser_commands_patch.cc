@@ -18,6 +18,8 @@
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
 #include "content/public/browser/web_contents.h"
 #include "content/public/browser/user_metrics.h"
+#include "chrome/browser/sessions/tab_restore_service.h"
+#include "chrome/browser/sessions/tab_restore_service_factory.h"
 
 #define DCHECK_UI_THREAD() \
   DCHECK(base::MessageLoop::current()->type() == base::MessageLoop::TYPE_UI)
@@ -57,6 +59,14 @@ void OpenDragDropUrl(Browser* browser,
   }
   params.window_action = chrome::NavigateParams::SHOW_WINDOW;
   chrome::Navigate(&params);
+}
+
+void ClearRestoreList(Browser* browser) {
+	DCHECK(browser);
+	content::RecordAction(base::UserMetricsAction("ClearRestoreList"));
+	TabRestoreService* restore_service =
+		TabRestoreServiceFactory::GetForProfile(browser->profile());
+	restore_service->ClearEntries();
 }
 
 void PageUp() {
