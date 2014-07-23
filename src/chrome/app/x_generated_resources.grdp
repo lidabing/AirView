@@ -47,37 +47,14 @@
   <message name="IDS_X_CLEAE_RESTORE_LIST" desc="xstring">
     Clear restore list
   </message>
-  <message name="IDS_X_TOOLTIP_RESTORE" desc="xstring">
-    Reopen close tab
-  </message>
   <message name="IDS_ACCNAME_X_RESTORE" desc="xstring">
     Restore
   </message>
   <message name="IDS_TOOLTIP_X_RESTORE" desc="xstring">
     Click to go restore page, hold to see restore list
   </message>
-  <message name="IDS_ACCNAME_X_BOOKMARK_MENU" desc="xstring">
-    BookMark
-  </message>
-  <message name="IDS_ACCNAME_RENDER_MODE" desc="xstring">
-    RenderMode
-  </message>
-  <message name="IDS_IE_MODE_DESCRIPTION" desc="xstring">
-    Click to switch  webkit mode
-  </message>
-  <message name="IDS_WEBKIT_MODE_DESCRIPTION" desc="xstring">
-    Click to switch IE mode
-  </message>
   <message name="IDS_XVIEW_BBS" desc="xstring">
     AirView BBS
-  </message>
-  <message name="IDS_XVIEW_CHECK_UPDATE" desc="xstring">
-    Check for update
-  </message>
-  <message name="IDS_ABOUT_CHROMIUM_VERSION" desc="xstring">
-    Chromium Version <ph name="PRODUCT_VERSION">
-      $1<ex>15.0.865.0</ex>
-    </ph>
   </message>
   <message name="IDS_X_MOUSE_CONTROL" desc="xstring">
     Mouse Control
