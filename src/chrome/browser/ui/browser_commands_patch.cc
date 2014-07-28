@@ -20,6 +20,8 @@
 #include "content/public/browser/user_metrics.h"
 #include "chrome/browser/sessions/tab_restore_service.h"
 #include "chrome/browser/sessions/tab_restore_service_factory.h"
+#include "ui/aura/window.h"
+#include "ui/aura/window_tree_host.h"
 
 #define DCHECK_UI_THREAD() \
   DCHECK(base::MessageLoop::current()->type() == base::MessageLoop::TYPE_UI)
@@ -39,6 +41,16 @@ void CloseTabSelectTask() {
   Browser* browser = GetLastActiveBrowser();
   if (browser)
     chrome::CloseTab(browser);
+}
+
+HWND GetCurrentRenderViewWindow() {
+  HWND window = NULL;
+  Browser* browser = GetLastActiveBrowser();
+  if (!browser)
+    return window;
+  window =
+      browser->window()->GetNativeWindow()->GetHost()->GetAcceleratedWidget();
+  return window;
 }
 }
 
@@ -62,27 +74,67 @@ void OpenDragDropUrl(Browser* browser,
 }
 
 void ClearRestoreList(Browser* browser) {
-	DCHECK(browser);
-	content::RecordAction(base::UserMetricsAction("ClearRestoreList"));
-	TabRestoreService* restore_service =
-		TabRestoreServiceFactory::GetForProfile(browser->profile());
-	restore_service->ClearEntries();
+  DCHECK(browser);
+  content::RecordAction(base::UserMetricsAction("ClearRestoreList"));
+  TabRestoreService* restore_service =
+      TabRestoreServiceFactory::GetForProfile(browser->profile());
+  restore_service->ClearEntries();
 }
 
 void PageUp() {
   DCHECK_UI_THREAD();
+  HWND window = GetCurrentRenderViewWindow();
+  if (window) {
+    //强制获得焦点
+    POINT point_;
+    ::GetCursorPos(&point_);
+    ::PostMessage(window, WM_LBUTTONDOWN, NULL, (LPARAM) & point_);
+    ::PostMessage(window, WM_LBUTTONUP, NULL, (LPARAM) & point_);
+    ::PostMessage(window, WM_KEYDOWN, VK_PRIOR, 0L);
+    ::PostMessage(window, WM_KEYUP, VK_PRIOR, 0L);
+  }
 }
 
 void PageDown() {
   DCHECK_UI_THREAD();
+  HWND window = GetCurrentRenderViewWindow();
+  if (window) {
+    //强制获得焦点
+    POINT point_;
+    ::GetCursorPos(&point_);
+    ::PostMessage(window, WM_LBUTTONDOWN, NULL, (LPARAM) & point_);
+    ::PostMessage(window, WM_LBUTTONUP, NULL, (LPARAM) & point_);
+    ::PostMessage(window, WM_KEYDOWN, VK_NEXT, 0L);
+    ::PostMessage(window, WM_KEYUP, VK_NEXT, 0L);
+  }
 }
 
 void GoPageTop() {
   DCHECK_UI_THREAD();
+  HWND window = GetCurrentRenderViewWindow();
+  if (window) {
+    //强制获得焦点
+    POINT point_;
+    ::GetCursorPos(&point_);
+    ::PostMessage(window, WM_LBUTTONDOWN, NULL, (LPARAM) & point_);
+    ::PostMessage(window, WM_LBUTTONUP, NULL, (LPARAM) & point_);
+    ::PostMessage(window, WM_KEYDOWN, VK_HOME, 0L);
+    ::PostMessage(window, WM_KEYUP, VK_HOME, 0L);
+  }
 }
 
 void GoPageBottom() {
   DCHECK_UI_THREAD();
+  HWND window = GetCurrentRenderViewWindow();
+  if (window) {
+    //强制获得焦点
+    POINT point_;
+    ::GetCursorPos(&point_);
+    ::PostMessage(window, WM_LBUTTONDOWN, NULL, (LPARAM) & point_);
+    ::PostMessage(window, WM_LBUTTONUP, NULL, (LPARAM) & point_);
+    ::PostMessage(window, WM_KEYDOWN, VK_END, 0L);
+    ::PostMessage(window, WM_KEYUP, VK_END, 0L);
+  }
 }
 void CloseCurrentTab() {
   DCHECK_UI_THREAD();
@@ -172,6 +224,9 @@ void StopLoading() {
 }
 void MinimizeWindow() {
   DCHECK_UI_THREAD();
-
+  Browser* browser = GetLastActiveBrowser();
+  if (browser) {
+    browser->window()->Minimize();
+  }
 }
 }
