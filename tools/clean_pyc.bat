@@ -1,0 +1,1 @@
+call python "%~dp0clean_pyc.py" %*  'C:/github/chromium-36.0.1985.125'

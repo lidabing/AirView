@@ -1,6 +1,6 @@
 import os, stat;
 
-root_dir = 'C:/chromium1/chromium/';
+root_dir = 'C:/github/chromium-36.0.1985.125';
 
 def walk(path):
      for item in os.listdir(path):
