@@ -7,7 +7,7 @@
 #include "base/strings/string_number_conversions.h"
 #include "base/strings/utf_string_conversions.h"
 #include "chrome/app/chrome_command_ids.h"
-#include "components/bookmarks/browser/bookmark_model.h"
+#include "components/bookmarks/core/browser/bookmark_model.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/views/bookmarks/bookmark_menu_delegate.h"
@@ -136,10 +136,6 @@ bool BookMarkMenu::IsCommandEnabled(int id) const {
 void BookMarkMenu::ExecuteCommand(int id, int mouse_event_flags) {
   bookmark_menu_delegate_->ExecuteCommand(id, mouse_event_flags);
   return;
-}
-
-bool BookMarkMenu::GetAccelerator(int id, ui::Accelerator* accelerator) const {
-  return false;
 }
 
 void BookMarkMenu::WillShowMenu(MenuItemView* menu) {

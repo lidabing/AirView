@@ -87,7 +87,7 @@ bool WebDragHanlderAura::GetPasteAndGoURL(const ui::OSExchangeData& data,
       ->Classify(text,
                  false,
                  false,
-                 metrics::OmniboxEventProto::INVALID_SPEC,
+                 AutocompleteInput::INVALID_SPEC,
                  &match,
                  NULL);
   if (!match.destination_url.is_valid())

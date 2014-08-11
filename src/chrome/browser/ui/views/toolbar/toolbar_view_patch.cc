@@ -39,6 +39,7 @@ void X_CLASS_PATCH_NAME(ToolbarView)::Init() {
 }
 
 void X_CLASS_PATCH_NAME(ToolbarView)::LoadImages() {
+#if 0
   ui::ThemeProvider* tp = that_->GetThemeProvider();
   restore_->SetImage(views::CustomButton::STATE_NORMAL,
                      tp->GetImageSkiaNamed(IDR_RESTORE_BUTTON));
@@ -53,6 +54,7 @@ void X_CLASS_PATCH_NAME(ToolbarView)::LoadImages() {
                       *tp->GetImageSkiaNamed(IDR_X_BOOKMARK_H));
   bookmark_->SetImage(views::CustomButton::STATE_PRESSED,
                       *tp->GetImageSkiaNamed(IDR_X_BOOKMARK_P));
+#endif
 }
 
 void X_CLASS_PATCH_NAME(

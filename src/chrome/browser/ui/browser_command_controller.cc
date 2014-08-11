@@ -13,7 +13,9 @@
 #include "chrome/browser/extensions/extension_service.h"
 #include "chrome/browser/lifetime/application_lifetime.h"
 #include "chrome/browser/prefs/incognito_mode_prefs.h"
+#include "chrome/browser/profiles/avatar_menu.h"
 #include "chrome/browser/profiles/profile.h"
+#include "chrome/browser/profiles/profile_manager.h"
 #include "chrome/browser/sessions/tab_restore_service.h"
 #include "chrome/browser/sessions/tab_restore_service_factory.h"
 #include "chrome/browser/shell_integration.h"
@@ -39,7 +41,6 @@
 #include "content/public/browser/web_contents.h"
 #include "content/public/browser/web_contents_observer.h"
 #include "content/public/common/url_constants.h"
-#include "extensions/browser/extension_system.h"
 #include "ui/events/keycodes/keyboard_codes.h"
 
 #if defined(OS_MACOSX)
@@ -138,7 +139,7 @@ class SwitchToMetroUIHandler
     switch (state) {
       case ShellIntegration::STATE_PROCESSING:
         return;
-      case ShellIntegration::STATE_UNKNOWN:
+      case ShellIntegration::STATE_UNKNOWN :
         break;
       case ShellIntegration::STATE_IS_DEFAULT:
         chrome::AttemptRestartToMetroMode();
@@ -155,7 +156,7 @@ class SwitchToMetroUIHandler
     delete this;
   }
 
-  virtual void OnSetAsDefaultConcluded(bool success) OVERRIDE {
+  virtual void OnSetAsDefaultConcluded(bool success)  OVERRIDE {
     if (!success) {
       delete this;
       return;
@@ -164,7 +165,9 @@ class SwitchToMetroUIHandler
     default_browser_worker_->StartCheckIsDefault();
   }
 
-  virtual bool IsInteractiveSetDefaultPermitted() OVERRIDE { return true; }
+  virtual bool IsInteractiveSetDefaultPermitted() OVERRIDE {
+    return true;
+  }
 
   scoped_refptr<ShellIntegration::DefaultBrowserWorker> default_browser_worker_;
   bool first_check_;
@@ -180,8 +183,11 @@ namespace chrome {
 ///////////////////////////////////////////////////////////////////////////////
 // BrowserCommandController, public:
 
-BrowserCommandController::BrowserCommandController(Browser* browser)
+BrowserCommandController::BrowserCommandController(
+    Browser* browser,
+    ProfileManager* profile_manager)
     : browser_(browser),
+      profile_manager_(profile_manager),
       command_updater_(this),
       block_command_execution_(false),
       last_blocked_command_id_(-1),
@@ -189,6 +195,8 @@ BrowserCommandController::BrowserCommandController(Browser* browser)
       X_PATCH_CLASS_INIT(BrowserCommandController),
       ///}
       last_blocked_command_disposition_(CURRENT_TAB) {
+  if (profile_manager_)
+    profile_manager_->GetProfileInfoCache().AddObserver(this);
   browser_->tab_strip_model()->AddObserver(this);
   PrefService* local_state = g_browser_process->local_state();
   if (local_state) {
@@ -254,6 +262,8 @@ BrowserCommandController::~BrowserCommandController() {
   profile_pref_registrar_.RemoveAll();
   local_pref_registrar_.RemoveAll();
   browser_->tab_strip_model()->RemoveObserver(this);
+  if (profile_manager_)
+    profile_manager_->GetProfileInfoCache().RemoveObserver(this);
 }
 
 bool BrowserCommandController::IsReservedCommandOrKey(
@@ -269,7 +279,7 @@ bool BrowserCommandController::IsReservedCommandOrKey(
   // behavior of these keys.  Ash handles F4 and up; this leaves us needing to
   // reserve browser back/forward and refresh here.
   ui::KeyboardCode key_code =
-      static_cast<ui::KeyboardCode>(event.windowsKeyCode);
+    static_cast<ui::KeyboardCode>(event.windowsKeyCode);
   if ((key_code == ui::VKEY_BROWSER_BACK && command_id == IDC_BACK) ||
       (key_code == ui::VKEY_BROWSER_FORWARD && command_id == IDC_FORWARD) ||
       (key_code == ui::VKEY_BROWSER_REFRESH && command_id == IDC_RELOAD)) {
@@ -289,11 +299,15 @@ bool BrowserCommandController::IsReservedCommandOrKey(
     return false;
 #endif
 
-  return command_id == IDC_CLOSE_TAB || command_id == IDC_CLOSE_WINDOW ||
-         command_id == IDC_NEW_INCOGNITO_WINDOW || command_id == IDC_NEW_TAB ||
-         command_id == IDC_NEW_WINDOW || command_id == IDC_RESTORE_TAB ||
+  return command_id == IDC_CLOSE_TAB ||
+         command_id == IDC_CLOSE_WINDOW ||
+         command_id == IDC_NEW_INCOGNITO_WINDOW ||
+         command_id == IDC_NEW_TAB ||
+         command_id == IDC_NEW_WINDOW ||
+         command_id == IDC_RESTORE_TAB ||
          command_id == IDC_SELECT_NEXT_TAB ||
-         command_id == IDC_SELECT_PREVIOUS_TAB || command_id == IDC_EXIT;
+         command_id == IDC_SELECT_PREVIOUS_TAB ||
+         command_id == IDC_EXIT;
 }
 
 void BrowserCommandController::SetBlockCommandExecution(bool block) {
@@ -365,7 +379,6 @@ void BrowserCommandController::ExecuteCommandWithDisposition(
   if (patch_.ExecuteCommandWithDisposition(id, disposition))
     return;
   ///}
-
   // The order of commands in this switch statement must match the function
   // declaration order in browser.h!
   switch (id) {
@@ -381,7 +394,7 @@ void BrowserCommandController::ExecuteCommandWithDisposition(
       break;
     case IDC_RELOAD_CLEARING_CACHE:
       ClearCache(browser_);
-    // FALL THROUGH
+      // FALL THROUGH
     case IDC_RELOAD_IGNORING_CACHE:
       ReloadIgnoringCache(browser_, disposition);
       break;
@@ -395,7 +408,7 @@ void BrowserCommandController::ExecuteCommandWithDisposition(
       Stop(browser_);
       break;
 
-    // Window management commands
+     // Window management commands
     case IDC_NEW_WINDOW:
       NewWindow(browser_);
       break;
@@ -418,7 +431,8 @@ void BrowserCommandController::ExecuteCommandWithDisposition(
       SelectNextTab(browser_);
       break;
     case IDC_SELECT_PREVIOUS_TAB:
-      content::RecordAction(base::UserMetricsAction("Accel_SelectPreviousTab"));
+      content::RecordAction(
+          base::UserMetricsAction("Accel_SelectPreviousTab"));
       SelectPreviousTab(browser_);
       break;
     case IDC_MOVE_TAB_NEXT:
@@ -466,8 +480,8 @@ void BrowserCommandController::ExecuteCommandWithDisposition(
           base::UserMetricsAction("Accel_Toggle_Minimized_M"));
       ash::accelerators::ToggleMinimized();
       break;
-// If Ash needs many more commands here we should implement a general
-// mechanism to pass accelerators back into Ash. http://crbug.com/285308
+    // If Ash needs many more commands here we should implement a general
+    // mechanism to pass accelerators back into Ash. http://crbug.com/285308
 #endif
 
 #if defined(OS_CHROMEOS)
@@ -650,7 +664,8 @@ void BrowserCommandController::ExecuteCommandWithDisposition(
       FocusAppMenu(browser_);
       break;
     case IDC_FOCUS_BOOKMARKS:
-      content::RecordAction(base::UserMetricsAction("Accel_Focus_Bookmarks"));
+      content::RecordAction(
+          base::UserMetricsAction("Accel_Focus_Bookmarks"));
       FocusBookmarksToolbar(browser_);
       break;
     case IDC_FOCUS_INFOBARS:
@@ -766,14 +781,25 @@ void BrowserCommandController::ExecuteCommandWithDisposition(
     case IDC_TOGGLE_SPEECH_INPUT:
       ToggleSpeechInput(browser_);
       break;
-    case IDC_DISTILL_PAGE:
-      DistillCurrentPage(browser_);
-      break;
 
     default:
       LOG(WARNING) << "Received Unimplemented Command: " << id;
       break;
   }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// BrowserCommandController, ProfileInfoCacheObserver implementation:
+
+void BrowserCommandController::OnProfileAdded(
+    const base::FilePath& profile_path) {
+  UpdateCommandsForMultipleProfiles();
+}
+
+void BrowserCommandController::OnProfileWasRemoved(
+    const base::FilePath& profile_path,
+    const base::string16& profile_name) {
+  UpdateCommandsForMultipleProfiles();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -837,7 +863,9 @@ class BrowserCommandController::InterstitialObserver
  public:
   InterstitialObserver(BrowserCommandController* controller,
                        content::WebContents* web_contents)
-      : WebContentsObserver(web_contents), controller_(controller) {}
+      : WebContentsObserver(web_contents),
+        controller_(controller) {
+  }
 
   using content::WebContentsObserver::web_contents;
 
@@ -948,30 +976,28 @@ void BrowserCommandController::InitCommandState() {
   command_updater_.UpdateCommandEnabled(IDC_ZOOM_MINUS, true);
 
   // Show various bits of UI
-  const bool guest_session = profile()->IsGuestSession();
-  const bool normal_window = browser_->is_type_tabbed();
   UpdateOpenFileState(&command_updater_);
   command_updater_.UpdateCommandEnabled(IDC_CREATE_SHORTCUTS, false);
   UpdateCommandsForDevTools();
   command_updater_.UpdateCommandEnabled(IDC_TASK_MANAGER, CanOpenTaskManager());
-  command_updater_.UpdateCommandEnabled(IDC_SHOW_HISTORY, !guest_session);
+  command_updater_.UpdateCommandEnabled(IDC_SHOW_HISTORY,
+                                        !profile()->IsGuestSession());
   command_updater_.UpdateCommandEnabled(IDC_SHOW_DOWNLOADS, true);
-  command_updater_.UpdateCommandEnabled(IDC_HELP_MENU, true);
   command_updater_.UpdateCommandEnabled(IDC_HELP_PAGE_VIA_KEYBOARD, true);
   command_updater_.UpdateCommandEnabled(IDC_HELP_PAGE_VIA_MENU, true);
-  command_updater_.UpdateCommandEnabled(IDC_BOOKMARKS_MENU, !guest_session);
-  command_updater_.UpdateCommandEnabled(
-      IDC_RECENT_TABS_MENU, !guest_session && !profile()->IsOffTheRecord());
-  command_updater_.UpdateCommandEnabled(IDC_CLEAR_BROWSING_DATA, normal_window);
+  command_updater_.UpdateCommandEnabled(IDC_BOOKMARKS_MENU,
+                                        !profile()->IsGuestSession());
+  command_updater_.UpdateCommandEnabled(IDC_RECENT_TABS_MENU,
+                                        !profile()->IsGuestSession() &&
+                                        !profile()->IsOffTheRecord());
 #if defined(OS_CHROMEOS)
   command_updater_.UpdateCommandEnabled(IDC_TAKE_SCREENSHOT, true);
-#else
-  // Chrome OS uses the system tray menu to handle multi-profiles.
-  if (normal_window && (guest_session || !profile()->IsOffTheRecord()))
-    command_updater_.UpdateCommandEnabled(IDC_SHOW_AVATAR_MENU, true);
 #endif
 
   UpdateShowSyncState(true);
+
+  // Initialize other commands based on the window type.
+  bool normal_window = browser_->is_type_tabbed();
 
   // Navigation commands
   command_updater_.UpdateCommandEnabled(
@@ -982,7 +1008,8 @@ void BrowserCommandController::InitCommandState() {
 
   // Window management commands
   command_updater_.UpdateCommandEnabled(IDC_SELECT_NEXT_TAB, normal_window);
-  command_updater_.UpdateCommandEnabled(IDC_SELECT_PREVIOUS_TAB, normal_window);
+  command_updater_.UpdateCommandEnabled(IDC_SELECT_PREVIOUS_TAB,
+                                        normal_window);
   command_updater_.UpdateCommandEnabled(IDC_MOVE_TAB_NEXT, normal_window);
   command_updater_.UpdateCommandEnabled(IDC_MOVE_TAB_PREVIOUS, normal_window);
   command_updater_.UpdateCommandEnabled(IDC_SELECT_TAB_0, normal_window);
@@ -995,30 +1022,39 @@ void BrowserCommandController::InitCommandState() {
   command_updater_.UpdateCommandEnabled(IDC_SELECT_TAB_7, normal_window);
   command_updater_.UpdateCommandEnabled(IDC_SELECT_LAST_TAB, normal_window);
 #if defined(OS_WIN)
-  bool metro = browser_->host_desktop_type() == chrome::HOST_DESKTOP_TYPE_ASH;
-  command_updater_.UpdateCommandEnabled(IDC_METRO_SNAP_ENABLE, metro);
-  command_updater_.UpdateCommandEnabled(IDC_METRO_SNAP_DISABLE, metro);
-  int restart_mode = metro ? IDC_WIN8_DESKTOP_RESTART : IDC_WIN8_METRO_RESTART;
+#if !defined(USE_AURA)
+  const bool metro_mode = base::win::IsMetroProcess();
+#else
+  const bool metro_mode =
+     browser_->host_desktop_type() == chrome::HOST_DESKTOP_TYPE_ASH ?
+         true : false;
+#endif
+  command_updater_.UpdateCommandEnabled(IDC_METRO_SNAP_ENABLE, metro_mode);
+  command_updater_.UpdateCommandEnabled(IDC_METRO_SNAP_DISABLE, metro_mode);
+  int restart_mode = metro_mode ?
+      IDC_WIN8_DESKTOP_RESTART : IDC_WIN8_METRO_RESTART;
   command_updater_.UpdateCommandEnabled(restart_mode, normal_window);
 #endif
 
-  // These are always enabled; the menu determines their menu item visibility.
+  // Show various bits of UI
+  command_updater_.UpdateCommandEnabled(IDC_CLEAR_BROWSING_DATA, normal_window);
+
+  // The upgrade entry and the view incompatibility entry should always be
+  // enabled. Whether they are visible is a separate matter determined on menu
+  // show.
   command_updater_.UpdateCommandEnabled(IDC_UPGRADE_DIALOG, true);
   command_updater_.UpdateCommandEnabled(IDC_VIEW_INCOMPATIBILITIES, true);
 
   // Toggle speech input
   command_updater_.UpdateCommandEnabled(IDC_TOGGLE_SPEECH_INPUT, true);
 
-  // Distill current page.
-  command_updater_.UpdateCommandEnabled(
-      IDC_DISTILL_PAGE,
-      CommandLine::ForCurrentProcess()->HasSwitch(
-          switches::kEnableDomDistiller));
-
-  // Initialize other commands whose state changes based on various conditions.
+  // Initialize other commands whose state changes based on fullscreen mode.
   UpdateCommandsForFullscreenMode();
+
   UpdateCommandsForContentRestrictionState();
+
   UpdateCommandsForBookmarkEditing();
+
   UpdateCommandsForIncognitoAvailability();
 }
 
@@ -1029,7 +1065,8 @@ void BrowserCommandController::UpdateSharedCommandsForIncognitoAvailability(
   IncognitoModePrefs::Availability incognito_availability =
       IncognitoModePrefs::GetAvailability(profile->GetPrefs());
   command_updater->UpdateCommandEnabled(
-      IDC_NEW_WINDOW, incognito_availability != IncognitoModePrefs::FORCED);
+      IDC_NEW_WINDOW,
+      incognito_availability != IncognitoModePrefs::FORCED);
   command_updater->UpdateCommandEnabled(
       IDC_NEW_INCOGNITO_WINDOW,
       incognito_availability != IncognitoModePrefs::DISABLED);
@@ -1041,8 +1078,7 @@ void BrowserCommandController::UpdateSharedCommandsForIncognitoAvailability(
   command_updater->UpdateCommandEnabled(
       IDC_SHOW_BOOKMARK_MANAGER,
       browser_defaults::bookmarks_enabled && !forced_incognito);
-  ExtensionService* extension_service =
-      extensions::ExtensionSystem::Get(profile)->extension_service();
+  ExtensionService* extension_service = profile->GetExtensionService();
   const bool enable_extensions =
       extension_service && extension_service->extensions_enabled();
 
@@ -1075,7 +1111,6 @@ void BrowserCommandController::UpdateCommandsForTabState() {
   /// airview patch{
   patch_.UpdateCommandsForTabState();
   ///}
-
   // Navigation commands
   command_updater_.UpdateCommandEnabled(IDC_BACK, CanGoBack(browser_));
   command_updater_.UpdateCommandEnabled(IDC_FORWARD, CanGoForward(browser_));
@@ -1086,8 +1121,8 @@ void BrowserCommandController::UpdateCommandsForTabState() {
                                         CanReload(browser_));
 
   // Window management commands
-  command_updater_.UpdateCommandEnabled(
-      IDC_DUPLICATE_TAB, !browser_->is_app() && CanDuplicateTab(browser_));
+  command_updater_.UpdateCommandEnabled(IDC_DUPLICATE_TAB,
+      !browser_->is_app() && CanDuplicateTab(browser_));
 
   // Page-related commands
   window()->SetStarredState(
@@ -1102,18 +1137,18 @@ void BrowserCommandController::UpdateCommandsForTabState() {
 
   // Changing the encoding is not possible on Chrome-internal webpages.
   NavigationController& nc = current_web_contents->GetController();
-  bool is_chrome_internal = HasInternalURL(nc.GetLastCommittedEntry()) ||
-                            current_web_contents->ShowingInterstitialPage();
-  command_updater_.UpdateCommandEnabled(
-      IDC_ENCODING_MENU,
+  bool is_chrome_internal = HasInternalURL(nc.GetActiveEntry()) ||
+      current_web_contents->ShowingInterstitialPage();
+  command_updater_.UpdateCommandEnabled(IDC_ENCODING_MENU,
       !is_chrome_internal && current_web_contents->IsSavable());
 
-// Show various bits of UI
-// TODO(pinkerton): Disable app-mode in the model until we implement it
-// on the Mac. Be sure to remove both ifdefs. http://crbug.com/13148
+  // Show various bits of UI
+  // TODO(pinkerton): Disable app-mode in the model until we implement it
+  // on the Mac. Be sure to remove both ifdefs. http://crbug.com/13148
 #if !defined(OS_MACOSX)
   command_updater_.UpdateCommandEnabled(
-      IDC_CREATE_SHORTCUTS, CanCreateApplicationShortcuts(browser_));
+      IDC_CREATE_SHORTCUTS,
+      CanCreateApplicationShortcuts(browser_));
   command_updater_.UpdateCommandEnabled(IDC_CREATE_HOSTED_APP,
                                         CanCreateBookmarkApp(browser_));
 #endif
@@ -1143,7 +1178,8 @@ void BrowserCommandController::UpdateCommandsForContentRestrictionState() {
 void BrowserCommandController::UpdateCommandsForDevTools() {
   bool dev_tools_enabled =
       !profile()->GetPrefs()->GetBoolean(prefs::kDevToolsDisabled);
-  command_updater_.UpdateCommandEnabled(IDC_DEV_TOOLS, dev_tools_enabled);
+  command_updater_.UpdateCommandEnabled(IDC_DEV_TOOLS,
+                                        dev_tools_enabled);
   command_updater_.UpdateCommandEnabled(IDC_DEV_TOOLS_CONSOLE,
                                         dev_tools_enabled);
   command_updater_.UpdateCommandEnabled(IDC_DEV_TOOLS_DEVICES,
@@ -1159,16 +1195,16 @@ void BrowserCommandController::UpdateCommandsForBookmarkEditing() {
                                         CanBookmarkCurrentPage(browser_));
   command_updater_.UpdateCommandEnabled(IDC_BOOKMARK_ALL_TABS,
                                         CanBookmarkAllTabs(browser_));
-  command_updater_.UpdateCommandEnabled(IDC_PIN_TO_START_SCREEN, true);
+  command_updater_.UpdateCommandEnabled(IDC_PIN_TO_START_SCREEN,
+                                        true);
 }
 
 void BrowserCommandController::UpdateCommandsForBookmarkBar() {
-  command_updater_.UpdateCommandEnabled(
-      IDC_SHOW_BOOKMARK_BAR,
-      browser_defaults::bookmarks_enabled && !profile()->IsGuestSession() &&
-          !profile()->GetPrefs()->IsManagedPreference(
-              prefs::kShowBookmarkBar) &&
-          IsShowingMainUI());
+  command_updater_.UpdateCommandEnabled(IDC_SHOW_BOOKMARK_BAR,
+      browser_defaults::bookmarks_enabled &&
+      !profile()->IsGuestSession() &&
+      !profile()->GetPrefs()->IsManagedPreference(prefs::kShowBookmarkBar) &&
+      IsShowingMainUI());
 }
 
 void BrowserCommandController::UpdateCommandsForFileSelectionDialogs() {
@@ -1202,16 +1238,16 @@ void BrowserCommandController::UpdateCommandsForFullscreenMode() {
   command_updater_.UpdateCommandEnabled(IDC_FOCUS_TOOLBAR, show_main_ui);
   command_updater_.UpdateCommandEnabled(IDC_FOCUS_LOCATION, show_main_ui);
   command_updater_.UpdateCommandEnabled(IDC_FOCUS_SEARCH, show_main_ui);
-  command_updater_.UpdateCommandEnabled(IDC_FOCUS_MENU_BAR,
-                                        main_not_fullscreen);
-  command_updater_.UpdateCommandEnabled(IDC_FOCUS_NEXT_PANE,
-                                        main_not_fullscreen);
-  command_updater_.UpdateCommandEnabled(IDC_FOCUS_PREVIOUS_PANE,
-                                        main_not_fullscreen);
-  command_updater_.UpdateCommandEnabled(IDC_FOCUS_BOOKMARKS,
-                                        main_not_fullscreen);
-  command_updater_.UpdateCommandEnabled(IDC_FOCUS_INFOBARS,
-                                        main_not_fullscreen);
+  command_updater_.UpdateCommandEnabled(
+      IDC_FOCUS_MENU_BAR, main_not_fullscreen);
+  command_updater_.UpdateCommandEnabled(
+      IDC_FOCUS_NEXT_PANE, main_not_fullscreen);
+  command_updater_.UpdateCommandEnabled(
+      IDC_FOCUS_PREVIOUS_PANE, main_not_fullscreen);
+  command_updater_.UpdateCommandEnabled(
+      IDC_FOCUS_BOOKMARKS, main_not_fullscreen);
+  command_updater_.UpdateCommandEnabled(
+      IDC_FOCUS_INFOBARS, main_not_fullscreen);
 
   // Show various bits of UI
   command_updater_.UpdateCommandEnabled(IDC_DEVELOPER_MENU, show_main_ui);
@@ -1222,10 +1258,9 @@ void BrowserCommandController::UpdateCommandsForFullscreenMode() {
 
   // Settings page/subpages are forced to open in normal mode. We disable these
   // commands for guest sessions and when incognito is forced.
-  const bool options_enabled =
-      show_main_ui &&
-      IncognitoModePrefs::GetAvailability(profile()->GetPrefs()) !=
-          IncognitoModePrefs::FORCED;
+  const bool options_enabled = show_main_ui &&
+      IncognitoModePrefs::GetAvailability(
+          profile()->GetPrefs()) != IncognitoModePrefs::FORCED;
   const bool guest_session = profile()->IsGuestSession();
   command_updater_.UpdateCommandEnabled(IDC_OPTIONS, options_enabled);
   command_updater_.UpdateCommandEnabled(IDC_IMPORT_SETTINGS,
@@ -1235,7 +1270,7 @@ void BrowserCommandController::UpdateCommandsForFullscreenMode() {
   command_updater_.UpdateCommandEnabled(IDC_VIEW_PASSWORDS, show_main_ui);
   command_updater_.UpdateCommandEnabled(IDC_ABOUT, show_main_ui);
   command_updater_.UpdateCommandEnabled(IDC_SHOW_APP_MENU, show_main_ui);
-#if defined(ENABLE_PROFILING) && !defined(NO_TCMALLOC)
+#if defined (ENABLE_PROFILING) && !defined(NO_TCMALLOC)
   command_updater_.UpdateCommandEnabled(IDC_PROFILING_ENABLED, show_main_ui);
 #endif
 
@@ -1254,6 +1289,18 @@ void BrowserCommandController::UpdateCommandsForFullscreenMode() {
                                         fullscreen_enabled);
 
   UpdateCommandsForBookmarkBar();
+  UpdateCommandsForMultipleProfiles();
+}
+
+void BrowserCommandController::UpdateCommandsForMultipleProfiles() {
+  bool is_regular_or_guest_session =
+      profile()->IsGuestSession() || !profile()->IsOffTheRecord();
+  bool enable = IsShowingMainUI() &&
+      is_regular_or_guest_session &&
+      profile_manager_ &&
+      AvatarMenu::ShouldShowAvatarMenu();
+  command_updater_.UpdateCommandEnabled(IDC_SHOW_AVATAR_MENU,
+                                        enable);
 }
 
 void BrowserCommandController::UpdatePrintingState() {
@@ -1304,8 +1351,8 @@ void BrowserCommandController::UpdateReloadStopState(bool is_loading,
 
 void BrowserCommandController::UpdateCommandsForFind() {
   TabStripModel* model = browser_->tab_strip_model();
-  bool enabled =
-      !model->IsTabBlocked(model->active_index()) && !browser_->is_devtools();
+  bool enabled = !model->IsTabBlocked(model->active_index()) &&
+                 !browser_->is_devtools();
 
   command_updater_.UpdateCommandEnabled(IDC_FIND, enabled);
   command_updater_.UpdateCommandEnabled(IDC_FIND_NEXT, enabled);

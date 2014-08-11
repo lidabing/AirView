@@ -6,7 +6,7 @@
 #define CHROME_BROWSER_UI_BOOKMARK_MENU_H_
 
 #include "base/memory/scoped_ptr.h"
-#include "components/bookmarks/browser/base_bookmark_model_observer.h"
+#include "components/bookmarks/core/browser/base_bookmark_model_observer.h"
 #include "ui/base/models/menu_model.h"
 #include "ui/views/controls/menu/menu_delegate.h"
 
@@ -60,8 +60,6 @@ class BookMarkMenu : public views::MenuDelegate,
   virtual bool IsItemChecked(int id) const OVERRIDE;
   virtual bool IsCommandEnabled(int id) const OVERRIDE;
   virtual void ExecuteCommand(int id, int mouse_event_flags) OVERRIDE;
-  virtual bool GetAccelerator(int id,
-                              ui::Accelerator* accelerator) const OVERRIDE;
   virtual void WillShowMenu(views::MenuItemView* menu) OVERRIDE;
   // BaseBookmarkModelObserver overrides:
   virtual void BookmarkModelChanged() OVERRIDE;

@@ -118,7 +118,7 @@ base::string16 RestoreMenuModel::GetLabelAt(int index) const {
   }
   DCHECK(!menu_text.empty());
   menu_text =
-      gfx::ElideText(menu_text, gfx::FontList(), kMaxWidth, gfx::ELIDE_TAIL);
+      gfx::ElideText(menu_text, gfx::FontList(), kMaxWidth, gfx::ELIDE_AT_END);
   return menu_text;
 }
 
@@ -272,12 +272,14 @@ void RestoreMenuModel::FetchFavicon(const GURL* url, int index) {
       browser_->profile(), Profile::EXPLICIT_ACCESS);
   if (!favicon_service)
     return;
-  /*FaviconService::Handle handle = */favicon_service->GetFaviconImageForPageURL(
+    /*
+    favicon_service->GetFaviconImageForPageURL(
       FaviconService::FaviconForPageURLParams(*url, favicon_base::FAVICON, gfx::kFaviconSize),
       base::Bind(&RestoreMenuModel::OnFavIconDataAvailable,
                  base::Unretained(this),
                  index),
       &cancelable_task_tracker_);
+      */
 }
 
 void RestoreMenuModel::OnFavIconDataAvailable(

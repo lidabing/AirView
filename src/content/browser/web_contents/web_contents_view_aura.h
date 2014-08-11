@@ -14,7 +14,6 @@
 #include "content/browser/web_contents/web_contents_view.h"
 #include "content/common/content_export.h"
 #include "ui/aura/window_delegate.h"
-#include "ui/aura/window_observer.h"
 #include "ui/compositor/layer_animation_observer.h"
 #include "ui/wm/public/drag_drop_delegate.h"
 ///airview patch{
@@ -32,7 +31,6 @@ namespace content {
 class GestureNavSimple;
 class OverscrollNavigationOverlay;
 class RenderWidgetHostImpl;
-class RenderWidgetHostViewAura;
 class ShadowLayerDelegate;
 class TouchEditableImplAura;
 class WebContentsViewDelegate;
@@ -45,11 +43,12 @@ class WebContentsViewAura
       public OverscrollControllerDelegate,
       public ui::ImplicitAnimationObserver,
       public aura::WindowDelegate,
-      public aura::client::DragDropDelegate,
-      public aura::WindowObserver {
+      public aura::client::DragDropDelegate {
  public:
   WebContentsViewAura(WebContentsImpl* web_contents,
                       WebContentsViewDelegate* delegate);
+
+  CONTENT_EXPORT void SetupOverlayWindowForTesting();
 
   CONTENT_EXPORT void SetTouchEditableForTest(
       TouchEditableImplAura* touch_editable);
@@ -63,7 +62,7 @@ class WebContentsViewAura
 
   void EndDrag(blink::WebDragOperationsMask ops);
 
-  void InstallOverscrollControllerDelegate(RenderWidgetHostViewAura* view);
+  void InstallOverscrollControllerDelegate(RenderWidgetHostImpl* host);
 
   // Creates and sets up the overlay window that will be displayed during the
   // overscroll gesture.
@@ -179,15 +178,6 @@ class WebContentsViewAura
   virtual void OnDragExited() OVERRIDE;
   virtual int OnPerformDrop(const ui::DropTargetEvent& event) OVERRIDE;
 
-  // Overridden from aura::WindowObserver:
-  virtual void OnWindowParentChanged(aura::Window* window,
-                                     aura::Window* parent) OVERRIDE;
-  virtual void OnWindowVisibilityChanged(aura::Window* window,
-                                         bool visible) OVERRIDE;
-
-  // Update the web contents visiblity.
-  void UpdateWebContentsVisibility(bool visible);
-
   scoped_ptr<aura::Window> window_;
 
   // The window that shows the screenshot of the history page during an
@@ -231,14 +221,10 @@ class WebContentsViewAura
   scoped_ptr<TouchEditableImplAura> touch_editable_;
   scoped_ptr<GestureNavSimple> gesture_nav_simple_;
 
-  // On Windows we can run into problems if resources get released within the
-  // initialization phase while the content (and its dimensions) are not known.
-  bool is_or_was_visible_;
 
   ///airview patch{
   X_PATCH_THIS(WebContentsViewAura);
   ///}
-
   DISALLOW_COPY_AND_ASSIGN(WebContentsViewAura);
 };
 

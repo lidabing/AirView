@@ -27,12 +27,12 @@ class TabController;
 namespace gfx {
 class Animation;
 class AnimationContainer;
+class Font;
 class LinearAnimation;
 class MultiAnimation;
 }
 namespace views {
 class ImageButton;
-class Label;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -58,11 +58,6 @@ class Tab : public gfx::AnimationDelegate,
   // See description above field.
   void set_dragging(bool dragging) { dragging_ = dragging; }
   bool dragging() const { return dragging_; }
-
-  // Used to mark the tab as having been detached.  Once this has happened, the
-  // tab should be invisibly closed.  This is irreversible.
-  void set_detached() { detached_ = true; }
-  bool detached() const { return detached_; }
 
   // Sets the container all animations run from.
   void set_animation_container(gfx::AnimationContainer* container);
@@ -106,17 +101,6 @@ class Tab : public gfx::AnimationDelegate,
   views::GlowHoverController* hover_controller() {
     return &hover_controller_;
   }
-
-  // Returns the inset within the first dragged tab to use when calculating the
-  // "drag insertion point".  If we simply used the x-coordinate of the tab,
-  // we'd be calculating based on a point well before where the user considers
-  // the tab to "be".  The value here is chosen to "feel good" based on the
-  // widths of the tab images and the tab overlap.
-  //
-  // Note that this must return a value smaller than the midpoint of any tab's
-  // width, or else the user won't be able to drag a tab to the left of the
-  // first tab in the strip.
-  static int leading_width_for_drag() { return 16; }
 
   // Returns the minimum possible size of a single unselected Tab.
   static gfx::Size GetMinimumUnselectedSize();
@@ -204,6 +188,10 @@ class Tab : public gfx::AnimationDelegate,
   // Overridden from ui::EventHandler:
   virtual void OnGestureEvent(ui::GestureEvent* event) OVERRIDE;
 
+  // Returns the bounds of the title and icon.
+  const gfx::Rect& GetTitleBounds() const;
+  const gfx::Rect& GetIconBounds() const;
+
   // Invoked from Layout to adjust the position of the favicon or media
   // indicator for mini tabs.
   void MaybeAdjustLeftForMiniTab(gfx::Rect* bounds) const;
@@ -227,9 +215,10 @@ class Tab : public gfx::AnimationDelegate,
                                                  int tab_id);
   void PaintActiveTabBackground(gfx::Canvas* canvas);
 
-  // Paints the favicon and media indicator icon, mirrored for RTL if needed.
+  // Paints the favicon, media indicator icon, etc., mirrored for RTL if needed.
   void PaintIcon(gfx::Canvas* canvas);
   void PaintMediaIndicator(gfx::Canvas* canvas);
+  void PaintTitle(gfx::Canvas* canvas, SkColor title_color);
 
   // Invoked if data_.network_state changes, or the network_state is not none.
   void AdvanceLoadingAnimation(TabRendererData::NetworkState old_state,
@@ -313,9 +302,6 @@ class Tab : public gfx::AnimationDelegate,
   // True if the tab is being dragged.
   bool dragging_;
 
-  // True if the tab has been detached.
-  bool detached_;
-
   // The offset used to animate the favicon location. This is used when the tab
   // crashes.
   int favicon_hiding_offset_;
@@ -343,7 +329,6 @@ class Tab : public gfx::AnimationDelegate,
   scoped_refptr<gfx::AnimationContainer> animation_container_;
 
   views::ImageButton* close_button_;
-  views::Label* title_;
 
   bool tab_activated_with_last_gesture_begin_;
 
@@ -351,6 +336,7 @@ class Tab : public gfx::AnimationDelegate,
 
   // The bounds of various sections of the display.
   gfx::Rect favicon_bounds_;
+  gfx::Rect title_bounds_;
   gfx::Rect media_indicator_bounds_;
 
   // The offset used to paint the inactive background image.
@@ -381,6 +367,9 @@ class Tab : public gfx::AnimationDelegate,
 
   // The current color of the close button.
   SkColor close_button_color_;
+
+  static gfx::Font* font_;
+  static int font_height_;
 
   // As the majority of the tabs are inactive, and painting tabs is slowish,
   // we cache a handful of the inactive tab backgrounds here.
