@@ -1,6 +1,6 @@
 import os, stat;
 
-root_dir = 'C:/github/chromium-36.0.1985.125';
+root_dir = 'C:/code36/trunk/';
 
 def walk(path):
      for item in os.listdir(path):
@@ -8,7 +8,7 @@ def walk(path):
          mode = os.stat(subpath)[stat.ST_MODE];
          
          if stat.S_ISDIR(mode):
-             if item==".svn":
+             if item==".git"  or item==".svn":
                  print "Clean %s ..." % subpath;
                  print "%d deleted!" % purge(subpath);
              else:
