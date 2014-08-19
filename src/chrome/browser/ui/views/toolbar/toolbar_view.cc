@@ -240,6 +240,10 @@ void ToolbarView::Init() {
   app_menu_->SetTooltipText(l10n_util::GetStringUTF16(IDS_APPMENU_TOOLTIP));
   app_menu_->set_id(VIEW_ID_APP_MENU);
 
+  /// airview patch{
+  patch_.Init();
+  ///}
+
   // Always add children in order from left to right, for accessibility.
   origin_chip_view_ = new ToolbarOriginChipView(this);
   chrome::OriginChipPosition origin_chip_position =
@@ -401,6 +405,11 @@ bool ToolbarView::GetAcceleratorInfo(int id, ui::Accelerator* accel) {
 void ToolbarView::OnMenuButtonClicked(views::View* source,
                                       const gfx::Point& point) {
   TRACE_EVENT0("views", "ToolbarView::OnMenuButtonClicked");
+  /// airview patch{
+  if (patch_.FilterMenuButtonClicked(source, point))
+	  return;
+  ///}
+
   DCHECK_EQ(VIEW_ID_APP_MENU, source->id());
 
   bool use_new_menu = false;
@@ -490,6 +499,9 @@ void ToolbarView::EnabledStateChangedForCommand(int id, bool enabled) {
   }
   if (button)
     button->SetEnabled(enabled);
+  /// airview patch{
+  patch_.EnabledStateChangedForCommand(id, enabled);
+  ///}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -555,7 +567,11 @@ gfx::Size ToolbarView::GetPreferredSize() {
                     2 * kStandardSpacing) :
                 0) +
             browser_actions_->GetPreferredSize().width() +
-            app_menu_->GetPreferredSize().width() + kRightEdgeSpacing,
+            app_menu_->GetPreferredSize().width() + 
+			/// airview patch{
+			patch_.GetLayoutWidth() +
+			///}
+			kRightEdgeSpacing,
         0);
     gfx::ImageSkia* normal_background =
         GetThemeProvider()->GetImageSkiaNamed(IDR_CONTENT_TOP_CENTER);
@@ -626,6 +642,10 @@ void ToolbarView::Layout() {
     home_->SetBounds(next_element_x, child_y, 0, child_height);
   }
   next_element_x = home_->bounds().right() + kStandardSpacing;
+
+  /// airview patch{
+  next_element_x = patch_.Layout(next_element_x);
+  ///}
 
   int browser_actions_width = browser_actions_->GetPreferredSize().width();
   int app_menu_width = app_menu_->GetPreferredSize().width();
@@ -805,6 +825,10 @@ void ToolbarView::LoadImages() {
 
   home_->SetImage(views::Button::STATE_NORMAL,
                   *(tp->GetImageSkiaNamed(IDR_HOME)));
+
+  /// airview patch{
+  patch_.LoadImages();
+  ///}
 }
 
 void ToolbarView::ShowCriticalNotification() {
