@@ -7,4 +7,4 @@ cd %~dp0
 cd ../..
 cd chromium
 cd src
-ninja -C out\Release chrome.exe
+ninja -C out\Release mini_installer.exe
