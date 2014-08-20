@@ -18,10 +18,6 @@
 #include "google_apis/internal/google_chrome_api_keys.h"
 #endif
 
-///airview patch{
-#include "google_apis/x_api_key.h"
-///}
-
 // Used to indicate an unset key/id/secret.  This works better with
 // various unit tests than leaving the token empty.
 #define DUMMY_API_TOKEN "dummytoken"
@@ -214,7 +210,7 @@ class APIKeyCache {
       // No key should be unset in an official build except the
       // GOOGLE_DEFAULT_* keys.  The default keys don't trigger this
       // check as their "unset" value is not DUMMY_API_TOKEN.
-      CHECK(false);
+     // CHECK(false);
 #endif
       if (default_if_unset.size() > 0) {
         VLOG(1) << "Using default value \"" << default_if_unset
