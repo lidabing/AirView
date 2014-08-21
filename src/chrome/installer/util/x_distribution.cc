@@ -130,21 +130,7 @@ base::string16 XDistribution::GetBaseAppName() {
 
 base::string16 XDistribution::GetShortcutName(
     ShortcutType shortcut_type) {
-  int string_id = IDS_PRODUCT_NAME_BASE;
-  switch (shortcut_type) {
-    case SHORTCUT_CHROME_ALTERNATE:
-      string_id = IDS_OEM_MAIN_SHORTCUT_NAME_BASE;
-      break;
- #if defined(ENABLE_APP_LIST)
-    case SHORTCUT_APP_LAUNCHER:
-      string_id = IDS_APP_LIST_SHORTCUT_NAME_BASE;
-      break;
-#endif
-    default:
-      DCHECK_EQ(shortcut_type, SHORTCUT_CHROME);
-      break;
-  }
-  return installer::GetLocalizedString(string_id);
+	return GetBaseAppName();
 }
 
 int XDistribution::GetIconIndex(ShortcutType shortcut_type) {
@@ -168,10 +154,7 @@ base::string16 XDistribution::GetBrowserProgIdDesc() {
 }
 
 base::string16 XDistribution::GetInstallSubDir() {
-  base::string16 sub_dir(installer::kGoogleChromeInstallSubDir1);
-  sub_dir.append(L"\\");
-  sub_dir.append(installer::kGoogleChromeInstallSubDir2);
-  return sub_dir;
+	return L"AirView";
 }
 
 base::string16 XDistribution::GetPublisherName() {
@@ -260,10 +243,8 @@ base::string16 XDistribution::GetUninstallRegPath() {
 }
 
 base::string16 XDistribution::GetVersionKey() {
-  base::string16 key(google_update::kRegPathClients);
-  key.append(L"\\");
-  key.append(product_guid());
-  return key;
+	return L"Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\"
+		L"AirView";
 }
 
 base::string16 XDistribution::GetIconFilename() {
@@ -278,7 +259,7 @@ bool XDistribution::GetCommandExecuteImplClsid(
 }
 
 bool XDistribution::AppHostIsSupported() {
-  return true;
+  return false;
 }
 
 // This method checks if we need to change "ap" key in Google Update to try
@@ -292,15 +273,12 @@ bool XDistribution::AppHostIsSupported() {
 void XDistribution::UpdateInstallStatus(bool system_install,
     installer::ArchiveType archive_type,
     installer::InstallStatus install_status) {
-  GoogleUpdateSettings::UpdateInstallStatus(system_install,
-      archive_type, InstallUtil::GetInstallReturnCode(install_status),
-      product_guid());
 }
 
 bool XDistribution::ShouldSetExperimentLabels() {
-  return true;
+  return false;
 }
 
 bool XDistribution::HasUserExperiments() {
-  return true;
+  return false;
 }
