@@ -1,0 +1,223 @@
+<?xml version="1.0" ?>
+<!DOCTYPE translationbundle>
+<translationbundle lang="zh-CN">
+<translation id="6871632937610821409">云游浏览器要求操作系统必须为 Windows Vista 或者 Windows XP SP2 或更高版本。</translation>
+<translation id="5923658919546551704">在这种情况下，列在证书中的地址与浏览器尝试显示的网站的地址不相符。引发这种情况的一个可能原因是，您的通信内容正被攻击者拦截，攻击者出示的是其他网站的证书，这就会引发网站地址不符的情况。另一可能引发这种情况的原因是，服务器已设置为对多个网站（包括您试图访问的网站）返回同一证书，即使此证书并不是对所有这些网站都有效。云游浏览器确定访问的是 &lt;strong&gt;<ph name="DOMAIN2"/>&lt;/strong&gt;，但无法证实该网站就是所要访问的网站 &lt;strong&gt;<ph name="DOMAIN"/>&lt;/strong&gt;。如果继续操作，则云游浏览器不会检查是否还有名称不相符的情况。</translation>
+<translation id="4952458666569179200">云游浏览器 Canary (mDNS-In)</translation>
+<translation id="1779255783045610365">云游浏览器操作系统无法同步您的数据。请更新您的同步密码。</translation>
+<translation id="6688951749110119428">您的偏好设置文件已损坏或无效。云游浏览器无法恢复您的设置。</translation>
+<translation id="6676384891291319759">访问互联网</translation>
+<translation id="6803393957336285097">云游浏览器正在后台运行。</translation>
+<translation id="6744395639738058152">将您自己添加到云游浏览器</translation>
+<translation id="2223199543594635792">云游浏览器已停止更新，并且不再支持您的操作系统版本。</translation>
+<translation id="7635130618293513477">让云游浏览器在后台运行</translation>
+<translation id="4742257506735933045">是的，退出云游浏览器</translation>
+<translation id="2783713371141101579">您可以在此处查看来自云游浏览器应用、扩展程序和网站的所有通知。</translation>
+<translation id="9014929462087085820">如果您希望单独保存现有的云游浏览器数据，可以为 <ph name="USER_NAME"/> 新建一个云游浏览器用户。</translation>
+<translation id="4002957534811778489">请关闭所有云游浏览器窗口，然后重试。</translation>
+<translation id="8522135483148084386">云游浏览器会妥善地存储您的信息，这样您日后就不必重新输入了。不过，您将来付款时仍需验证信用卡的安全码。</translation>
+<translation id="2770231113462710648">将默认浏览器更改为：</translation>
+<translation id="8862005628249241328">某个扩展程序更改了云游浏览器启动后显示的页面。</translation>
+<translation id="2077129598763517140">使用硬件加速模式（如果可用）</translation>
+<translation id="1065672644894730302">系统无法读取您的偏好设置。某些功能可能无法使用，并且对偏好设置所做的更改不会保存。</translation>
+<translation id="8530227187263341185">云游浏览器现已推出新版本。</translation>
+<translation id="7126724845011830318">访客使用云游浏览器不会留下任何痕迹。</translation>
+<translation id="4223921115571775534">让云游浏览器在后台运行</translation>
+<translation id="2228793076448885695">这是您的专属云游浏览器</translation>
+<translation id="4666014621945889318">感谢您试用新版云游浏览器。云游浏览器需要重新启动。继续之前，请务必先保存所有未保存的工作。</translation>
+<translation id="1332631172766905076">启动云游浏览器应用</translation>
+<translation id="5765993128085212454">在苹果机上，密码会保存到您的钥匙串中，可供共用此 OS X 帐户的其他云游浏览器用户使用或同步。</translation>
+<translation id="3497614779324245808">云游浏览器Canary版的入站规则，允许mDNS流量。</translation>
+<translation id="2451366534133310583">将云游浏览器设为默认浏览器</translation>
+<translation id="6951580448182607067">您现在已登录云游浏览器！不过，管理员已停用同步功能。</translation>
+<translation id="2102873661302377876">由于您的网域停用了同步功能，云游浏览器操作系统无法同步您的数据。</translation>
+<translation id="7517632674626106627">您所做的更改会在下次重新启动云游浏览器时生效。</translation>
+<translation id="5640549428418848905">获取云游浏览器操作系统使用帮助</translation>
+<translation id="8408179906542974110"><ph name="DOMAIN"/> 要求您必须先阅读并接受以下服务条款，才能使用此设备。这些条款不会扩大、修改或限制云游浏览器操作系统条款。</translation>
+<translation id="7813389424510446688">（需要<ph name="BEGIN_BUTTON"/>重新启动<ph name="END_BUTTON"/> 云游浏览器）</translation>
+<translation id="8030318113982266900">正在将您的设备更新至“<ph name="CHANNEL_NAME"/>”版…</translation>
+<translation id="2130367812994208423">从云游浏览器移除您的帐户后，您可能需要重新加载已打开的标签页才能使其正常显示。</translation>
+<translation id="228611780010542534">该计算机已经安装了更高版本的云游浏览器组件。请使用更高版本的安装程序。</translation>
+<translation id="5869672997329498482">请关闭所有云游浏览器窗口（包括 Windows 8 模式下的窗口），然后重试。</translation>
+<translation id="4360922351906645748">在云游浏览器菜单或书签栏中查找您的书签。</translation>
+<translation id="4298019148013004454">云游浏览器现已推出速度更快的新版本。</translation>
+<translation id="3889935523125858976">未知错误导致安装失败。如果云游浏览器正在运行，请将其关闭，然后重试。</translation>
+<translation id="4590391569607594043">关闭云游浏览器后继续运行后台应用</translation>
+<translation id="2215412865860263654">安装程序无法解压缩存档文件。请重新下载云游浏览器。</translation>
+<translation id="5271652502309638022">此计算机很快将停止接收云游浏览器更新，因为其硬件不再受支持。</translation>
+<translation id="5288135795417436213">云游浏览器已更新，但您已经至少 30 天未使用它了。</translation>
+<translation id="724179662548338582">云游浏览器无法对其数据目录 <ph name="USER_DATA_DIRECTORY"/> 执行读写操作</translation>
+<translation id="7753184971837497405">云游浏览器必须启动外部应用才能处理 <ph name="SCHEME"/> 链接。请求的链接是 <ph name="PROTOLINK"/>。</translation>
+<translation id="3494351949353261653">哎呀！云游浏览器崩溃了。是否立即重新启动？</translation>
+<translation id="1480489203462860648">它已经安装完毕了，试试看吧。</translation>
+<translation id="1757527511911698622">云游浏览器<ph name="TERMS_OF_SERVICE_LINK"/>服务条款<ph name="END_TERMS_OF_SERVICE_LINK"/></translation>
+<translation id="7499591522730141225">获取云游浏览器使用帮助</translation>
+<translation id="1816382866377009615">您之前登录云游浏览器时使用的帐户为 <ph name="USER_EMAIL_ADDRESS"/>，请使用同一帐户再次登录。</translation>
+<translation id="4144606333649812019">您的帐单明细已保存在云游浏览器中。</translation>
+<translation id="7739739109693938560">云游浏览器正在使用您的麦克风。</translation>
+<translation id="2110985674212299592">自定义及控制云游浏览器</translation>
+<translation id="5584358419316623716">您尝试访问的是 &lt;strong&gt;<ph name="DOMAIN"/>&lt;/strong&gt;，但服务器出示的证书已过期。由于该证书已过期，因此没有任何信息可表明它是否已被盗用。这意味着云游浏览器无法保证与您通信的是 &lt;strong&gt;<ph name="DOMAIN2"/>&lt;/strong&gt; 还是攻击者。您计算机时钟的当前设置为 <ph name="CURRENT_TIME"/>。该设置是否正确？如果不正确，您应更正错误并刷新此页面。</translation>
+<translation id="3197823471738295152">您的设备已更新到最新版本。</translation>
+<translation id="2929334555550102357">云游浏览器正在尝试显示密码，请输入您的Windows密码以允许此操作。</translation>
+<translation id="1462297700306919424">卸载云游浏览器</translation>
+<translation id="5612557783971004356">云游浏览器 Canary 应用</translation>
+<translation id="8551886023433311834">即将更新到最新版本！请重新启动您的设备，以完成更新。</translation>
+<translation id="8725973982173572314"><ph name="PAGE_TITLE"/> - 云游浏览器</translation>
+<translation id="7646936392564273747">云游浏览器 - 通知</translation>
+<translation id="7339898014177206373">打开新的窗口</translation>
+<translation id="2130935632125976101">登录云游浏览器</translation>
+<translation id="3917310174885182238">云游浏览器现已推出更安全的新版本。</translation>
+<translation id="2428583155212987480">请关闭所有云游浏览器窗口，然后重新启动，以使此更改生效。</translation>
+<translation id="1835581234799223588">云游浏览器应用启动器是 Chrome 应用的独立平台。</translation>
+<translation id="225614027745146050">欢迎</translation>
+<translation id="904234852105737272">您尝试访问 &lt;strong&gt;<ph name="DOMAIN"/>&lt;/strong&gt;，但服务器出示的证书尚未生效。没有任何信息可表明该证书是否可以信任。云游浏览器无法准确保证与您通信的是 &lt;strong&gt;<ph name="DOMAIN2"/>&lt;/strong&gt; 而不是攻击者。您计算机时钟的当前时间为 <ph name="CURRENT_TIME"/>。该时间是否准确？如果不准确，您可以更正系统上的时钟并刷新此页面。</translation>
+<translation id="4298853828775962437">http://support.google.com/chrome/?p=ib_chromeframe</translation>
+<translation id="3327361727226406504">云游浏览器应用</translation>
+<translation id="727622870351876254"><ph name="FILE_NAME"/> 是恶意文件，云游浏览器已将其拦截。</translation>
+<translation id="9092786017660446149">云游浏览器操作系统的问世还有其他<ph name="BEGIN_LINK_CROS_OSS"/>开放源代码软件<ph name="END_LINK_CROS_OSS"/>的一份功劳。</translation>
+<translation id="5709388733687154057">您可以设置同步以将个性化浏览器功能保存到网上，以便在任意计算机上的云游浏览器中使用这些功能。</translation>
+<translation id="2824099007785483548">云游浏览器版本太旧</translation>
+<translation id="473775607612524610">更新</translation>
+<translation id="134902020219456900">云游浏览器未正确关闭。要重新打开之前浏览的页面，请点击“恢复”。</translation>
+<translation id="8477860667461484686">云游浏览器刚刚经过了改进！新版本已推出。</translation>
+<translation id="8769602403992098263">为了提高云游浏览器的安全性，系统停用了一些未列在 <ph name="IDS_EXTENSION_WEB_STORE_TITLE"/>中、可能是在您不知情的情况下添加的扩展程序。</translation>
+<translation id="3656661827369545115">启动计算机时自动启动Chromium</translation>
+<translation id="3767368817922815798">云游浏览器正尝试显示密码。</translation>
+<translation id="5794385614889059565">无法安装与当前运行版本相同的云游浏览器。请关闭云游浏览器，然后重试。</translation>
+<translation id="2431159810063000697">云游浏览器通知中心</translation>
+<translation id="4731533162053985030">正在更新云游浏览器...</translation>
+<translation id="6924378427607632374">由于您的网域停用了同步功能，云游浏览器无法同步您的数据。</translation>
+<translation id="7747138024166251722">安装程序无法创建临时目录。请检查您是否有足够的磁盘空间和权限来安装该软件。</translation>
+<translation id="4662710171771720016">您尝试访问 &lt;strong&gt;<ph name="DOMAIN"/>&lt;/strong&gt;，但服务器出示的证书却不是由您计算机操作系统信任的实体颁发的。这可能意味着该服务器已生成自己的安全凭据（云游浏览器无法依据这些凭据确定身份信息），或者有攻击者尝试拦截您的通信。</translation>
+<translation id="8800317486507231680">您的个人资料来自新版云游浏览器，因此无法使用。某些功能可能无法使用。请指定其他个人资料目录，或使用新版云游浏览器。</translation>
+<translation id="7540425979917378121">云游浏览器 - 通知（<ph name="QUANTITY"/>条未读）</translation>
+<translation id="8245368330769433203">依次转到云游浏览器菜单 &gt;“<ph name="SETTINGS_TITLE"/>”&gt;“<ph name="ADVANCED_TITLE"/>”&gt;“<ph name="PROXIES_TITLE"/>”，并确保您已将配置设为“无代理”或“直接连接”。</translation>
+<translation id="6970811910055250180">正在更新设备...</translation>
+<translation id="2485422356828889247">卸载</translation>
+<translation id="5069844128094431075">登录时出现错误，云游浏览器操作系统无法同步您的数据。</translation>
+<translation id="8339069742002943368">此计算机将不再接收云游浏览器更新，因为其硬件不再受支持。</translation>
+<translation id="2419683304128810113">您正在查看的是安全的云游浏览器网页。</translation>
+<translation id="8754999921360708228"><ph name="EXTENSION_NAME"/>已添加到云游浏览器。</translation>
+<translation id="65127619564591980">您尝试访问 &lt;strong&gt;<ph name="DOMAIN"/>&lt;/strong&gt;，但服务器出示的证书却不是由云游浏览器信任的实体颁发的。这可能意味着该服务器已自行生成自己的安全凭据（云游浏览器无法依据这些凭据确定身份信息），或者有攻击者尝试拦截您的通信。</translation>
+<translation id="4601506110237587414">云游浏览器开放源代码许可</translation>
+<translation id="4804467442209483499">之前有人在此计算机上以 <ph name="ACCOUNT_EMAIL_LAST"/> 帐户登录云游浏览器。如果这不是您的帐户，请新建一个云游浏览器用户来单独保存您的信息。
+
+  如果您仍然登录，云游浏览器信息（例如书签、历史记录和其他设置）将合并到 <ph name="ACCOUNT_EMAIL_NEW"/>。</translation>
+<translation id="1322243917484819140"><ph name="BEGIN_BOLD"/>警告<ph name="END_BOLD"/>：云游浏览器无法阻止扩展程序记录您的浏览记录。要在隐身模式下停用此扩展程序，请取消选中此选项。</translation>
+<translation id="1069340132162409993">云游浏览器</translation>
+<translation id="2626422795124415362">云游浏览器操作系统开放源代码许可</translation>
+<translation id="4214895682170835056">缺少 Google API 密钥，因此云游浏览器的部分功能将无法使用。</translation>
+<translation id="7950705269022528490">在云游浏览器中保存详细信息</translation>
+<translation id="911206726377975832">同时删除您的浏览数据吗？</translation>
+<translation id="2120498446267961567">预览一下新版云游浏览器吧</translation>
+<translation id="7343282895154727752">您计算机上运行的软件与云游浏览器不兼容。</translation>
+<translation id="7947470770835004452">重新安装云游浏览器</translation>
+<translation id="2182746008872494238">云游浏览器工具栏</translation>
+<translation id="8862326446509486874">您的权限不足，无法进行系统级安装。请尝试以管理员身份再次运行安装程序。</translation>
+<translation id="8704949399782995322">云游浏览器的诞生离不开 <ph name="BEGIN_LINK_CHROMIUM"/>Chromium<ph name="END_LINK_CHROMIUM"/> 开源项目以及其他<ph name="BEGIN_LINK_OSS"/>开源软件<ph name="END_LINK_OSS"/>。</translation>
+<translation id="5766035689898134147">云游浏览器可能会使用网络服务改善您的浏览体验。</translation>
+<translation id="7108432604969204547">您需要在 Windows XP 或更高版本的操作系统中运行云游浏览器，否则可能无法正常使用某些功能。</translation>
+<translation id="5877064549588274448">版本已更改。请重新启动设备来应用这些变更。</translation>
+<translation id="3240435408071327444">与您的云游浏览器数据相关的重要信息</translation>
+<translation id="2562518414705669879">云游浏览器</translation>
+<translation id="6757767188268205357">谢绝打扰</translation>
+<translation id="588787925956426870">确定要卸载云游浏览器吗？</translation>
+<translation id="3954028001665272081">正在进行一项下载。您希望退出云游浏览器并取消该下载吗？</translation>
+<translation id="5011172302362812706">云游浏览器已配置为在计算机启动时自动启动。</translation>
+<translation id="2287587658386242988">关于云游浏览器操作系统(&amp;C)</translation>
+<translation id="6657945965533426700">云游浏览器二进制文件</translation>
+<translation id="6203879582471742652">将云游浏览器设为默认浏览器</translation>
+<translation id="838783432195939713">通讯录中的详细信息有助于您在云游浏览器中更快速地填写表单。</translation>
+<translation id="6695775960513740611">其他计算机 (<ph name="HOST_NAME"/>) 的另一个云游浏览器进程 (<ph name="PROCESS_ID"/>) 好像正在使用此个人资料。云游浏览器已锁定此个人资料以防止其受损。如果您确定其他进程目前未使用此个人资料，请为其解锁并重新启动云游浏览器。</translation>
+<translation id="1784188609508132485">云游浏览器应用启动器</translation>
+<translation id="4785739526473776685">您需要先登录云游浏览器，再使用各项应用。这样，云游浏览器就可以在各个设备上同步您的应用、书签、历史记录、密码和其他设置。</translation>
+<translation id="7255751579048844275">AirView Canary</translation>
+<translation id="43807899210906403">您可以在云游浏览器中点击网上的电话号码，然后通过 Skype 拨打！</translation>
+<translation id="2017514981573848412">卸载云游浏览器应用启动器</translation>
+<translation id="205855448709210895">已发现一个同名的模块与云游浏览器存在冲突。</translation>
+<translation id="3113613409198027306">将崩溃报告和<ph name="UMA_LINK"/>发送给云游浏览器，帮助我们完善云游浏览器。</translation>
+<translation id="3149187852397191101">点击您的姓名即可打开云游浏览器并开始浏览。</translation>
+<translation id="4864451188650489141">您可以添加其他Google帐户，并在下方锁定您的Chromium。</translation>
+<translation id="3014608005751178136">依次转到云游浏览器菜单 &gt;“<ph name="SETTINGS_TITLE"/>”&gt;“<ph name="ADVANCED_TITLE"/>”，然后取消选中“<ph name="NO_PREFETCH_DESCRIPTION"/>”。如果这样仍无法解决问题，建议您重新选中此选项以提高性能。</translation>
+<translation id="2839428502327443397">云游浏览器的入站规则，允许mDNS流量。</translation>
+<translation id="6073361269005974578">更新云游浏览器操作系统(&amp;C)</translation>
+<translation id="6691510779270958140">云游浏览器无法同步您的数据。请更新您的同步密码。</translation>
+<translation id="2046365331136529626">您的帐户登录详细信息已过期，云游浏览器操作系统无法同步您的数据。</translation>
+<translation id="3337938532935218675">云游浏览器应用启动器 Canary</translation>
+<translation id="3412858965259103134">从云游浏览器中移除</translation>
+<translation id="490372824828455823">您已登录云游浏览器！</translation>
+<translation id="8429952460755492250">如果您与亲朋好友共用计算机，他们将能够使用单独的帐户进行浏览，并可随心所欲地设置云游浏览器。</translation>
+<translation id="3255854196738778153">欢迎使用云游浏览器</translation>
+<translation id="3968964914985701319">您目前登录的帐户是一个托管帐户，该帐户的管理员将能够控制您的云游浏览器个人资料。您的云游浏览器数据（例如您的应用、书签、历史记录、密码和其他设置）将永远与 <ph name="USER_NAME"/> 相关联。您可以通过 Google 帐户信息中心删除这些数据，但无法将这些数据与其他帐户相关联。<ph name="LEARN_MORE"/></translation>
+<translation id="1585358729301223840">由于云游浏览器更新群组政策设置不一致，导致系统无法更新云游浏览器。请使用群组政策编辑器设置更新政策，以替换云游浏览器Binaries应用，然后重试；有关详情，请访问http://goo.gl/uJ9gV。</translation>
+<translation id="8488195712191068898">您必须升级云游浏览器才能使用 Google 电子钱包 [<ph name="ERROR_CODE"/>]。</translation>
+<translation id="8187289872471304532">依次转到“应用”&gt;“系统偏好设置”&gt;“网络”&gt;“高级”&gt;“代理”，然后取消选中所有已选的代理。</translation>
+<translation id="2482669478128856389">更新云游浏览器(&amp;G)</translation>
+<translation id="130631256467250065">您所做的更改会在下次重新启动设备时生效。</translation>
+<translation id="3082178505741361100">云游浏览器操作系统使用入门</translation>
+<translation id="2983745582009066039">云游浏览器正在使用您的摄像头。</translation>
+<translation id="2169645285964291003">该计算机已安装了更高版本的云游浏览器。如果该软件无法正常运行，请卸载云游浏览器，然后重试。</translation>
+<translation id="659666516289441685">显示云游浏览器菜单</translation>
+<translation id="3444832043240812445">如果<ph name="BEGIN_LINK"/>启用崩溃报告<ph name="END_LINK"/>，则该网页将只显示您最近的崩溃信息。</translation>
+<translation id="6874091776669556683">云游浏览器未响应。是否立即重新启动？</translation>
+<translation id="3835422098430150502">在系统中安装“云游浏览器”时发现已存在其他版本，请先卸载然后重试。</translation>
+<translation id="2456819532930721327">您已登录，现在您除了可以获取您的笔记本电脑、手机和平板电脑上的标签页、书签和其他云游浏览器内容外，还将获得 Google 服务方面的更多相关建议和功能。</translation>
+<translation id="2342505334880319168">您正在预览新版云游浏览器。</translation>
+<translation id="3695076784928300115">想让云游浏览器保存您的密码吗？</translation>
+<translation id="3841372537569862817">您希望云游浏览器保存您在此网站上使用的密码吗？</translation>
+<translation id="4900677122191723841">是否将您的云游浏览器数据与此帐户相关联？</translation>
+<translation id="7765871381476844045">云游浏览器无法自动更新到最新版本，因此其中缺少一些非常棒的新功能和安全修复程序。要获得这些内容，您需要手动重新安装云游浏览器。</translation>
+<translation id="5581944981975176435">您的上网记录、书签和其他云游浏览器资料和数据都保存在此处。</translation>
+<translation id="8865765905101981392">互联网浏览器</translation>
+<translation id="9111561304401919566">赶快通过您的Google帐户以及共用的计算机试试云游浏览器的新界面吧！</translation>
+<translation id="2836656089986030268">云游浏览器(mDNS-In)</translation>
+<translation id="9142250846092436715">云游浏览器现在更好用了</translation>
+<translation id="5469664487656773595">由于在登录时出现错误，云游浏览器无法同步您的数据。</translation>
+<translation id="6729349873267043086">云游浏览器正在使用您的摄像头和麦克风。</translation>
+<translation id="8542127585750637256">云游浏览器操作系统不支持启动外部应用处理 <ph name="SCHEME"/> 链接。请求的链接是 <ph name="PROTOLINK"/>。</translation>
+<translation id="7837407096654739280">对防火墙或防病毒软件进行设置，以允许云游浏览器访问该网络。</translation>
+<translation id="5598339109273367306">这是恶意文件，云游浏览器已将其拦截。</translation>
+<translation id="3478038437602768343">该网站使用的云游浏览器内嵌框架插件已停止使用，并且不再接收安全性和稳定性更新。请将其卸载，然后升级到新式浏览器。</translation>
+<translation id="3315646074449027530">可选：将使用情况统计信息和崩溃报告自动发送给云游浏览器，帮助完善云游浏览器操作系统。</translation>
+<translation id="7728090216044055355">正在进行多项下载。您希望退出云游浏览器并取消这些下载吗？</translation>
+<translation id="604699519888942671">现在，无论是通过Google帐户还是在共用的计算机上，您都可以更轻松地使用云游浏览器。</translation>
+<translation id="7196020411877309443">为何会出现这个窗口？</translation>
+<translation id="4389821159304143939">云游浏览器不是您的默认浏览器。</translation>
+<translation id="4567424176335768812">您已使用 <ph name="USER_EMAIL_ADDRESS"/> 的身份登录。现在您可在已登录的所有设备上访问您的书签、历史记录和其他设置。</translation>
+<translation id="3676536388228484509">依次转到云游浏览器菜单 &gt;“<ph name="SETTINGS_TITLE"/>”&gt;“<ph name="ADVANCED_TITLE"/>”&gt;“<ph name="PROXIES_TITLE"/>”&gt;“LAN 设置”，然后取消选中“为 LAN 使用代理服务器”。</translation>
+<translation id="3539824081925965728">您在使用<ph name="PROFILE_EMAIL"/>同步自己的云游浏览器资料和数据。要更新您的同步偏好设置或在不登录Google帐户的情况下使用云游浏览器，请前往<ph name="SETTINGS_LINK"/>部分。</translation>
+<translation id="5172561444457536033">由于未指定的错误导致安装失败。请重新下载云游浏览器。</translation>
+<translation id="4458285410772214805">请先退出，然后重新登录，以便此更改生效。</translation>
+<translation id="6734977936418111128">它还能够控制云游浏览器启动后显示的页面。</translation>
+<translation id="3481872521101250679">已知此模块与云游浏览器存在冲突。</translation>
+<translation id="6029937333866876174">云游浏览器操作系统</translation>
+<translation id="4256744841188203872">云游浏览器已是最新版本。</translation>
+<translation id="4990851764207768840">您希望云游浏览器保存此信用卡信息以便填写网络表单吗？</translation>
+<translation id="234942182383580783">添加到云游浏览器</translation>
+<translation id="660015537484517135">云游浏览器帮助程序</translation>
+<translation id="1055070206878241826">云游浏览器版本太旧</translation>
+<translation id="2689032952384248810">由于您的帐户登录详细信息已过期，云游浏览器无法同步您的数据。</translation>
+<translation id="459934836710706752">将我的云游浏览器数据与此帐户关联</translation>
+<translation id="5811131606690727542">添加到云游浏览器...</translation>
+<translation id="7639222530138836884">云游浏览器建议使用</translation>
+<translation id="3047079729301751317">取消与<ph name="USERNAME"/>的关联将会清除您的历史记录、书签、设置以及存储在此设备上的其他云游浏览器数据。您的Google帐户中存储的数据将不会被清除，并且您可以通过<ph name="GOOGLE_DASHBOARD_LINK"/>Google信息中心<ph name="END_GOOGLE_DASHBOARD_LINK"/>管理这些数据。</translation>
+<translation id="9200411899641267550">安装程序存档文件损坏或无效。请重新下载云游浏览器。</translation>
+<translation id="6738875729641694720">在缺少内置 PDF 查看器的情况下，云游浏览器无法显示打印预览。</translation>
+<translation id="5640107037384044910">抱歉，无法在 Mozilla Firefox 浏览器运行时获取其设置。要将其设置导入云游浏览器，请保存您手头的工作并关闭所有 Firefox 窗口，然后点击“继续”。</translation>
+<translation id="2457319297144237377">您目前登录的帐户是一个托管帐户，该帐户的管理员将能够控制您的云游浏览器个人资料。您的云游浏览器数据（例如您的应用、书签、历史记录、密码和其他设置）将永远与 <ph name="USER_NAME"/> 相关联。您可以通过 Google 帐户信息中心删除这些数据，但无法将这些数据与其他帐户相关联。您可以选择创建新的个人资料来单独存储现有的云游浏览器数据。<ph name="LEARN_MORE"/></translation>
+<translation id="2968296786052317070">它还能够控制您启动云游浏览器后或通过多功能框进行搜索时系统显示的页面。</translation>
+<translation id="2334084861041072223">版权所有<ph name="YEAR"/> Google Inc. 保留所有权利。</translation>
+<translation id="8563125308700798333">云游浏览器是一款可高速运行网页和应用的网络浏览器。它快捷、稳定且易于使用。云游浏览器内置的恶意软件和网上诱骗防护功能可让您更安全地浏览网页。</translation>
+<translation id="4326876180442369620">您目前是以托管帐户登录，该帐户的管理员将能够控制您的云游浏览器个人资料。您的云游浏览器数据（例如您的应用、书签、历史记录、密码和其他设置）将永久绑定到 <ph name="USER_NAME"/>。您可以通过 Google 帐户信息中心删除这些数据，但无法将这些数据关联到其他帐户。</translation>
+<translation id="9128989205664161841">管理员已为该系统安装了云游浏览器，并且所有用户均可使用它。因此，原来针对个别用户安装的浏览器现在可供系统上的所有用户使用。</translation>
+<translation id="5175598878253821150">云游浏览器无法自动更新到最新版本，因此其中缺少一些非常棒的新功能和安全修复程序。要获得这些内容，您需要更新云游浏览器。</translation>
+<translation id="7427795956338742594">您尝试访问的是 &lt;strong&gt;<ph name="DOMAIN"/>&lt;/strong&gt;，但服务器出示的证书有误。云游浏览器无法使用有错误的证书，也无法验证所尝试连接的网站的身份。</translation>
+<translation id="3870154837782082782">Google Inc.</translation>
+<translation id="3626063748543305147">即将更新到最新版本！重新启动云游浏览器以完成更新。</translation>
+<translation id="8562513632640428084">它还能够控制您启动云游浏览器或点击“主页”按钮后系统显示的页面。</translation>
+<translation id="4600970588568937894">任务管理器 - 云游浏览器</translation>
+<translation id="8109447242439442404">安装过程中出现操作系统错误。请重新下载云游浏览器。</translation>
+<translation id="2968461379728203418">未找到要更新的云游浏览器安装实例。</translation>
+<translation id="5852261595809134164">模块已加载到云游浏览器中</translation>
+<translation id="1530811255092372008">关于云游浏览器(&amp;G)</translation>
+</translationbundle>

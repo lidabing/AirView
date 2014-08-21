@@ -241,7 +241,7 @@
 <translation id="5866560098872665830">ServiceWorker 是一种可以拦截资源请求的新型网络工作线程。如需详细信息，请访问 https://github.com/slightlyoff/ServiceWorker。</translation>
 <translation id="4395129973926795186"><ph name="START_DATE"/>至 <ph name="END_DATE"/></translation>
 <translation id="98515147261107953">横向</translation>
-<translation id="2396967175343051699">Chrome会将其添加到您|保存的密码|中。</translation>
+<translation id="1562991846164081900">云游浏览器会将其添加到您|保存的密码|中。</translation>
 <translation id="1303101771013849280">以前导出的书签（HTML文件）</translation>
 <translation id="4344368877506330515">要前往的网站包含恶意软件！</translation>
 <translation id="8974161578568356045">自动检测</translation>
@@ -444,7 +444,7 @@
 <translation id="4422347585044846479">修改此页的书签</translation>
 <translation id="1965624977906726414">无需特殊权限。</translation>
 <translation id="2452539774207938933">切换到用户：<ph name="PROFILE_NAME"/></translation>
-<translation id="4700157086864140907">Google Chrome 浏览器可将您在浏览器中输入的内容发送到 Google 服务器，让您使用 Google 搜索所用的拼写检查技术，从而提供更智能的拼写检查功能，</translation>
+<translation id="9052944978682658184">云游浏览器可将您在浏览器中输入的内容发送到 Google 服务器，让您使用 Google 搜索所用的拼写检查技术，从而提供更智能的拼写检查功能，</translation>
 <translation id="1880905663253319515">要删除证书“<ph name="CERTIFICATE_NAME"/>”吗？</translation>
 <translation id="8546306075665861288">图片缓存</translation>
 <translation id="5904093760909470684">代理配置</translation>
@@ -802,7 +802,7 @@
 <translation id="7665369617277396874">添加帐户</translation>
 <translation id="1007408791287232274">无法加载设备。</translation>
 <translation id="7550830279652415241">bookmarks_<ph name="DATESTAMP"/>.html</translation>
-<translation id="8437332772351535342">若以桌面模式重新启动，将会关闭并重新启动您的Chrome应用。</translation>
+<translation id="899416944992012986">若以桌面模式重新启动，将会关闭并重新启动您的云游浏览器应用。</translation>
 <translation id="164814987133974965">受监管用户可以在您的指导下浏览网页。作为受监管用户的管理员，您可以执行以下操作：
     <ph name="BEGIN_BOLD"/>允许或禁止<ph name="END_BOLD"/>访问某些网站，
     <ph name="BEGIN_BOLD"/>审核<ph name="END_BOLD"/>受监管用户访问过的网站，以及
@@ -1555,13 +1555,13 @@
 <translation id="7378810950367401542">/</translation>
 <translation id="6426039856985689743">停用移动数据</translation>
 <translation id="539643935609409426">要禁止使用此程序，您需要使用控制面板中的“<ph name="CONTROL_PANEL_APPLET_NAME"/>”将其卸载。要启动“<ph name="CONTROL_PANEL_APPLET_NAME"/>”吗？</translation>
-<translation id="8571992327053899347">受监管用户可以在您的指导下浏览网页。作为Chrome中受监管用户的管理员，您可以：
+<translation id="3929232864818567545">受监管用户可以在您的指导下浏览网页。作为云游浏览器中受监管用户的管理员，您可以：
 
  • 允许或禁止受监管用户访问某些网站；
  • 查看受监管用户访问过的网站；
  • 管理其他设置。
 
-创建受监管用户时不会随之创建Google帐户，因此通过Chrome同步将这些用户同步到其他设备时，他们的书签、浏览记录及其他偏好设置不会一起同步到其他设备。
+创建受监管用户时不会随之创建Google帐户，因此通过云游浏览器同步将这些用户同步到其他设备时，他们的书签、浏览记录及其他偏好设置不会一起同步到其他设备。
 
 创建新的受监管用户后，您可以随时通过任意设备在www.chrome.com/manage上管理其设置。<ph name="BEGIN_LINK"/>详细了解受监管用户<ph name="END_LINK"/></translation>
 <translation id="6562758426028728553">请输入原来的 PIN 和新的 PIN。</translation>
@@ -1958,7 +1958,7 @@
 <translation id="7273110280511444812">上次连接日期：<ph name="DATE"/></translation>
 <translation id="6588399906604251380">启用拼写检查</translation>
 <translation id="4572815280350369984"><ph name="FILE_TYPE"/> 文件</translation>
-<translation id="3012890944909934180">重新启动桌面版 Chrome</translation>
+<translation id="6115731935237699015">重新启动桌面版云游浏览器</translation>
 <translation id="7053983685419859001">禁止</translation>
 <translation id="7912024687060120840">在以下文件夹中：</translation>
 <translation id="7853659566314288686">启动应用</translation>
@@ -2029,7 +2029,7 @@
 <translation id="1521442365706402292">管理证书</translation>
 <translation id="1679068421605151609">开发者工具</translation>
 <translation id="7014051144917845222">“<ph name="PRODUCT_NAME"/>”到 <ph name="HOST_NAME"/> 的连接尝试遭到拒绝。原因可能是该网站已崩溃，也可能是您的网络配置不正确。</translation>
-<translation id="2097372108957554726">您需要登录 Chrome 才能注册新设备</translation>
+<translation id="5574821358948054507">您需要登录云游浏览器才能注册新设备</translation>
 <translation id="4332213577120623185">您需要提供更多信息才能完成此次购买。</translation>
 <translation id="9201305942933582053">适用于Chrome的Google即时！</translation>
 <translation id="1708338024780164500">（无效）</translation>
@@ -2078,7 +2078,7 @@
 <translation id="1450927657625573300">停用旨在改进触摸滚动响应的优化。强制所有触摸事件转至 Blink 主线程查找处理程序，而不是在合成器线程中强制执行短路操作。</translation>
 <translation id="3348038390189153836">检测到可移除的设备</translation>
 <translation id="1663298465081438178">简单易用，让您省力又省心。</translation>
-<translation id="8005540215158006229">Chrome 浏览器即将准备就绪。</translation>
+<translation id="6716437948418101986">云游浏览器即将准备就绪。</translation>
 <translation id="1666788816626221136">您有一些证书不属于前面任何类别：</translation>
 <translation id="4821935166599369261">分析已启用(&amp;P)</translation>
 <translation id="1429740407920618615">信号强度：</translation>
@@ -2369,7 +2369,7 @@
 <translation id="6575134580692778371">未配置</translation>
 <translation id="4624768044135598934">成功！</translation>
 <translation id="7518150891539970662">WebRTC日志（<ph name="WEBRTC_LOG_COUNT"/>个）</translation>
-<translation id="9067401056540256169">启用此项会导致Chrome不安全。除非您了解其作用，否则请不要使用它。请注意：此项日后可能会被弃用，恕不另行通知。如果您启用了此项，来自https来源的框架将可以使用来自不安全网址(ws://)的WebSocket。</translation>
+<translation id="7926397005117163268">启用此项会导致云游浏览器不安全。除非您了解其作用，否则请不要使用它。请注意：此项日后可能会被弃用，恕不另行通知。如果您启用了此项，来自https来源的框架将可以使用来自不安全网址(ws://)的WebSocket。</translation>
 <translation id="8299319456683969623">您目前处于离线状态。</translation>
 <translation id="3177995438281002843">启用DirectWrite</translation>
 <translation id="419914107014680585">感谢您的帮助！</translation>
@@ -2438,7 +2438,7 @@
 <translation id="3564708465992574908">缩放级别</translation>
 <translation id="6546686722964485737">加入 WiMAX 网络</translation>
 <translation id="266983583785200437">与 <ph name="SHORT_PRODUCT_NAME"/>崩溃或故障相关的事件</translation>
-<translation id="5785746630574083988">若以Windows 8模式重新启动，将会关闭并重新启动您的Chrome应用。</translation>
+<translation id="6015079339048420140">若以Windows 8模式重新启动，将会关闭并重新启动您的云游浏览器应用。</translation>
 <translation id="9118804773997839291">以下所列为此页面上包含的所有不安全元素。点击“诊断”链接可了解有关特定元素的详情。</translation>
 <translation id="6287852322318138013">选择用于打开此文件的应用</translation>
 <translation id="1313065465616456728">发出时间：</translation>
@@ -2767,7 +2767,7 @@
 <translation id="2478076885740497414">安装应用</translation>
 <translation id="1781502536226964113">打开新标签页</translation>
 <translation id="765676359832457558">隐藏高级设置...</translation>
-<translation id="7626032353295482388">欢迎使用 Chrome</translation>
+<translation id="3255854196738778153">欢迎使用云游浏览器</translation>
 <translation id="8655295600908251630">渠道</translation>
 <translation id="166222140726737248">如果您在2013年12月1日之前购买了一台HP Chromebook 11，我们将向您邮寄一个免费充电器，用来更换原装充电器。您还将收到一个已付运费的包裹，请使用该包裹退回原装充电器，以便我们对其进行妥善处理。</translation>
 <translation id="5829401023154985950">管理...</translation>
@@ -3109,7 +3109,7 @@
 <translation id="6566142449942033617">无法加载插件的路径“<ph name="PLUGIN_PATH"/>”。</translation>
 <translation id="7299337219131431707">启用访客浏览</translation>
 <translation id="2312980885338881851">糟糕！您似乎没有可导入的现有受监管用户。请先从其他设备上创建一个或多个受监管用户，然后才能在此导入。</translation>
-<translation id="6823506025919456619">您需要登录 Chrome，才能看到自己的设备</translation>
+<translation id="2882635281780107184">您需要登录云游浏览器，才能看到自己的设备</translation>
 <translation id="7065534935986314333">关于系统</translation>
 <translation id="4691088804026137116">不同步任何数据</translation>
 <translation id="6454421252317455908">中文输入法（快速）</translation>
@@ -3392,7 +3392,7 @@
 <translation id="5578327870501192725">与 <ph name="DOMAIN"/> 的连接采用 <ph name="BIT_COUNT"/> 位加密技术。</translation>
 <translation id="4336032328163998280">复制操作失败。<ph name="ERROR_MESSAGE"/></translation>
 <translation id="351486934407749662">很长</translation>
-<translation id="2267273557509361161">在 Windows 8 模式下重新启动 Chrome</translation>
+<translation id="776712412258794120">在 Windows 8 模式下重新启动云游浏览器</translation>
 <translation id="5269977353971873915">打印失败</translation>
 <translation id="3193734264051635522">速度：</translation>
 <translation id="869884720829132584">应用菜单</translation>
@@ -3828,7 +3828,7 @@
 <translation id="1215411991991485844">已添加新的后台应用</translation>
 <translation id="7158238151765743968">仍在连接“<ph name="DEVICE_NAME"/>”。</translation>
 <translation id="8782565991310229362">已取消启动信息亭模式下的应用。</translation>
-<translation id="2252923619938421629">请报告当前设置以帮助改进 Google Chrome 的功能</translation>
+<translation id="2050017204865623834">请报告当前设置以帮助改进云游浏览器的功能</translation>
 <translation id="4647697156028544508">请输入“<ph name="DEVICE_NAME"/>”的 PIN：</translation>
 <translation id="1062866675591297858">请通过<ph name="BEGIN_LINK"/>受监管用户信息中心<ph name="END_LINK"/>管理您的受监管用户。</translation>
 <translation id="7671130400130574146">使用系统标题栏和边框</translation>
@@ -4024,7 +4024,7 @@
 <translation id="5039512255859636053">$1 TB</translation>
 <translation id="4285498937028063278">取消固定</translation>
 <translation id="8734073480934656039">如果您启用了此设置，在浏览器启动时，信息亭模式下的应用会自动启动。</translation>
-<translation id="2588322182880276190">Chrome 徽标</translation>
+<translation id="4205992319940165326">云游浏览器徽标</translation>
 <translation id="5449624072515809082">打开输入时的文本自动更正功能。同步拼写检查与此功能不兼容。</translation>
 <translation id="2668079306436607263">滚动反弹历史记录导航</translation>
 <translation id="7066944511817949584">无法连接“<ph name="DEVICE_NAME"/>”。</translation>
@@ -4667,7 +4667,7 @@
 <translation id="2859369953631715804">选择移动网络</translation>
 <translation id="6934265752871836553">使用全新的代码提升Chrome提取内容的速度。在此路径之后进行的更改很可能会影响大量内容。</translation>
 <translation id="2788135150614412178">+</translation>
-<translation id="8274359292107649245">打开桌面版 Chrome</translation>
+<translation id="2561451941023433361">打开桌面版云游浏览器</translation>
 <translation id="1571119610742640910">合成固定的根背景。</translation>
 <translation id="6514565641373682518">此网页已隐藏鼠标指针。</translation>
 <translation id="5308689395849655368">已停用崩溃报告。</translation>
@@ -5032,7 +5032,7 @@
 <translation id="6920989436227028121">在常规标签页中打开</translation>
 <translation id="4057041477816018958"><ph name="SPEED"/> - <ph name="RECEIVED_AMOUNT"/></translation>
 <translation id="2050339315714019657">纵向</translation>
-<translation id="8273027367978594412">启用后，桌面 Chrome 将支持访客用户。</translation>
+<translation id="2177833757259132930">启用后，桌面云游浏览器将支持访客用户。</translation>
 <translation id="6991128190741664836">以后再说</translation>
 <translation id="8261490674758214762">这些程序可以：</translation>
 <translation id="8647750283161643317">全部重置为默认值</translation>
@@ -5205,4 +5205,78 @@
 <translation id="7943385054491506837">美国英语(Colemak)</translation>
 <translation id="8203365863660628138">确认安装</translation>
 <translation id="2533972581508214006">报告不正确的警告</translation>
+
+<translation id="5090111105763664790">切换到Chrome内核</translation>
+<translation id="5238795329764605913">切换到IE内核</translation>
+<translation id="8076492880354921740">Tabs</translation>
+<translation id="5647815283907633026">点击显示书签菜单</translation>
+<translation id="591702390501059038">BookMark</translation>
+<translation id="1754792837224968062">显示"恢复"按钮</translation>
+<translation id="3550019112133256040">显示"书签"按钮</translation>
+<translation id="1072273632782158644">标签栏</translation>
+<translation id="3157718818683069445">在新标签打开收藏夹里的网址</translation>
+<translation id="2120170704245060838">在新标签打开地址栏输入的网址</translation>
+<translation id="8288017496376033475">双击鼠标左键关闭当前标签</translation>
+<translation id="4367493054132686074">单击鼠标右键关闭当前标签</translation>
+<translation id="2494054977946255137">点击链接打开新标签时,总是切换到新标签页</translation>
+<translation id="57991808960578090">清空恢复列表</translation>
+<translation id="6161949294447571899">点击恢复刚关闭的网页, 按住或者右键查看恢复列表</translation>
+<translation id="2468058932197035758">论坛</translation>
+<translation id="3426692317920585190">鼠标控制</translation>
+<translation id="1102830199106043208">启用拖放功能</translation>
+<translation id="5250656836799796663">打开拖拽页面时,不切换到新标签页</translation>
+<translation id="9020407179558656649">启用鼠标手势</translation>
+<translation id="6574092768147864209">自定义鼠标手势...</translation>
+<translation id="4725280126550191472">鼠标手势---自定义设置</translation>
+<translation id="4078167768497571183">鼠标手势功能</translation>
+<translation id="2015918568050183219">上</translation>
+<translation id="6041650041418071626">下</translation>
+<translation id="5965477019852341851">左</translation>
+<translation id="6203943883998160447">右</translation>
+<translation id="3207127552620881142">上左</translation>
+<translation id="1712551116309375805">上右</translation>
+<translation id="8870802557581876093">下左</translation>
+<translation id="1659968866155501938">下右</translation>
+<translation id="1768860771363295651">右左</translation>
+<translation id="8222723787484471919">左右</translation>
+<translation id="1823839271941979178">上下</translation>
+<translation id="3183280335889920995">下上</translation>
+<translation id="6316161997866388774">右上</translation>
+<translation id="1153168731756576362">右下</translation>
+<translation id="3527783580119603128">左上</translation>
+<translation id="5278421704307401750">左下</translation>
+<translation id="7108547373741388822">向下翻一页</translation>
+<translation id="682910899209987018">向上翻一页</translation>
+<translation id="7405879860788550556">滚到页面顶部</translation>
+<translation id="549290695382500111">滚到页面底部</translation>
+<translation id="8508785492889511520">切换到上个标签</translation>
+<translation id="349894672988072647">切换到下个标签</translation>
+<translation id="7004415653037810868">恢复上次打开的页面</translation>
+<translation id="617161082837201102">停止</translation>
+<translation id="566267640231535083">最小化当前窗口</translation>
+<translation id="5939339720858582219">无动作</translation>
+<translation id="5740681247045117769">退出浏览器时自动清理浏览痕迹</translation>
+<translation id="3484500935798789164">设置自动清理类型...</translation>
+<translation id="1413768951234456918">自动清理浏览历史</translation>
+<translation id="6001621991816939414">自动清理下载历史</translation>
+<translation id="8723436814410552546">自动清空Internet临时文件</translation>
+<translation id="3309601310291292110">自动删除COOKIE</translation>
+<translation id="5127101898711307428">自动清理用户密码</translation>
+<translation id="6369437398630659012">自动清理表单数据</translation>
+<translation id="6667412012684604143">老板键</translation>
+<translation id="3198371028413317689">启用老板键</translation>
+<translation id="6046191962424332371">设置默认下载工具</translation>
+<translation id="6857090721393355300">文件名:</translation>
+<translation id="7655933584237634008">下载到：</translation>
+<translation id="4985509611418653372">打开</translation>
+<translation id="7185099430786833524">其他下载工具</translation>
+<translation id="8598410202900821813">新建下载任务</translation>
+<translation id="4810980787834078040">选择默认下载工具:</translation>
+<translation id="2977804012005932196">已经存在, 是否覆盖该文件?</translation>
+<translation id="7835950625226950452">文件路径错误,请重试</translation>
+<translation id="2785210790729739098">内置下载器</translation>
+<translation id="9057346146555851930">迅雷</translation>
+<translation id="2948764807280402657">迷你迅雷</translation>
+<translation id="4370547446331072069">QQ旋风</translation>
+<translation id="4013794286379809233">请登录</translation>
 </translationbundle>
