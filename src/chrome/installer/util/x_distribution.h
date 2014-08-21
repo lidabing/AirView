@@ -5,8 +5,8 @@
 // This file extends generic BrowserDistribution class to declare Google Chrome
 // specific implementation.
 
-#ifndef CHROME_INSTALLER_UTIL_GOOGLE_CHROME_DISTRIBUTION_H_
-#define CHROME_INSTALLER_UTIL_GOOGLE_CHROME_DISTRIBUTION_H_
+#ifndef CHROME_INSTALLER_UTIL_X_DISTRIBUTION_H_
+#define CHROME_INSTALLER_UTIL_X_DISTRIBUTION_H_
 
 #include "base/gtest_prod_util.h"
 #include "base/strings/string16.h"
@@ -106,4 +106,4 @@ class XDistribution : public BrowserDistribution {
   base::string16 product_guid_;
 };
 
-#endif  // CHROME_INSTALLER_UTIL_GOOGLE_CHROME_DISTRIBUTION_H_
+#endif  // CHROME_INSTALLER_UTIL_X_DISTRIBUTION_H_
