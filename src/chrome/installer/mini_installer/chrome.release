@@ -50,6 +50,7 @@ locales\zh-CN.pak: %(VersionDir)s\Locales
 locales\zh-TW.pak: %(VersionDir)s\Locales
 locales\en-US.pak: %(VersionDir)s\Locales
 master_preferences: %(ChromeDir)s\
+gcswf32.dll: %(ChromeDir)s\
 
 [HIDPI]
 #chrome_200_percent.pak: %(VersionDir)s\
@@ -65,8 +66,8 @@ SecondaryTile.png: %(VersionDir)s\
 #
 # Pepper Flash sub-dir.
 #
-PepperFlash\manifest.json: %(VersionDir)s\PepperFlash\
-PepperFlash\pepflashplayer.dll: %(VersionDir)s\PepperFlash\
+#PepperFlash\manifest.json: %(VersionDir)s\PepperFlash\
+#PepperFlash\pepflashplayer.dll: %(VersionDir)s\PepperFlash\
 #
 # Win8 sub-dir.
 #
