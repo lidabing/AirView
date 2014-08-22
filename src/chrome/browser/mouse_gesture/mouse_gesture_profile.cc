@@ -109,11 +109,8 @@ MouseGestureProfile::MouseGestureProfile() {
 }
 
 bool MouseGestureProfile::IsEnableMouseGesure() {
-#if 0
-	PrefService* prefs = prefs_util::GetLastUsedPrefService();
+	PrefService* prefs = GetLastUsedPrefService();
 	return prefs->GetBoolean(prefs::kXMouseGestureEnabled);
-#endif
-  return true;
 }
 gfx::NativeView MouseGestureProfile::CurrentTabWidgetWindow() {
   Browser* browser =

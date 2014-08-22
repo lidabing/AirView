@@ -174,6 +174,12 @@ void RegisterProfilePrefsX(user_prefs::PrefRegistrySyncable* registry) {
       MGACTION_GOPAGETOP,
       user_prefs::PrefRegistrySyncable::UNSYNCABLE_PREF);
 
+  //老板键
+  registry->RegisterBooleanPref(
+	  prefs::kXEnableBosskey,
+	  true,
+	  user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
+
   // registry->RegisterIntegerPref(prefs::kXDefaultDownloader,
   //kDownloaderChrome, //使用默认下载器
   //user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);

@@ -645,6 +645,10 @@ void BrowserView::ShowInactive() {
 
 void BrowserView::Hide() {
   // Not implemented.
+	///airview patch
+	if (frame_->IsVisible())
+		frame_->Hide();
+	///}
 }
 
 void BrowserView::SetBounds(const gfx::Rect& bounds) {
