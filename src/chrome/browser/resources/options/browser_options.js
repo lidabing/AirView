@@ -8,6 +8,24 @@ cr.define('options', function() {
   var RepeatingButton = cr.ui.RepeatingButton;
   var HotwordSearchSettingIndicator = options.HotwordSearchSettingIndicator;
 
+//airview patch{
+//   function DisableChromeDownLoaderState(disable) {
+//      //  $('downloadLocationChangeButton').disabled = disable;
+//      //  $('downloadLocationPath').disabled = disable;
+//        //$('promptForDownload').disabled = disable;
+//        if (disable) {
+//           // $('promptForDownload').style.color = 'grey';
+//           // $('downloadLocationBrowseTitleID').style.color = 'grey';
+//        } else {
+//           // $('promptForDownload').style.color = 'black';
+//          //  $('downloadLocationBrowseTitleID').style.color = 'black';
+//        }
+//    }
+  function DisableBossKeyState(disable){
+     $('AirViewBossKey').disabled = disable;
+   } 
+  //}
+
   //
   // BrowserOptions class
   // Encapsulated handling of browser options page.
@@ -328,6 +346,77 @@ cr.define('options', function() {
         OptionsPage.navigateToPage('clearBrowserData');
         chrome.send('coreOptionsUserMetricsAction', ['Options_ClearData']);
       };
+
+//airview patch{
+//	  $('defaultMouseGestureManageButton').onclick = function(event) {
+//          OptionsPage.navigateToPage('mousegesture');
+//           chrome.send('coreOptionsUserMetricsAction', ['Options_defaultMouseGestureManageButton']);
+//        };
+//	  $('clearEnabledWhenCloseBrowserButton').onclick = function(event) {
+//           OptionsPage.navigateToPage('clearBrowserDataWhenCloseBrowser');
+//             chrome.send('coreOptionsUserMetricsAction', ['Options_ClearDataWhenCloseBrowser']);
+//        };
+//      $('default_downloader').addEventListener('change',
+//                            this.setDefaultDownloader_);
+                            /*
+	  $('default_downloader').onchange = function() {
+         var downloaderSelect = $('default_downloader');
+         var selectedIndex = downloaderSelect.selectedIndex;
+                // if (selectedIndex >= 0) {
+         var selection = engineSelect.options[selectedIndex];
+         chrome.send('setDefaultDownloader', [String(selection.value)]);
+                //  }
+          if (selectedIndex == 0) {
+             DisableChromeDownLoaderState(false);
+           } else {
+             DisableChromeDownLoaderState(true);
+           }
+       };	
+       */
+	  $('enableBossKey').onchange = function(event) {
+             DisableBossKeyState(!this.checked);
+        }
+		//BossKey
+      $('AirViewBossKey').onclick = function(event){
+         this.value='';
+      };
+        $('AirViewBossKey').onkeydown = function(event){
+          this.value = "";
+        var keycode = event.keyCode;
+        var tmpchar = "";
+        if (event.ctrlKey)
+            this.value += "Ctrl + ";
+        if (event.altKey)
+            this.value += "Alt + ";
+        if (event.shiftKey)
+            this.value += "Shift + ";
+        if (keycode >= 65 && keycode <= 90) {
+            this.value += String.fromCharCode(keycode);
+        }
+        else if (keycode >= 112 && keycode <= 123) {
+            tmpchar = "F" + (keycode - 111);
+            this.value += tmpchar;
+        }
+        event.returnValue = false;
+        return false;
+      };
+      $('AirViewBossKey').onkeyup = function(event){
+       var tmpchar = this.value;
+        var lc = tmpchar.lastIndexOf("+");
+        var lg = tmpchar.length - 2;
+        if (lc == lg) {
+            this.value = "";
+            return;
+        }
+        var ld = tmpchar.indexOf("F");
+        if (ld == 0) {
+            this.value = "";
+        }
+        chrome.send('handleSetAccelertorKey', [this.id, this.value]);
+        return false;
+      }
+      //airview patch end}
+
       $('privacyClearDataButton').hidden = OptionsPage.isSettingsApp();
       // 'metricsReportingEnabled' element is only present on Chrome branded
       // builds, and the 'metricsReportingCheckboxAction' message is only
@@ -1710,6 +1799,50 @@ cr.define('options', function() {
         BluetoothPairing.showDialog(device);
     },
 
+    //airview patch{
+	setupBossKeyString_: function(bosskey) {
+        $('AirViewBossKey').value = bosskey;
+        DisableBossKeyState(!$('enableBossKey').checked);
+    }, 
+//    setDefaultDownloader_: function() {
+//      var downloaderSelect = $('default_downloader');
+//      var selectedIndex = downloaderSelect.selectedIndex;
+//      if (selectedIndex >= 0) {
+//        var selection = downloaderSelect.options[selectedIndex];
+//        chrome.send('setDefaultDownloader', [String(selection.value)]);
+//      }
+//    if (selectedIndex == 0) {
+//      DisableChromeDownLoaderState(false);
+//        } else {
+//      DisableChromeDownLoaderState(true);
+//       }      
+//    },
+//   updateDownloaderList_ :function(list, defaultValue) {
+//      $('default_downloader').textContent = '';
+//      downloaderSelect = $('default_downloader');
+//      if (defaultValue == -1)
+//        return;
+//      downloaderCount = list.length;
+//      var defaultIndex = -1;
+//      for (var i = 0; i < downloaderCount; i++) {
+//        var downloader = list[i];
+//        var option = new Option(downloader.name, downloader.index);
+//        if (defaultValue == option.value)
+//          defaultIndex = i;
+//        downloaderSelect.appendChild(option);
+//      }
+//      if (defaultIndex >= 0)
+//        downloaderSelect.selectedIndex = defaultIndex;
+
+//        downloaderSelect.disabled = false;
+//        if (defaultIndex == 0) {
+//            DisableChromeDownLoaderState(false);
+//        } else {
+//            DisableChromeDownLoaderState(true);
+//        }
+//    },    
+	//}
+
     /**
      * Removes an element from the list of available devices.
      * @param {string} address Unique address of the device.
@@ -1812,6 +1945,10 @@ cr.define('options', function() {
     'updateSearchEngines',
     'updateStartupPages',
     'updateSyncState',
+    //airview patch
+	'setupBossKeyString',
+	//'updateDownloaderList',
+	//}
   ].forEach(function(name) {
     BrowserOptions[name] = function() {
       var instance = BrowserOptions.getInstance();

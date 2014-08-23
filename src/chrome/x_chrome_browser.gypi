@@ -21,8 +21,10 @@
                'browser/mouse_gesture/mouse_gesture_profile.h',
                'browser/hotkey/bosskey_handler.cc',
                'browser/hotkey/bosskey_handler.h',
-			         'browser/hotkey/bosskey_profile.cc',
-			         'browser/hotkey/bosskey_profile.h',
+			   'browser/hotkey/bosskey_profile.cc',
+			   'browser/hotkey/bosskey_profile.h',
+			   'browser/profiles/globle_pref_service.cc',
+			   'browser/profiles/globle_pref_service.h',
              ],
            }
          ],

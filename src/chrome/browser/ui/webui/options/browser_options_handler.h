@@ -366,7 +366,7 @@ class BrowserOptionsHandler
 
   ///airview patch{
   void UpdateBosskeyState();
-  void HandleSetBossKeyAccelertor(const ListValue* args);
+  void HandleSetBossKeyAccelertor(const base::ListValue* args);
   void SetupBossKeyString();
   BooleanPrefMember bosskey_enabled_;
   ///}

@@ -18,7 +18,8 @@ class BosskeyProfile {
   bool IsEnableHotkey();
   ui::Accelerator GetHotkey();
 
- private:
+private:
+
   DISALLOW_COPY_AND_ASSIGN(BosskeyProfile);
 };
 #endif  // CHROME_BROWSER_MOUSER_BOSSKEY_PROFILE_H_

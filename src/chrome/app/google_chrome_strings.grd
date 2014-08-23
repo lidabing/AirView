@@ -751,7 +751,7 @@ For AirView, processes used to display diagnostics information (such as this "ab
 
       <!-- Chrome sign-in page -->
       <message name="IDS_CHROME_SIGNIN_TITLE" desc="Title on the about:chrome-signin page">
-        AirView
+        Signining Google
       </message>
 
       <!-- Tutorial card in the avatar menu bubble -->

@@ -13,10 +13,6 @@
 namespace chrome {
 void RegisterProfilePrefsX(user_prefs::PrefRegistrySyncable* registry) {
   registry->RegisterBooleanPref(
-      prefs::kXEnableBosskey,
-      false,
-      user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
-  registry->RegisterBooleanPref(
       prefs::kXShowRestoreButton,
       true,
       user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);

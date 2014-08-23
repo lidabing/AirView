@@ -134,6 +134,13 @@
 #include "chrome/browser/local_discovery/privet_notifications.h"
 #endif
 
+///airview patch{
+#include "chrome/common/x_pref_names.h"
+#include "chrome/browser/hotkey/bosskey_handler.h"
+#include "ui/base/accelerators/accelerator_serialization.h"
+#include "chrome/browser/profiles/globle_pref_service.h"
+///}
+
 using base::UserMetricsAction;
 using content::BrowserContext;
 using content::BrowserThread;
@@ -921,6 +928,9 @@ void BrowserOptionsHandler::InitializePage() {
   SetupManagingSupervisedUsers();
   SetupEasyUnlock();
   SetupExtensionControlledIndicators();
+  ///airview patch{
+  SetupBossKeyString();
+  ///}
 
 #if defined(OS_CHROMEOS)
   SetupAccessibilityFeatures();
@@ -1826,18 +1836,18 @@ void BrowserOptionsHandler::SetupExtensionControlledIndicators() {
 
 ///airview patch{
 void BrowserOptionsHandler::UpdateBosskeyState(){
-	PrefService* prefs = Profile::FromWebUI(web_ui())->GetPrefs();
-	prefs->SetBoolean(prefs::kXEnableBosskey,bosskey_enabled_.GetValue());
-	content::BossKeyHandler_UpdateBossKeyState();
+	GloblePrefService::GetInstance()->SetBoolean(prefs::kXEnableBosskey,
+		bosskey_enabled_.GetValue());
+	BossKeyHandler_UpdateBossKeyState();
 }
 
-void BrowserOptionsHandler::HandleSetBossKeyAccelertor(const ListValue* args){
-	if(!args && args->IsType(Value::TYPE_LIST))
+void BrowserOptionsHandler::HandleSetBossKeyAccelertor(const base::ListValue* args){
+	if(!args && args->IsType(base::Value::TYPE_LIST))
 		return ;
 	std::string read_command;
 	std::string read_boss_key;
 
-	const ListValue* list = static_cast<const ListValue*>(args);
+	const base::ListValue* list = static_cast<const base::ListValue*>(args);
 	if (list->GetSize() != 2 || !list->GetString(0, &read_command) ||  !list->GetString(1, &read_boss_key)) {
 		NOTREACHED();
 		return;
@@ -1851,15 +1861,14 @@ void BrowserOptionsHandler::HandleSetBossKeyAccelertor(const ListValue* args){
 	boss_key_str = read_boss_key;
 	ui::Accelerator accelerator;
 
-	PrefService* prefs = Profile::FromWebUI(web_ui())->GetPrefs();
 	if(ui::DescriptStringToAccelerator(read_boss_key,accelerator)){
-		prefs->SetString(prefs::kXBosskeyValue,ui::AcceleratorToString(accelerator));
-		content::BossKeyHandler_UpdateBossKeyState();
+		GloblePrefService::GetInstance()->SetString(prefs::kXBosskeyValue,ui::AcceleratorToString(accelerator));
+		BossKeyHandler_UpdateBossKeyState();
 	}
 }
 
 void BrowserOptionsHandler::SetupBossKeyString(){
-	PrefService* prefs = Profile::FromWebUI(web_ui())->GetPrefs();
+	GloblePrefService* prefs = GloblePrefService::GetInstance();
 	std::string value_key = prefs->GetString(prefs::kXBosskeyValue,"81|4");
 	base::StringValue value(ui::AcceleratorToDescriptString(ui::StringToAccelerator(value_key)));
 	web_ui()->CallJavascriptFunction(
