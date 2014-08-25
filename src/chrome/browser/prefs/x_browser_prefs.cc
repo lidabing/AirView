@@ -13,10 +13,6 @@
 namespace chrome {
 void RegisterProfilePrefsX(user_prefs::PrefRegistrySyncable* registry) {
   registry->RegisterBooleanPref(
-      prefs::kXEnableBosskey,
-      false,
-      user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
-  registry->RegisterBooleanPref(
       prefs::kXShowRestoreButton,
       true,
       user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
@@ -173,6 +169,12 @@ void RegisterProfilePrefsX(user_prefs::PrefRegistrySyncable* registry) {
       prefs::kXMouseActionLeftDown,
       MGACTION_GOPAGETOP,
       user_prefs::PrefRegistrySyncable::UNSYNCABLE_PREF);
+
+  //老板键
+  registry->RegisterBooleanPref(
+	  prefs::kXEnableBosskey,
+	  true,
+	  user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
 
   // registry->RegisterIntegerPref(prefs::kXDefaultDownloader,
   //kDownloaderChrome, //使用默认下载器

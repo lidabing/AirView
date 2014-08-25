@@ -4,13 +4,19 @@
 
 #include "chrome/browser/hotkey/bosskey_profile.h"
 #include "ui/base/accelerators/accelerator_serialization.h"
+#include "base/prefs/pref_service.h"
+#include "chrome/common/x_pref_names.h"
+#include "chrome/browser/profiles/globle_pref_service.h"
 
 bool BosskeyProfile::IsEnableHotkey() {
-  return true;
+	GloblePrefService* prefs = GloblePrefService::GetInstance();
+	return prefs->GetBoolean(prefs::kXEnableBosskey,true);	
 }
 
 ui::Accelerator BosskeyProfile::GetHotkey() {
-  std::string value("81|4");
-  ui::Accelerator accelertor = ui::StringToAccelerator(value);
-  return accelertor;
+	GloblePrefService* prefs = GloblePrefService::GetInstance();
+	//Ctrl + Q
+	std::string  value = prefs->GetString(prefs::kXBosskeyValue,"81|4");	;
+	ui::Accelerator accelertor = ui::StringToAccelerator(value);
+	return accelertor;
 }

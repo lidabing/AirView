@@ -134,6 +134,13 @@
 #include "chrome/browser/local_discovery/privet_notifications.h"
 #endif
 
+///airview patch{
+#include "chrome/common/x_pref_names.h"
+#include "chrome/browser/hotkey/bosskey_handler.h"
+#include "ui/base/accelerators/accelerator_serialization.h"
+#include "chrome/browser/profiles/globle_pref_service.h"
+///}
+
 using base::UserMetricsAction;
 using content::BrowserContext;
 using content::BrowserThread;
@@ -749,6 +756,13 @@ void BrowserOptionsHandler::RegisterMessages() {
           &BrowserOptionsHandler::HandleRefreshExtensionControlIndicators,
           base::Unretained(this)));
 #endif  // defined(OS_WIN)
+
+  ///airview patch{
+  web_ui()->RegisterMessageCallback(
+	  "handleSetAccelertorKey",
+	  base::Bind(&BrowserOptionsHandler::HandleSetBossKeyAccelertor,
+	  base::Unretained(this)));
+  ///}
 }
 
 void BrowserOptionsHandler::Uninitialize() {
@@ -888,6 +902,12 @@ void BrowserOptionsHandler::InitializeHandler() {
       base::Bind(&BrowserOptionsHandler::SetupProxySettingsSection,
                  base::Unretained(this)));
 #endif  // !defined(OS_CHROMEOS)
+  ///airview patch{
+  bosskey_enabled_.Init(prefs::kXEnableBosskey,
+	  prefs,
+	  base::Bind(&BrowserOptionsHandler::UpdateBosskeyState,
+	  base::Unretained(this)));
+  ///}
 }
 
 void BrowserOptionsHandler::InitializePage() {
@@ -908,6 +928,9 @@ void BrowserOptionsHandler::InitializePage() {
   SetupManagingSupervisedUsers();
   SetupEasyUnlock();
   SetupExtensionControlledIndicators();
+  ///airview patch{
+  SetupBossKeyString();
+  ///}
 
 #if defined(OS_CHROMEOS)
   SetupAccessibilityFeatures();
@@ -1810,5 +1833,47 @@ void BrowserOptionsHandler::SetupExtensionControlledIndicators() {
                                    extension_controlled);
 #endif  // defined(OS_WIN)
 }
+
+///airview patch{
+void BrowserOptionsHandler::UpdateBosskeyState(){
+	GloblePrefService::GetInstance()->SetBoolean(prefs::kXEnableBosskey,
+		bosskey_enabled_.GetValue());
+	BossKeyHandler_UpdateBossKeyState();
+}
+
+void BrowserOptionsHandler::HandleSetBossKeyAccelertor(const base::ListValue* args){
+	if(!args && args->IsType(base::Value::TYPE_LIST))
+		return ;
+	std::string read_command;
+	std::string read_boss_key;
+
+	const base::ListValue* list = static_cast<const base::ListValue*>(args);
+	if (list->GetSize() != 2 || !list->GetString(0, &read_command) ||  !list->GetString(1, &read_boss_key)) {
+		NOTREACHED();
+		return;
+	}
+	//记录上次设置的内容，如果一样，那么不做处理,因为是在设置快捷键后会发送多次
+	static std::string command_str;
+	static std::string boss_key_str;
+	if((read_command == command_str) && (read_boss_key==boss_key_str))
+		return ;
+	command_str = read_command;
+	boss_key_str = read_boss_key;
+	ui::Accelerator accelerator;
+
+	if(ui::DescriptStringToAccelerator(read_boss_key,accelerator)){
+		GloblePrefService::GetInstance()->SetString(prefs::kXBosskeyValue,ui::AcceleratorToString(accelerator));
+		BossKeyHandler_UpdateBossKeyState();
+	}
+}
+
+void BrowserOptionsHandler::SetupBossKeyString(){
+	GloblePrefService* prefs = GloblePrefService::GetInstance();
+	std::string value_key = prefs->GetString(prefs::kXBosskeyValue,"81|4");
+	base::StringValue value(ui::AcceleratorToDescriptString(ui::StringToAccelerator(value_key)));
+	web_ui()->CallJavascriptFunction(
+		"BrowserOptions.setupBossKeyString", value);
+}
+///}
 
 }  // namespace options
