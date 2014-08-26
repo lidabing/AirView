@@ -34,6 +34,7 @@ if /i "%1"=="x86"           set target_arch=ia32&goto arg-ok
 if /i "%1"=="x64"           set target_arch=x64&goto arg-ok
 if /i "%1"=="static"         set link_mode=static&goto arg-ok
 if /i "%1"=="shared"         set link_mode=shared&goto arg-ok
+if /i "%1"=="justrun"         set justrun=justrun
 
 echo Warning: ignoring invalid command line option `%1`.
 
@@ -58,6 +59,7 @@ cd %~dp0
 cd ../..
 cd chromium
 cd src
+if "%justrun%" == "justrun" goto build
 goto create-project
 
 :create-project
@@ -74,7 +76,7 @@ ninja -C out\%output_dir% mini_installer.exe
 goto exit
 
 :help
-echo ninja_build.bat [release/debug] [ia32/x64] [static/shared]
+echo ninja_build.bat [release/debug] [ia32/x64] [static/shared][justrun]
 echo Examples:
 echo   ninja_build.bat                          : builds release 
 echo   ninja_build.bat debug                    : builds debug 
