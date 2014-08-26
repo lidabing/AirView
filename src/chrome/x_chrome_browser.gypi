@@ -30,11 +30,13 @@
          ],
        ],
        'sources' :[
-          'browser/x_chrome_browser_main_extra_parts.cc',
-          'browser/x_chrome_browser_main_extra_parts.h',
+                    'browser/x_chrome_browser_main_extra_parts.cc',
+                    'browser/x_chrome_browser_main_extra_parts.h',
 					'browser/prefs/x_browser_prefs.h',
 					'browser/prefs/x_browser_prefs.cc',
 					'browser/mouse_gesture/mouse_gesture_common.h',
 					'browser/mouse_gesture/mouse_gesture_common.cc',
+					'browser/common/prefs_util.h',
+					'browser/common/prefs_util.cc',
                   ]
 }

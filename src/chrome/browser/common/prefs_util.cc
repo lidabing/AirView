@@ -1,9 +1,9 @@
-#include "chrome/common/prefs_util.h"
+#include "chrome/browser/common/prefs_util.h"
 
 #include "base/prefs/pref_service.h"
 #include "base/strings/utf_string_conversions.h"
 #include "base/message_loop/message_loop.h"
-#include "ui/base/events/event_constants.h"
+#include "ui/events/event_constants.h"
 #include "content/public/browser/web_contents.h"
 #include "chrome/common/url_constants.h"
 #include "chrome/browser/profiles/profile_manager.h"

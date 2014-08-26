@@ -9,7 +9,5 @@
                'common/x_pref_names.h',
                'common/x_chrome_paths_internal.h',
                'common/x_chrome_paths_internal.cc',
-			   'common/prefs_util.h',
-               'common/prefs_util.cc',
              ],
 }
