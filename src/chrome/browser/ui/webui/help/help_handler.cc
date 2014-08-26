@@ -102,6 +102,9 @@ base::string16 BuildChromiumVersionString() {
 	//browser_version += " (";
 	//browser_version += version_info.LastChange();
 	//browser_version += ")";
+#if defined(_WIN64)
+	browser_version += " (64-bit)";
+#endif
 
 	return base::UTF8ToUTF16(browser_version);
 }

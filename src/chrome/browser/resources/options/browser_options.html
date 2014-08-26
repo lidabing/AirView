@@ -92,15 +92,33 @@
         </span>
       </span>
     </div>
-<if expr="is_posix and not chromeos and not is_macosx">
-    <div class="checkbox"><label>
-        <input id="show-window-decorations" type="checkbox"
-            pref="browser.custom_chrome_frame" metric="Options_CustomFrame"
-            inverted_pref>
-        <span i18n-content="showWindowDecorations"></span>
-    </label></div>
-</if>
-  </section>
+      <!--- airview patch{ ---->
+      <div class="checkbox" guest-visibility="disabled">
+          <label>
+              <input id="toolbarShowRestoreButton" pref="x.show_restore_button"
+                     metric="Options_ShowRestoreButton" type="checkbox">
+              <span i18n-content="toolbarShowRestoreButton"></span>
+          </label>
+      </div>
+      <div class="checkbox" guest-visibility="disabled">
+          <label>
+              <input id="toolbarShowBookmarksButton" pref="x.show_bookmarks_button"
+                     metric="Options_ShowBookmarksButton" type="checkbox">
+              <span i18n-content="toolbarShowBookmarksButton"></span>
+          </label>
+      </div>
+      <!--- } ----------->
+          <if expr="is_posix and not chromeos and not is_macosx">
+              <div class="checkbox">
+                  <label>
+                      <input id="show-window-decorations" type="checkbox"
+                             pref="browser.custom_chrome_frame" metric="Options_CustomFrame"
+                             inverted_pref>
+                      <span i18n-content="showWindowDecorations"></span>
+                  </label>
+              </div>
+          </if>
+</section>
 <if expr="chromeos">
   <section>
     <h3 i18n-content="sectionTitleDevice"></h3>

@@ -637,11 +637,11 @@ void ToolbarView::Layout() {
     home_->SetVisible(true);
     home_->SetBounds(next_element_x, child_y,
                      home_->GetPreferredSize().width(), child_height);
+	next_element_x = home_->bounds().right() + kStandardSpacing;
   } else {
     home_->SetVisible(false);
     home_->SetBounds(next_element_x, child_y, 0, child_height);
   }
-  next_element_x = home_->bounds().right() + kStandardSpacing;
 
   /// airview patch{
   next_element_x = patch_.Layout(next_element_x);

@@ -16,6 +16,9 @@
 #include "ui/base/l10n/l10n_util.h"
 #include "chrome/browser/ui/restore_menu_model.h"
 #include "chrome/app/chrome_command_ids_patch.h"
+#include "chrome/common/x_pref_names.h"
+#include "chrome/browser/ui/browser.h"
+#include "chrome/browser/profiles/profile.h"
 
 void X_CLASS_PATCH_NAME(ToolbarView)::Init() {
   restore_ = new views::ButtonDropDownForRestore(
@@ -36,6 +39,15 @@ void X_CLASS_PATCH_NAME(ToolbarView)::Init() {
       l10n_util::GetStringUTF16(IDS_X_BOOKMARK_MENU_TOOLTIP));
   // bookmark_->set_id(VIEW_ID_X_BOOKMARK_MENU);
   that_->AddChildView(bookmark_);
+
+  show_restore_button_.Init(prefs::kXShowRestoreButton,
+	  that_->browser_->profile()->GetPrefs(),
+	  base::Bind(&X_CLASS_PATCH_NAME(ToolbarView)::OnCustomButtonChanged,
+	  base::Unretained(this)));
+  show_bookmark_button_.Init(prefs::kXShowBookmarksButton,
+	  that_->browser_->profile()->GetPrefs(),
+	  base::Bind(&X_CLASS_PATCH_NAME(ToolbarView)::OnCustomButtonChanged,
+	  base::Unretained(this)));
 }
 
 void X_CLASS_PATCH_NAME(ToolbarView)::LoadImages() {
@@ -76,9 +88,13 @@ bool X_CLASS_PATCH_NAME(ToolbarView)::FilterMenuButtonClicked(
 }
 
 int X_CLASS_PATCH_NAME(ToolbarView)::GetLayoutWidth() const {
-  int width = restore_->GetPreferredSize().width() + that_->kStandardSpacing +
-              bookmark_->GetPreferredSize().width() + that_->kStandardSpacing;
-  return width;
+	int width = 0;
+	if (show_restore_button_.GetValue())
+		width += restore_->GetPreferredSize().width() + that_->kStandardSpacing;
+	if (show_bookmark_button_.GetValue())
+		width += bookmark_->GetPreferredSize().width() + that_->kStandardSpacing;
+
+	return width;
 }
 
 int X_CLASS_PATCH_NAME(ToolbarView)::Layout(int position) {
@@ -86,13 +102,26 @@ int X_CLASS_PATCH_NAME(ToolbarView)::Layout(int position) {
       std::min(restore_->GetPreferredSize().height(), that_->height());
   int child_y = (that_->height() - child_height + 1) / 2;
 
-  restore_->SetBounds(
-      position, child_y, restore_->GetPreferredSize().width(), child_height);
-  position = restore_->bounds().right() + that_->kStandardSpacing;
-
-  bookmark_->SetBounds(
-      position, child_y, bookmark_->GetPreferredSize().width(), child_height);
-  position = bookmark_->bounds().right() + that_->kStandardSpacing;
+  if (show_restore_button_.GetValue()){
+	  restore_->SetVisible(true);
+	  restore_->SetBounds(
+		  position, child_y, restore_->GetPreferredSize().width(), child_height);
+	  position = restore_->bounds().right() + that_->kStandardSpacing;
+  } else
+	  restore_->SetVisible(false);
+ 
+  if (show_bookmark_button_.GetValue()){
+	  bookmark_->SetVisible(true);
+	  bookmark_->SetBounds(
+		  position, child_y, bookmark_->GetPreferredSize().width(), child_height);
+	  position = bookmark_->bounds().right() + that_->kStandardSpacing;
+  } else
+	  bookmark_->SetVisible(false);
 
   return position;
+}
+
+void X_CLASS_PATCH_NAME(ToolbarView)::OnCustomButtonChanged() {
+	that_->Layout();
+	that_->SchedulePaint();
 }

@@ -8,6 +8,7 @@
 #include "base/patch.h"
 #include "base/memory/scoped_ptr.h"
 #include "chrome/browser/ui/bookmark_menu.h"
+#include "base/prefs/pref_member.h"
 
 namespace views{
 class ImageButton;
@@ -27,11 +28,14 @@ X_START_CLASS_PATCH(ToolbarView)
   bool FilterMenuButtonClicked(views::View* source, const gfx::Point& point);
   int GetLayoutWidth() const;
   int Layout(int position);
+  void OnCustomButtonChanged();
 
  private:
   views::ImageButton* restore_;
   views::MenuButton* bookmark_;
   scoped_ptr<views::BookMarkMenu> bookmark_menu_;
+  BooleanPrefMember show_restore_button_;
+  BooleanPrefMember show_bookmark_button_;
 
 X_END_CLASS_PATCH(ToolbarView)
 
