@@ -88,6 +88,25 @@ base::string16 BuildBrowserVersionString() {
   return base::UTF8ToUTF16(browser_version);
 }
 
+///airview patch{
+// Returns the browser version as a string.
+base::string16 BuildChromiumVersionString() {
+	chrome::VersionInfo version_info;
+	DCHECK(version_info.is_valid());
+
+	std::string browser_version = version_info.Version();
+	std::string version_modifier =
+		chrome::VersionInfo::GetVersionStringModifier();
+	if (!version_modifier.empty())
+		browser_version += " " + version_modifier;
+	//browser_version += " (";
+	//browser_version += version_info.LastChange();
+	//browser_version += ")";
+
+	return base::UTF8ToUTF16(browser_version);
+}
+///}
+
 #if defined(OS_CHROMEOS)
 
 // Returns message that informs user that for update it's better to
@@ -239,6 +258,10 @@ void HelpHandler::GetLocalizedValues(content::WebUIDataSource* source) {
       "browserVersion",
       l10n_util::GetStringFUTF16(IDS_ABOUT_PRODUCT_VERSION,
                                  BuildBrowserVersionString()));
+  source->AddString(
+	  "chromiumVersion",
+	  l10n_util::GetStringFUTF16(IDS_ABOUT_CHROMIUM_VERSION,
+	  BuildChromiumVersionString()));
 
   base::Time::Exploded exploded_time;
   base::Time::Now().LocalExplode(&exploded_time);

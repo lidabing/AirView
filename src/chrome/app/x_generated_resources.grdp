@@ -56,6 +56,11 @@
   <message name="IDS_XVIEW_BBS" desc="xstring">
     AirView BBS
   </message>
+  <message name="IDS_ABOUT_CHROMIUM_VERSION" desc="xstring">
+    Chromium Version <ph name="PRODUCT_VERSION">
+      $1<ex>15.0.865.0</ex>
+    </ph>
+  </message>
   <message name="IDS_X_MOUSE_CONTROL" desc="xstring">
     Mouse Control
   </message>
