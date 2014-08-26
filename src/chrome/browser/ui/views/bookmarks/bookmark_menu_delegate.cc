@@ -30,7 +30,7 @@
 #include "ui/views/controls/menu/submenu_view.h"
 #include "ui/views/widget/widget.h"
 ///airview patch{
-#include "chrome/common/prefs_util.h"
+#include "chrome/browser/common/prefs_util.h"
 ///}
 
 using base::UserMetricsAction;

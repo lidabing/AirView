@@ -82,7 +82,7 @@
 #include "ui/views/widget/widget.h"
 #include "ui/views/window/non_client_view.h"
 ///airview patch{
-#include "chrome/common/prefs_util.h"
+#include "chrome/browser/common/prefs_util.h"
 ///}
 
 using base::UserMetricsAction;

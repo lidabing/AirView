@@ -52,7 +52,7 @@ namespace prefs_util{
 		DCHECK_UI_THREAD();
 		PrefService* prefs = GetLastUsedPrefService();
 		CHECK(prefs);
-		if(current_url && current_url->DomainIs(content::kChromeUINewTabHost))
+		if(current_url && current_url->DomainIs(chrome::kChromeUINewTabHost))
 			return CURRENT_TAB;
 
 		WindowOpenDisposition disposition = CURRENT_TAB;
@@ -71,7 +71,7 @@ namespace prefs_util{
 		CHECK(prefs);
 		if( new_url && new_url->SchemeIs("javascript") )
 			return CURRENT_TAB;
-		if(current_url && current_url->DomainIs(content::kChromeUINewTabHost))
+		if(current_url && current_url->DomainIs(chrome::kChromeUINewTabHost))
 			return CURRENT_TAB;
 
 		bool middle_button = (event_flags & ui::EF_MIDDLE_MOUSE_BUTTON) != 0;
@@ -102,7 +102,7 @@ namespace prefs_util{
 		DCHECK_UI_THREAD();
 		PrefService* prefs = GetLastUsedPrefService();
 		CHECK(prefs);
-		if(current_url && current_url->DomainIs(content::kChromeUINewTabHost))
+		if(current_url && current_url->DomainIs(chrome::kChromeUINewTabHost))
 			return CURRENT_TAB;
 
 		WindowOpenDisposition disposition = CURRENT_TAB;

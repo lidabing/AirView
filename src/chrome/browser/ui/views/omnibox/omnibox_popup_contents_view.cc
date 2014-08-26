@@ -21,7 +21,7 @@
 #include "ui/views/window/non_client_view.h"
 #include "ui/wm/core/window_animations.h"
 ///airview patch{
-#include "chrome/common/prefs_util.h"
+#include "chrome/browser/common/prefs_util.h"
 ///}
 
 // This is the number of pixels in the border image interior to the actual

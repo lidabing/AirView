@@ -7,7 +7,7 @@
 #include "chrome/browser/ui/views/tabs/tab_strip_types.h"
 #include "chrome/browser/ui/views/tabs/tab_controller.h"
 #include "ui/events/event.h"
-#include "chrome/common/prefs_util.h"
+#include "chrome/browser/common/prefs_util.h"
 
 bool TabPatch::OnMousePressed(const ui::MouseEvent& event, bool& handle) {
   if (event.IsLeftMouseButtonDoubleClick()

@@ -56,7 +56,7 @@
 #include "ui/views/widget/widget.h"
 #include "url/gurl.h"
 ///airview patch{
-#include "chrome/common/prefs_util.h"
+#include "chrome/browser/common/prefs_util.h"
 ///}
 
 #if defined(OS_WIN)
