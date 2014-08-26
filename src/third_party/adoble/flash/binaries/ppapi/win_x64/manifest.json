@@ -1,9 +1,9 @@
 {
     "description": "Pepper Flash Player", 
     "name": "Flapper", 
-    "version": "14.0.0.177", 
-    "x-flapper-revision": "1277476", 
-    "x-ppapi-arch": "x64", 
+    "version": "15.0.0.114", 
+    "x-flapper-revision": "458", 
+    "x-ppapi-arch": "ia32", 
     "x-ppapi-os": "win", 
     "x-ppapi-required-interfaces": [
         "PPB_AudioConfig;1.1|PPB_AudioConfig;1.0", 
