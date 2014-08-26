@@ -7,23 +7,27 @@
 #include "chrome/browser/ui/views/tabs/tab_strip_types.h"
 #include "chrome/browser/ui/views/tabs/tab_controller.h"
 #include "ui/events/event.h"
+#include "chrome/common/prefs_util.h"
 
 bool TabPatch::OnMousePressed(const ui::MouseEvent& event, bool& handle) {
   if (event.IsLeftMouseButtonDoubleClick()
-      /*&& prefs_util::IsLeftDoubleClickCloseTab()*/) {
+      && prefs_util::IsLeftDoubleClickCloseTab()) {
     that_->controller_->CloseTab(that_, CLOSE_TAB_FROM_MOUSE);
     return true;
   }
   return false;
 }
 bool TabPatch::ShouldShowContextMenu() {
-  return false;
+	if(prefs_util::IsRightClickedCloseTab())
+		return false;
+	else
+		return true;
 }
 bool TabPatch::OnMouseReleased(const ui::MouseEvent& event, bool& handle) {
   if (event.IsOnlyRightMouseButton()) {
     //添加一句这样的判断，防止程序退出时崩溃
     if (that_->HitTestPoint(event.location())
-        /*&&prefs_util::IsRightClickedCloseTab()*/) {
+        &&prefs_util::IsRightClickedCloseTab()) {
       that_->controller_->CloseTab(that_, CLOSE_TAB_FROM_MOUSE);
       return true;
     }

@@ -55,6 +55,9 @@
 #include "ui/views/views_delegate.h"
 #include "ui/views/widget/widget.h"
 #include "url/gurl.h"
+///airview patch{
+#include "chrome/common/prefs_util.h"
+///}
 
 #if defined(OS_WIN)
 #include "chrome/browser/browser_process.h"
@@ -715,7 +718,17 @@ bool OmniboxViewViews::OnKeyPressed(const ui::KeyEvent& event) {
   const bool alt = event.IsAltDown() || event.IsAltGrDown();
   switch (event.key_code()) {
     case ui::VKEY_RETURN:
-      model()->AcceptInput(alt ? NEW_FOREGROUND_TAB : CURRENT_TAB, false);
+	  ///airview patch{
+#if 0
+		model()->AcceptInput(alt ? NEW_FOREGROUND_TAB : CURRENT_TAB, false);
+#else
+	{
+			GURL current_url = prefs_util::GetCurrentActiveTabURL();
+			model()->AcceptInput(alt ? NEW_FOREGROUND_TAB : prefs_util::GetDispositionForAddressBar(&current_url),
+				false);
+		}
+#endif
+	  ///}
       return true;
     case ui::VKEY_ESCAPE:
       return model()->OnEscapeKeyPressed();
