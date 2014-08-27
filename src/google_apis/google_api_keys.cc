@@ -210,7 +210,11 @@ class APIKeyCache {
       // No key should be unset in an official build except the
       // GOOGLE_DEFAULT_* keys.  The default keys don't trigger this
       // check as their "unset" value is not DUMMY_API_TOKEN.
+	///airview patch{
+#if 0
       CHECK(false);
+#endif
+	  ///}
 #endif
       if (default_if_unset.size() > 0) {
         VLOG(1) << "Using default value \"" << default_if_unset
