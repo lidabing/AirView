@@ -59,9 +59,12 @@ void X_CLASS_PATCH_NAME(ToolbarView)::LoadImages() {
   restore_->SetImage(views::CustomButton::STATE_PRESSED,
                      tp->GetImageSkiaNamed(IDR_RESTORE_BUTTON_P));
 
-  bookmark_->SetIcon(*tp->GetImageSkiaNamed(IDR_X_BOOKMARK));
-  bookmark_->SetHoverIcon(*tp->GetImageSkiaNamed(IDR_X_BOOKMARK_H));
-  bookmark_->SetPushedIcon(*tp->GetImageSkiaNamed(IDR_X_BOOKMARK_P));
+  bookmark_->SetImage(views::Button::STATE_NORMAL, 
+	  *tp->GetImageSkiaNamed(IDR_X_BOOKMARK));
+  bookmark_->SetImage(views::Button::STATE_HOVERED, 
+	  *tp->GetImageSkiaNamed(IDR_X_BOOKMARK_H));
+  bookmark_->SetImage(views::Button::STATE_PRESSED,
+	  *tp->GetImageSkiaNamed(IDR_X_BOOKMARK_P));
 }
 
 void X_CLASS_PATCH_NAME(

@@ -232,12 +232,6 @@
               'dependencies': [
                 '../breakpad/breakpad.gyp:dump_syms',
                 '../breakpad/breakpad.gyp:symupload',
-
-                # In order to process symbols for the Remoting Host plugin,
-                # that plugin needs to be built beforehand.  Since the
-                # "Dump Symbols" step hangs off this target, that plugin also
-                # needs to be added as a dependency.
-                '../remoting/remoting.gyp:remoting_host_plugin',
               ],
               # The "Dump Symbols" post-build step is in a target_conditions
               # block so that it will follow the "Strip If Needed" step if that
@@ -363,15 +357,12 @@
               # application reads Keystone keys from this plist and not the
               # framework's, and the ticket will reference this Info.plist to
               # determine the tag of the installed product.  Use --scm=1 to
-              # include SCM information.  The --pdf flag controls whether
-              # to insert PDF as a supported type identifier that can be
-              # opened.
+              # include SCM information.
               'postbuild_name': 'Tweak Info.plist',
               'action': ['<(tweak_info_plist_path)',
                          '--breakpad=0',
                          '--keystone=<(mac_keystone)',
                          '--scm=1',
-                         '--pdf=<(internal_pdf)',
                          '--bundle_id=<(mac_bundle_id)'],
             },
             {
@@ -433,20 +424,19 @@
             # chrome/app/theme/google_chrome/BRANDING have the short name
             # "chrome" etc.; should we try to extract from there instead?
 
-            # On Mac, this is done in chrome_dll.gypi.
-            ['internal_pdf', {
+            # CrOS does this in a separate build step.
+            ['OS=="linux" and chromeos==0 and linux_dump_symbols==1', {
               'dependencies': [
+                '../pdf/pdf.gyp:pdf_linux_symbols',
+              ],
+            }], # OS=="linux" and chromeos==0 and linux_dump_symbols==1
+            # Android doesn't use pdfium.
+            ['OS!="android"', {
+              'dependencies': [
+                # On Mac, this is done in chrome_dll.gypi.
                 '../pdf/pdf.gyp:pdf',
               ],
-              'conditions': [
-                # CrOS does this in a separate build step.
-                ['OS=="linux" and chromeos==0 and linux_dump_symbols==1', {
-                  'dependencies': [
-                    '../pdf/pdf.gyp:pdf_linux_symbols',
-                  ],
-                }], # OS=="linux" and chromeos==0 and linux_dump_symbols==1
-              ],
-            }], # internal_pdf
+            }], # OS=="android"
           ],
           'dependencies': [
             '../components/components.gyp:startup_metric_utils',
@@ -504,7 +494,6 @@
             '../breakpad/breakpad.gyp:breakpad_sender',
             '../chrome_elf/chrome_elf.gyp:chrome_elf',
             '../components/components.gyp:breakpad_component',
-            '../components/components.gyp:policy',
             '../sandbox/sandbox.gyp:sandbox',
           ],
           'sources': [
@@ -527,8 +516,13 @@
                 'oleaut32.dll',
               ],
               'AdditionalDependencies': [ 'wintrust.lib' ],
-              # Set /SUBSYSTEM:WINDOWS for chrome.exe itself.
-              'SubSystem': '2',
+              'conditions': [
+                ['asan==0', {
+                  # Set /SUBSYSTEM:WINDOWS for chrome.exe itself, except for the
+                  # AddressSanitizer build where console output is important.
+                  'SubSystem': '2',
+                }],
+              ],
             },
             'VCManifestTool': {
               'AdditionalManifestFiles': [
@@ -537,6 +531,13 @@
               ],
             },
           },
+          'conditions': [
+            ['configuration_policy==1', {
+              'dependencies': [
+                '<(DEPTH)/components/components.gyp:policy',
+              ],
+            }],
+          ],
           'actions': [
             {
               'action_name': 'first_run',
@@ -565,14 +566,6 @@
         }, {  # 'OS!="win"
           'sources!': [
             'app/client_util.cc',
-          ],
-        }],
-        ['OS=="win" and target_arch=="ia32"', {
-          'sources': [
-            # TODO(scottmg): This is a workaround for
-            # http://crbug.com/348525 that affects VS2013 before Update 2.
-            # This should be removed once Update 2 is released.
-            '../build/win/ftol3.obj',
           ],
         }],
         ['OS=="win" and component=="shared_library"', {
@@ -631,7 +624,6 @@
                 '../breakpad/breakpad.gyp:breakpad_sender_win64',
                 '../components/components.gyp:breakpad_win64',
                 '../chrome/common_constants.gyp:common_constants_win64',
-                '../components/components.gyp:policy_win64',
                 '../components/nacl.gyp:nacl_win64',
                 '../crypto/crypto.gyp:crypto_nacl_win64',
                 '../ipc/ipc.gyp:ipc_win64',
@@ -655,6 +647,13 @@
                   'msvs_target_platform': 'x64',
                 },
               },
+              'conditions': [
+                ['configuration_policy==1', {
+                  'dependencies': [
+                    '<(DEPTH)/components/components.gyp:policy_win64',
+                  ],
+                }],
+              ],
             },
           ],
         }, {  # else (disable_nacl==1)

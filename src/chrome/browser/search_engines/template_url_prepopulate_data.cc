@@ -15,14 +15,11 @@
 #include "base/strings/string_piece.h"
 #include "base/strings/string_util.h"
 #include "base/strings/utf_string_conversions.h"
-#include "chrome/browser/google/google_util.h"
-#include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/search_engines/prepopulated_engines.h"
-#include "chrome/browser/search_engines/search_terms_data.h"
 #include "chrome/browser/search_engines/template_url.h"
-#include "chrome/browser/search_engines/template_url_service.h"
 #include "chrome/common/pref_names.h"
-#include "components/user_prefs/pref_registry_syncable.h"
+#include "components/google/core/browser/google_util.h"
+#include "components/pref_registry/pref_registry_syncable.h"
+#include "components/search_engines/prepopulated_engines.h"
 #include "content/public/browser/browser_thread.h"
 #include "grit/generated_resources.h"
 #include "grit/theme_resources.h"
@@ -520,14 +517,6 @@ const PrepopulatedEngine* kAllEngines[] = {
   &search_results, &searchnu,   &snapdo,       &softonic,     &sweetim,
   &terra_ar,     &terra_es,     &tut,          &walla,        &wp,
   &zoznam,
-};
-
-const struct LogoURLs {
-  const char* const logo_100_percent_url;
-  const char* const logo_200_percent_url;
-} google_logos = {
-  "https://www.google.com/images/chrome_search/google_logo.png",
-  "https://www.google.com/images/chrome_search/google_logo_2x.png",
 };
 
 // Please refer to ISO 3166-1 for information about the two-character country
@@ -1072,6 +1061,7 @@ scoped_ptr<TemplateURLData> MakePrepopulatedTemplateURLData(
     const base::StringPiece& instant_url,
     const base::StringPiece& image_url,
     const base::StringPiece& new_tab_url,
+    const base::StringPiece& contextual_search_url,
     const base::StringPiece& search_url_post_params,
     const base::StringPiece& suggest_url_post_params,
     const base::StringPiece& instant_url_post_params,
@@ -1090,6 +1080,7 @@ scoped_ptr<TemplateURLData> MakePrepopulatedTemplateURLData(
   data->instant_url = instant_url.as_string();
   data->image_url = image_url.as_string();
   data->new_tab_url = new_tab_url.as_string();
+  data->contextual_search_url = contextual_search_url.as_string();
   data->search_url_post_params = search_url_post_params.as_string();
   data->suggestions_url_post_params = suggest_url_post_params.as_string();
   data->instant_url_post_params = instant_url_post_params.as_string();
@@ -1144,6 +1135,7 @@ ScopedVector<TemplateURLData> GetPrepopulatedTemplateURLData(
       std::string instant_url;
       std::string image_url;
       std::string new_tab_url;
+      std::string contextual_search_url;
       std::string search_url_post_params;
       std::string suggest_url_post_params;
       std::string instant_url_post_params;
@@ -1155,6 +1147,7 @@ ScopedVector<TemplateURLData> GetPrepopulatedTemplateURLData(
       engine->GetString("instant_url", &instant_url);
       engine->GetString("image_url", &image_url);
       engine->GetString("new_tab_url", &new_tab_url);
+      engine->GetString("contextual_search_url", &contextual_search_url);
       engine->GetString("search_url_post_params", &search_url_post_params);
       engine->GetString("suggest_url_post_params", &suggest_url_post_params);
       engine->GetString("instant_url_post_params", &instant_url_post_params);
@@ -1164,10 +1157,10 @@ ScopedVector<TemplateURLData> GetPrepopulatedTemplateURLData(
           &search_terms_replacement_key);
       t_urls.push_back(MakePrepopulatedTemplateURLData(name, keyword,
           search_url, suggest_url, instant_url, image_url, new_tab_url,
-          search_url_post_params, suggest_url_post_params,
-          instant_url_post_params, image_url_post_params,
-          favicon_url, encoding, *alternate_urls, search_terms_replacement_key,
-          id).release());
+          contextual_search_url, search_url_post_params,
+          suggest_url_post_params, instant_url_post_params,
+          image_url_post_params, favicon_url, encoding, *alternate_urls,
+          search_terms_replacement_key, id).release());
     }
   }
   return t_urls.Pass();
@@ -1189,6 +1182,7 @@ scoped_ptr<TemplateURLData>
                                          engine.instant_url,
                                          engine.image_url,
                                          engine.new_tab_url,
+                                         engine.contextual_search_url,
                                          engine.search_url_post_params,
                                          engine.suggest_url_post_params,
                                          engine.instant_url_post_params,
@@ -1291,7 +1285,8 @@ scoped_ptr<TemplateURLData> GetPrepopulatedDefaultSearch(PrefService* prefs) {
   return default_search_provider.Pass();
 }
 
-SearchEngineType GetEngineType(const TemplateURL& url) {
+SearchEngineType GetEngineType(const TemplateURL& url,
+                               const SearchTermsData& search_terms_data) {
   // Restricted to UI thread because ReplaceSearchTerms() is so restricted.
   using content::BrowserThread;
   DCHECK(!BrowserThread::IsThreadInitialized(BrowserThread::UI) ||
@@ -1301,7 +1296,7 @@ SearchEngineType GetEngineType(const TemplateURL& url) {
   // can't be directly inspected (e.g. due to containing {google:baseURL}) can
   // be converted to GURLs we can look at.
   GURL gurl(url.url_ref().ReplaceSearchTerms(TemplateURLRef::SearchTermsArgs(
-      base::ASCIIToUTF16("x"))));
+      base::ASCIIToUTF16("x")), search_terms_data));
   return gurl.is_valid() ? GetEngineType(gurl) : SEARCH_ENGINE_OTHER;
 }
 
@@ -1332,13 +1327,6 @@ SearchEngineType GetEngineType(const GURL& url) {
   }
 
   return SEARCH_ENGINE_OTHER;
-}
-
-GURL GetLogoURL(const TemplateURL& template_url, LogoSize size) {
-  if (GetEngineType(template_url) != SEARCH_ENGINE_GOOGLE)
-    return GURL();
-  return GURL((size == LOGO_200_PERCENT) ?
-      google_logos.logo_200_percent_url : google_logos.logo_100_percent_url);
 }
 
 }  // namespace TemplateURLPrepopulateData

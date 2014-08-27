@@ -6,7 +6,7 @@
 #define CHROME_BROWSER_UI_BOOKMARK_MENU_H_
 
 #include "base/memory/scoped_ptr.h"
-#include "components/bookmarks/core/browser/base_bookmark_model_observer.h"
+#include "components/bookmarks/browser/base_bookmark_model_observer.h"
 #include "ui/base/models/menu_model.h"
 #include "ui/views/controls/menu/menu_delegate.h"
 

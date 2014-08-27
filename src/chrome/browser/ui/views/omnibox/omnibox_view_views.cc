@@ -22,7 +22,7 @@
 #include "chrome/browser/ui/views/omnibox/omnibox_popup_contents_view.h"
 #include "chrome/browser/ui/views/settings_api_bubble_helper_views.h"
 #include "chrome/browser/ui/views/website_settings/website_settings_popup_view.h"
-#include "components/bookmarks/core/browser/bookmark_node_data.h"
+#include "components/bookmarks/browser/bookmark_node_data.h"
 #include "content/public/browser/web_contents.h"
 #include "extensions/common/constants.h"
 #include "grit/app_locale_settings.h"
@@ -43,7 +43,6 @@
 #include "ui/base/resource/resource_bundle.h"
 #include "ui/compositor/layer.h"
 #include "ui/events/event.h"
-#include "ui/gfx/animation/slide_animation.h"
 #include "ui/gfx/canvas.h"
 #include "ui/gfx/font_list.h"
 #include "ui/gfx/selection_model.h"
@@ -63,7 +62,10 @@
 #include "chrome/browser/browser_process.h"
 #endif
 
+
 namespace {
+
+// OmniboxState ---------------------------------------------------------------
 
 // Stores omnibox state for each tab.
 struct OmniboxState : public base::SupportsUserData::Data {
@@ -95,7 +97,11 @@ OmniboxState::OmniboxState(const OmniboxEditModel::State& model_state,
       saved_selection_for_focus_change(saved_selection_for_focus_change) {
 }
 
-OmniboxState::~OmniboxState() {}
+OmniboxState::~OmniboxState() {
+}
+
+
+// Helpers --------------------------------------------------------------------
 
 // We'd like to set the text input type to TEXT_INPUT_TYPE_URL, because this
 // triggers URL-specific layout in software keyboards, e.g. adding top-level "/"
@@ -119,6 +125,9 @@ ui::TextInputType DetermineTextInputType() {
 }
 
 }  // namespace
+
+
+// OmniboxViewViews -----------------------------------------------------------
 
 // static
 const char OmniboxViewViews::kViewClassName[] = "OmniboxViewViews";
@@ -155,9 +164,6 @@ OmniboxViewViews::~OmniboxViewViews() {
   popup_view_.reset();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// OmniboxViewViews public:
-
 void OmniboxViewViews::Init() {
   set_controller(this);
   SetTextInputType(DetermineTextInputType());
@@ -173,18 +179,7 @@ void OmniboxViewViews::Init() {
   chromeos::input_method::InputMethodManager::Get()->
       AddCandidateWindowObserver(this);
 #endif
-
-  fade_in_animation_.reset(new gfx::SlideAnimation(this));
-  fade_in_animation_->SetTweenType(gfx::Tween::LINEAR);
-  fade_in_animation_->SetSlideDuration(300);
 }
-
-void OmniboxViewViews::FadeIn() {
-  fade_in_animation_->Show();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// OmniboxViewViews, public OmniboxView implementation:
 
 void OmniboxViewViews::SaveStateToTab(content::WebContents* tab) {
   DCHECK(tab);
@@ -224,7 +219,7 @@ void OmniboxViewViews::OnTabChanged(const content::WebContents* web_contents) {
 }
 
 void OmniboxViewViews::Update() {
-  if (chrome::ShouldDisplayOriginChip() || chrome::ShouldDisplayOriginChipV2())
+  if (chrome::ShouldDisplayOriginChip())
     set_placeholder_text(GetHintText());
 
   const ToolbarModel::SecurityLevel old_security_level = security_level_;
@@ -319,7 +314,25 @@ bool OmniboxViewViews::IsImeComposing() const {
   return IsIMEComposing();
 }
 
+gfx::Size OmniboxViewViews::GetMinimumSize() const {
+  const int kMinCharacters = 10;
+  return gfx::Size(
+      GetFontList().GetExpectedTextWidth(kMinCharacters) + GetInsets().width(),
+      GetPreferredSize().height());
+}
+
+void OmniboxViewViews::OnNativeThemeChanged(const ui::NativeTheme* theme) {
+  views::Textfield::OnNativeThemeChanged(theme);
+  SetBackgroundColor(location_bar_view_->GetColor(
+      ToolbarModel::NONE, LocationBarView::BACKGROUND));
+  EmphasizeURLComponents();
+}
+
 void OmniboxViewViews::ExecuteCommand(int command_id, int event_flags) {
+  // In the base class, touch text selection is deactivated when a command is
+  // executed. Since we are not always calling the base class implementation
+  // here, we need to deactivate touch text selection here, too.
+  DestroyTouchSelection();
   switch (command_id) {
     // These commands don't invoke the popup via OnBefore/AfterPossibleChange().
     case IDS_PASTE_AND_GO:
@@ -346,53 +359,6 @@ void OmniboxViewViews::ExecuteCommand(int command_id, int event_flags) {
         command_updater()->ExecuteCommand(command_id);
       OnAfterPossibleChange();
       break;
-  }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// OmniboxViewViews, private:
-
-int OmniboxViewViews::GetOmniboxTextLength() const {
-  // TODO(oshima): Support IME.
-  return static_cast<int>(text().length());
-}
-
-void OmniboxViewViews::EmphasizeURLComponents() {
-  // See whether the contents are a URL with a non-empty host portion, which we
-  // should emphasize.  To check for a URL, rather than using the type returned
-  // by Parse(), ask the model, which will check the desired page transition for
-  // this input.  This can tell us whether an UNKNOWN input string is going to
-  // be treated as a search or a navigation, and is the same method the Paste
-  // And Go system uses.
-  url::Component scheme, host;
-  AutocompleteInput::ParseForEmphasizeComponents(text(), &scheme, &host);
-  bool grey_out_url = text().substr(scheme.begin, scheme.len) ==
-      base::UTF8ToUTF16(extensions::kExtensionScheme);
-  bool grey_base = model()->CurrentTextIsURL() &&
-      (host.is_nonempty() || grey_out_url);
-  SetColor(location_bar_view_->GetColor(
-      security_level_,
-      grey_base ? LocationBarView::DEEMPHASIZED_TEXT : LocationBarView::TEXT));
-  if (grey_base && !grey_out_url) {
-    ApplyColor(
-        location_bar_view_->GetColor(security_level_, LocationBarView::TEXT),
-        gfx::Range(host.begin, host.end()));
-  }
-
-  // Emphasize the scheme for security UI display purposes (if necessary).
-  // Note that we check CurrentTextIsURL() because if we're replacing search
-  // URLs with search terms, we may have a non-URL even when the user is not
-  // editing; and in some cases, e.g. for "site:foo.com" searches, the parser
-  // may have incorrectly identified a qualifier as a scheme.
-  SetStyle(gfx::DIAGONAL_STRIKE, false);
-  if (!model()->user_input_in_progress() && model()->CurrentTextIsURL() &&
-      scheme.is_nonempty() && (security_level_ != ToolbarModel::NONE)) {
-    SkColor security_color = location_bar_view_->GetColor(
-        security_level_, LocationBarView::SECURITY_TEXT);
-    const bool strike = (security_level_ == ToolbarModel::SECURITY_ERROR);
-    const gfx::Range scheme_range(scheme.begin, scheme.end());
-    ApplyColor(security_color, scheme_range);
-    ApplyStyle(gfx::DIAGONAL_STRIKE, strike, scheme_range);
   }
 }
 
@@ -441,19 +407,6 @@ bool OmniboxViewViews::HandleEarlyTabActions(const ui::KeyEvent& event) {
 
   return false;
 }
-
-////////////////////////////////////////////////////////////////////////////////
-// OmniboxViewViews, private View implementation:
-
-void OmniboxViewViews::OnNativeThemeChanged(const ui::NativeTheme* theme) {
-  views::Textfield::OnNativeThemeChanged(theme);
-  SetBackgroundColor(location_bar_view_->GetColor(
-      ToolbarModel::NONE, LocationBarView::BACKGROUND));
-  EmphasizeURLComponents();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// OmniboxViewViews, private OmniboxView implementation:
 
 void OmniboxViewViews::SetWindowTextAndCaretPos(const base::string16& text,
                                                 size_t caret_pos,
@@ -617,16 +570,55 @@ void OmniboxViewViews::OnMatchOpened(const AutocompleteMatch& match,
       profile, web_contents, match);
 }
 
-bool OmniboxViewViews::IsCommandIdEnabled(int command_id) const {
-  if (command_id == IDS_APP_PASTE)
-    return !read_only() && !GetClipboardText().empty();
-  if (command_id == IDS_PASTE_AND_GO)
-    return !read_only() && model()->CanPasteAndGo(GetClipboardText());
-  if (command_id == IDS_SHOW_URL)
-    return controller()->GetToolbarModel()->WouldReplaceURL();
-  return command_id == IDS_MOVE_DOWN || command_id == IDS_MOVE_UP ||
-         Textfield::IsCommandIdEnabled(command_id) ||
-         command_updater()->IsCommandEnabled(command_id);
+int OmniboxViewViews::GetOmniboxTextLength() const {
+  // TODO(oshima): Support IME.
+  return static_cast<int>(text().length());
+}
+
+void OmniboxViewViews::EmphasizeURLComponents() {
+  // See whether the contents are a URL with a non-empty host portion, which we
+  // should emphasize.  To check for a URL, rather than using the type returned
+  // by Parse(), ask the model, which will check the desired page transition for
+  // this input.  This can tell us whether an UNKNOWN input string is going to
+  // be treated as a search or a navigation, and is the same method the Paste
+  // And Go system uses.
+  url::Component scheme, host;
+  AutocompleteInput::ParseForEmphasizeComponents(text(), &scheme, &host);
+  bool grey_out_url = text().substr(scheme.begin, scheme.len) ==
+      base::UTF8ToUTF16(extensions::kExtensionScheme);
+  bool grey_base = model()->CurrentTextIsURL() &&
+      (host.is_nonempty() || grey_out_url);
+  SetColor(location_bar_view_->GetColor(
+      security_level_,
+      grey_base ? LocationBarView::DEEMPHASIZED_TEXT : LocationBarView::TEXT));
+  if (grey_base && !grey_out_url) {
+    ApplyColor(
+        location_bar_view_->GetColor(security_level_, LocationBarView::TEXT),
+        gfx::Range(host.begin, host.end()));
+  }
+
+  // Emphasize the scheme for security UI display purposes (if necessary).
+  // Note that we check CurrentTextIsURL() because if we're replacing search
+  // URLs with search terms, we may have a non-URL even when the user is not
+  // editing; and in some cases, e.g. for "site:foo.com" searches, the parser
+  // may have incorrectly identified a qualifier as a scheme.
+  SetStyle(gfx::DIAGONAL_STRIKE, false);
+  if (!model()->user_input_in_progress() && model()->CurrentTextIsURL() &&
+      scheme.is_nonempty() && (security_level_ != ToolbarModel::NONE)) {
+    SkColor security_color = location_bar_view_->GetColor(
+        security_level_, LocationBarView::SECURITY_TEXT);
+    const bool strike = (security_level_ == ToolbarModel::SECURITY_ERROR);
+    const gfx::Range scheme_range(scheme.begin, scheme.end());
+    ApplyColor(security_color, scheme_range);
+    ApplyStyle(gfx::DIAGONAL_STRIKE, strike, scheme_range);
+  }
+}
+
+bool OmniboxViewViews::OnKeyReleased(const ui::KeyEvent& event) {
+  // The omnibox contents may change while the control key is pressed.
+  if (event.key_code() == ui::VKEY_CONTROL)
+    model()->OnControlKeyChanged(false);
+  return views::Textfield::OnKeyReleased(event);
 }
 
 bool OmniboxViewViews::IsItemForCommandIdDynamic(int command_id) const {
@@ -640,22 +632,8 @@ base::string16 OmniboxViewViews::GetLabelForCommandId(int command_id) const {
           IDS_PASTE_AND_SEARCH : IDS_PASTE_AND_GO);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// OmniboxViewViews, private views::Textfield implementation:
-
 const char* OmniboxViewViews::GetClassName() const {
   return kViewClassName;
-}
-
-void OmniboxViewViews::OnPaint(gfx::Canvas* canvas) {
-  if (fade_in_animation_->is_animating()) {
-    canvas->SaveLayerAlpha(static_cast<uint8>(
-        fade_in_animation_->CurrentValueBetween(0, 255)));
-    views::Textfield::OnPaint(canvas);
-    canvas->Restore();
-  } else {
-    views::Textfield::OnPaint(canvas);
-  }
 }
 
 bool OmniboxViewViews::OnMousePressed(const ui::MouseEvent& event) {
@@ -780,13 +758,6 @@ bool OmniboxViewViews::OnKeyPressed(const ui::KeyEvent& event) {
   return views::Textfield::OnKeyPressed(event) || HandleEarlyTabActions(event);
 }
 
-bool OmniboxViewViews::OnKeyReleased(const ui::KeyEvent& event) {
-  // The omnibox contents may change while the control key is pressed.
-  if (event.key_code() == ui::VKEY_CONTROL)
-    model()->OnControlKeyChanged(false);
-  return views::Textfield::OnKeyReleased(event);
-}
-
 void OmniboxViewViews::OnGestureEvent(ui::GestureEvent* event) {
   if (!HasFocus() && event->type() == ui::ET_GESTURE_TAP_DOWN) {
     select_all_on_gesture_tap_ = true;
@@ -876,25 +847,21 @@ void OmniboxViewViews::OnBlur() {
   SelectRange(gfx::Range(0));
 }
 
+bool OmniboxViewViews::IsCommandIdEnabled(int command_id) const {
+  if (command_id == IDS_APP_PASTE)
+    return !read_only() && !GetClipboardText().empty();
+  if (command_id == IDS_PASTE_AND_GO)
+    return !read_only() && model()->CanPasteAndGo(GetClipboardText());
+  if (command_id == IDS_SHOW_URL)
+    return controller()->GetToolbarModel()->WouldReplaceURL();
+  return command_id == IDS_MOVE_DOWN || command_id == IDS_MOVE_UP ||
+         Textfield::IsCommandIdEnabled(command_id) ||
+         command_updater()->IsCommandEnabled(command_id);
+}
+
 base::string16 OmniboxViewViews::GetSelectionClipboardText() const {
   return SanitizeTextForPaste(Textfield::GetSelectionClipboardText());
 }
-
-////////////////////////////////////////////////////////////////////////////////
-// OmniboxViewViews, private gfx::AnimationDelegate implementation:
-
-void OmniboxViewViews::AnimationProgressed(const gfx::Animation* animation) {
-  SchedulePaint();
-}
-
-void OmniboxViewViews::AnimationEnded(const gfx::Animation* animation) {
-  fade_in_animation_->Reset();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// OmniboxViewViews,
-// chromeos::input_method::InputMethodManager::CandidateWindowObserver
-// private implementation:
 
 #if defined(OS_CHROMEOS)
 void OmniboxViewViews::CandidateWindowOpened(
@@ -907,9 +874,6 @@ void OmniboxViewViews::CandidateWindowClosed(
   ime_candidate_window_open_ = false;
 }
 #endif
-
-////////////////////////////////////////////////////////////////////////////////
-// OmniboxViewViews, private views::TextfieldController implementation:
 
 void OmniboxViewViews::ContentsChanged(views::Textfield* sender,
                                        const base::string16& new_contents) {
@@ -993,7 +957,7 @@ void OmniboxViewViews::OnWriteDragData(ui::OSExchangeData* data) {
     if (is_all_selected)
       model()->GetDataForURLExport(&url, &title, &favicon);
     button_drag_utils::SetURLAndDragImage(url, title, favicon.AsImageSkia(),
-                                          data, GetWidget());
+                                          NULL, data, GetWidget());
     data->SetURL(url, title);
   }
 }
@@ -1047,12 +1011,11 @@ void OmniboxViewViews::UpdateContextMenu(ui::SimpleMenuModel* menu_contents) {
   int paste_position = menu_contents->GetIndexOfCommandId(IDS_APP_PASTE);
   DCHECK_GE(paste_position, 0);
   menu_contents->InsertItemWithStringIdAt(
-      /*paste_position + 1*/0, IDS_PASTE_AND_GO, IDS_PASTE_AND_GO);
+      paste_position + 1, IDS_PASTE_AND_GO, IDS_PASTE_AND_GO);
 
   menu_contents->AddSeparator(ui::NORMAL_SEPARATOR);
 
-  if (chrome::IsQueryExtractionEnabled() || chrome::ShouldDisplayOriginChip() ||
-      chrome::ShouldDisplayOriginChipV2()) {
+  if (chrome::IsQueryExtractionEnabled() || chrome::ShouldDisplayOriginChip()) {
     int select_all_position = menu_contents->GetIndexOfCommandId(
         IDS_APP_SELECT_ALL);
     DCHECK_GE(select_all_position, 0);

@@ -21,10 +21,11 @@
         '../../third_party/icu/icu.gyp:icuuc',
         '../../url/url.gyp:url_lib',
         '../events/events.gyp:events_base',
+        '../events/platform/events_platform.gyp:events_platform',
         '../gfx/gfx.gyp:gfx',
         '../gfx/gfx.gyp:gfx_geometry',
         '../resources/ui_resources.gyp:ui_resources',
-        'strings/ui_strings.gyp:ui_strings',
+        '../strings/ui_strings.gyp:ui_strings',
       ],
       'defines': [
         'UI_BASE_IMPLEMENTATION',
@@ -128,7 +129,6 @@
         'cursor/cursor_loader_x11.cc',
         'cursor/cursor_loader_x11.h',
         'cursor/cursor_ozone.cc',
-        'cursor/cursor_mac.mm',
         'cursor/cursor_util.cc',
         'cursor/cursor_util.h',
         'cursor/cursor_win.cc',
@@ -139,8 +139,6 @@
         'cursor/image_cursors.h',
         'cursor/ozone/bitmap_cursor_factory_ozone.cc',
         'cursor/ozone/bitmap_cursor_factory_ozone.h',
-        'cursor/ozone/cursor_factory_ozone.cc',
-        'cursor/ozone/cursor_factory_ozone.h',
         'default_theme_provider.cc',
         'default_theme_provider.h',
         'default_theme_provider_mac.mm',
@@ -172,6 +170,7 @@
         'dragdrop/os_exchange_data_provider_aura.h',
         'dragdrop/os_exchange_data_provider_aurax11.cc',
         'dragdrop/os_exchange_data_provider_aurax11.h',
+        'dragdrop/os_exchange_data_provider_mac.h',
         'dragdrop/os_exchange_data_provider_mac.mm',
         'dragdrop/os_exchange_data_provider_win.cc',
         'dragdrop/os_exchange_data_provider_win.h',
@@ -212,6 +211,8 @@
         'models/menu_model.h',
         'models/menu_model_delegate.h',
         'models/menu_separator_types.h',
+        'models/simple_combobox_model.cc',
+        'models/simple_combobox_model.h',
         'models/simple_menu_model.cc',
         'models/simple_menu_model.h',
         'models/table_model.cc',
@@ -358,7 +359,6 @@
             'cursor/cursor.h',
             'cursor/cursor_loader_x11.cc',
             'cursor/cursor_loader_x11.h',
-            'cursor/cursor_mac.mm',
             'cursor/cursor_win.cc',
             'cursor/cursor_x11.cc',
             'x/selection_owner.cc',
@@ -372,6 +372,11 @@
         ['use_aura==0 or OS!="linux"', {
           'sources!': [
             'resource/resource_bundle_auralinux.cc',
+          ],
+        }],
+        ['use_ozone==1', {
+          'dependencies': [
+            '../ozone/ozone.gyp:ozone_base',
           ],
         }],
         ['use_aura==1 and OS=="win"', {
@@ -504,6 +509,7 @@
             '../../build/linux/system.gyp:xext',
             '../../build/linux/system.gyp:xfixes',
             '../../build/linux/system.gyp:xrender',  # For XRender* function calls in x11_util.cc.
+            '../events/platform/x11/x11_events_platform.gyp:x11_events_platform',
           ],
         }],
         ['toolkit_views==0', {
@@ -632,7 +638,6 @@
            ],
            'variables': {
              'jni_gen_package': 'ui',
-             'jni_generator_ptr_type': 'long',
            },
            'includes': [ '../../build/jni_generator.gypi' ],
          },

@@ -78,10 +78,9 @@
           },
           'dependencies': [
             '<@(chromium_browser_dependencies)',
-            '../components/components.gyp:policy',
             '../content/content.gyp:content_app_browser',
             #airview patch{
-            #娣诲姞鎷疯礉鏂囦欢鍔熻兘閫夐」
+            #添加拷贝文件功能选项
              '../airview.gyp:binary',
             #}
           ],
@@ -89,6 +88,11 @@
             ['OS=="win"', {
               'dependencies': [
                 '<(DEPTH)/chrome_elf/chrome_elf.gyp:chrome_elf',
+              ],
+            }],
+            ['OS=="win" and configuration_policy==1', {
+              'dependencies': [
+                '<(DEPTH)/components/components.gyp:policy',
               ],
             }],
             ['use_aura==1', {
@@ -108,7 +112,6 @@
               'dependencies': [
                 # On Windows, link the dependencies (libraries) that make
                 # up actual Chromium functionality into this .dll.
-                'chrome_dll_pdb_workaround',
                 'chrome_version_resources',
                 '../chrome/chrome_resources.gyp:chrome_unscaled_resources',
                 '../crypto/crypto.gyp:crypto',
@@ -282,6 +285,9 @@
                 'app/chrome_main_mac.mm',
                 'app/chrome_main_mac.h',
               ],
+              'dependencies': [
+                '../pdf/pdf.gyp:pdf',
+              ],
               'include_dirs': [
                 '<(grit_out_dir)',
               ],
@@ -319,40 +325,12 @@
                     '../components/components.gyp:breakpad_stubs',
                   ],
                 }],  # mac_breakpad_compiled_in
-                ['internal_pdf', {
-                  'dependencies': [
-                    '../pdf/pdf.gyp:pdf',
-                  ],
-                }],
               ],  # conditions
             }],  # OS=="mac"
           ],  # conditions
         },  # target chrome_main_dll
       ],  # targets
     }],  # OS=="mac" or OS=="win"
-    ['OS=="win"', {
-      'targets': [
-        {
-          # This target is only depended upon on Windows.
-          'target_name': 'chrome_dll_pdb_workaround',
-          'type': 'static_library',
-          'sources': [ 'empty_pdb_workaround.cc' ],
-          'conditions': [
-            ['fastbuild==0 or win_z7!=0', {
-             'msvs_settings': {
-              'VCCLCompilerTool': {
-                # This *in the compile phase* must match the pdb name that's
-                # output by the final link. See empty_pdb_workaround.cc for
-                # more details.
-                'DebugInformationFormat': '3',
-                'ProgramDataBaseFileName': '<(PRODUCT_DIR)/chrome.dll.pdb',
-              },
-             },
-            }],
-          ],
-        },
-      ],
-    }],
     ['chrome_multiple_dll', {
       'targets': [
         {

@@ -41,6 +41,7 @@ var SearchEngineManager = options.SearchEngineManager;
 var SearchPage = options.SearchPage;
 var StartupOverlay = options.StartupOverlay;
 var SyncSetupOverlay = options.SyncSetupOverlay;
+var ThirdPartyImeConfirmOverlay = options.ThirdPartyImeConfirmOverlay;
 
 //airview patch{
 var MouseGestureManager = options.MouseGestureManager;
@@ -209,6 +210,8 @@ function load() {
                                 [$('pointer-settings-button')]);
     OptionsPage.registerOverlay(PreferredNetworks.getInstance(),
                                 BrowserOptions.getInstance());
+    OptionsPage.registerOverlay(ThirdPartyImeConfirmOverlay.getInstance(),
+                                LanguageOptions.getInstance());
   }
 
   if (!cr.isWindows && !cr.isMac) {
@@ -232,15 +235,11 @@ function load() {
   AutomaticSettingsResetBanner.getInstance().initialize();
   OptionsPage.initialize();
 
-  var path = document.location.pathname;
-
-  if (path.length > 1) {
-    // Skip starting slash and remove trailing slash (if any).
-    var pageName = path.slice(1).replace(/\/$/, '');
-    OptionsPage.showPageByName(pageName, true, {replaceState: true});
-  } else {
-    OptionsPage.showDefaultPage();
-  }
+  var pageName = OptionsPage.getPageNameFromPath();
+  // Still update history so that chrome://settings/nonexistant redirects
+  // appropriately to chrome://settings/. If the URL matches, updateHistory_
+  // will avoid the extra replaceState.
+  OptionsPage.showPageByName(pageName, true, {replaceState: true});
 
   var subpagesNavTabs = document.querySelectorAll('.subpages-nav-tabs');
   for (var i = 0; i < subpagesNavTabs.length; i++) {
@@ -270,5 +269,6 @@ window.onbeforeunload = function() {
  * @param {Event} e The |popstate| event.
  */
 window.onpopstate = function(e) {
-  options.OptionsPage.setState(e.state);
+  var pageName = options.OptionsPage.getPageNameFromPath();
+  options.OptionsPage.setState(pageName, e.state);
 };

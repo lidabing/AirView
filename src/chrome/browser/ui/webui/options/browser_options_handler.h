@@ -370,7 +370,6 @@ class BrowserOptionsHandler
   void SetupBossKeyString();
   BooleanPrefMember bosskey_enabled_;
   ///}
-
   DISALLOW_COPY_AND_ASSIGN(BrowserOptionsHandler);
 };
 

@@ -158,6 +158,32 @@
             }],
           ],
         }],
+        ['OS == "win"', {
+          # Specify delayload for base.dll.
+          'msvs_settings': {
+            'VCLinkerTool': {
+              'DelayLoadDLLs': [
+                'powrprof.dll',
+              ],
+              'AdditionalDependencies': [
+                'powrprof.lib',
+              ],
+            },
+          },
+          # Specify delayload for components that link with base.lib.
+          'all_dependent_settings': {
+            'msvs_settings': {
+              'VCLinkerTool': {
+                'DelayLoadDLLs': [
+                  'powrprof.dll',
+                ],
+                'AdditionalDependencies': [
+                  'powrprof.lib',
+                ],
+              },
+            },
+          },
+        }],
         ['OS == "mac" or (OS == "ios" and _toolset == "host")', {
           'link_settings': {
             'libraries': [
@@ -555,6 +581,7 @@
         'strings/sys_string_conversions_unittest.cc',
         'strings/utf_offset_string_conversions_unittest.cc',
         'strings/utf_string_conversions_unittest.cc',
+        'supports_user_data_unittest.cc',
         'sync_socket_unittest.cc',
         'synchronization/cancellation_flag_unittest.cc',
         'synchronization/condition_variable_unittest.cc',
@@ -643,13 +670,7 @@
         ['OS == "android"', {
           'dependencies': [
             'android/jni_generator/jni_generator.gyp:jni_generator_tests',
-          ],
-          'conditions': [
-            ['gtest_target_type == "shared_library"', {
-              'dependencies': [
-                '../testing/android/native_test.gyp:native_test_native_code',
-              ],
-            }],
+            '../testing/android/native_test.gyp:native_test_native_code',
           ],
         }],
         ['OS == "ios" and _toolset != "host"', {
@@ -785,7 +806,7 @@
         '../testing/perf/perf_test.cc'
       ],
       'conditions': [
-        ['OS == "android" and gtest_target_type == "shared_library"', {
+        ['OS == "android"', {
           'dependencies': [
             '../testing/android/native_test.gyp:native_test_native_code',
           ],
@@ -985,6 +1006,11 @@
             '../third_party/libc++/libc++.gyp:libcxx_proxy',
           ],
         }],
+        ['tsan==1', {
+          'sources': [
+            'debug/tsan_suppressions.cc',
+          ],
+        }],
       ],
       'cflags!': [
         '-fsanitize=address',
@@ -1065,6 +1091,30 @@
               ],
             }],
           ],
+          # Specify delayload for base_win64.dll.
+          'msvs_settings': {
+            'VCLinkerTool': {
+              'DelayLoadDLLs': [
+                'powrprof.dll',
+              ],
+              'AdditionalDependencies': [
+                'powrprof.lib',
+              ],
+            },
+          },
+          # Specify delayload for components that link with base_win64.lib.
+          'all_dependent_settings': {
+            'msvs_settings': {
+              'VCLinkerTool': {
+                'DelayLoadDLLs': [
+                  'powrprof.dll',
+                ],
+                'AdditionalDependencies': [
+                  'powrprof.lib',
+                ],
+              },
+            },
+          },
           # TODO(rvargas): Bug 78117. Remove this.
           'msvs_disabled_warnings': [
             4244,
@@ -1238,6 +1288,7 @@
             'android/java/src/org/chromium/base/CommandLine.java',
             'android/java/src/org/chromium/base/ContentUriUtils.java',
             'android/java/src/org/chromium/base/CpuFeatures.java',
+            'android/java/src/org/chromium/base/EventLog.java',
             'android/java/src/org/chromium/base/ImportantFileWriterAndroid.java',
             'android/java/src/org/chromium/base/library_loader/LibraryLoader.java',
             'android/java/src/org/chromium/base/MemoryPressureListener.java',
@@ -1252,7 +1303,6 @@
           ],
           'variables': {
             'jni_gen_package': 'base',
-            'jni_generator_ptr_type': 'long',
           },
           'includes': [ '../build/jni_generator.gypi' ],
         },
@@ -1264,7 +1314,6 @@
           ],
           'variables': {
             'jni_gen_package': 'base',
-            'jni_generator_ptr_type': 'long',
           },
           'includes': [ '../build/jni_generator.gypi' ],
         },
@@ -1379,8 +1428,15 @@
               'sources': [
                 'android/linker/linker_jni.cc',
               ],
+              # The crazy linker is never instrumented.
+              'cflags!': [
+                '-finstrument-functions',
+              ],
               'dependencies': [
-                '<(android_ndk_root)/crazy_linker.gyp:crazy_linker',
+                # The NDK contains the crazy_linker here:
+                #   '<(android_ndk_root)/crazy_linker.gyp:crazy_linker'
+                # However, we use our own fork.  See bug 384700.
+                '../third_party/android_crazy_linker/crazy_linker.gyp:crazy_linker',
               ],
             }],
           ],
@@ -1388,7 +1444,7 @@
 
       ],
     }],
-    ['OS == "android" and gtest_target_type == "shared_library"', {
+    ['OS == "android"', {
       'targets': [
         {
           'target_name': 'base_perftests_apk',
@@ -1419,13 +1475,7 @@
         },
       ],
     }],
-    # Special target to wrap a gtest_target_type == shared_library
-    # base_unittests into an android apk for execution.
-    # TODO(jrg): lib.target comes from _InstallableTargetInstallPath()
-    # in the gyp make generator.  What is the correct way to extract
-    # this path from gyp and into 'raw' for input to antfiles?
-    # Hard-coding in the gypfile seems a poor choice.
-    ['OS == "android" and gtest_target_type == "shared_library"', {
+    ['OS == "android"', {
       'targets': [
         {
           'target_name': 'base_unittests_apk',

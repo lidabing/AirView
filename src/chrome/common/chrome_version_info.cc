@@ -48,7 +48,7 @@ std::string VersionInfo::Name() const {
 std::string VersionInfo::Version() const {
 	///airviwe patch{
 	///一律使用定义的好version,使用其他version会影响网站对浏览器的识别能力
-	return  "36.0.1985.125";
+	return  "37.0.2062.94";
 	///}
   if (!is_valid())
     return std::string();
@@ -62,7 +62,6 @@ std::string VersionInfo::RealVersion() const{
 	return base::UTF16ToUTF8(version_info_->product_version());
 }
 ///}
-
 std::string VersionInfo::LastChange() const {
   if (!is_valid())
     return std::string();

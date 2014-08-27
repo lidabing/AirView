@@ -118,7 +118,7 @@ base::string16 RestoreMenuModel::GetLabelAt(int index) const {
   }
   DCHECK(!menu_text.empty());
   menu_text =
-      gfx::ElideText(menu_text, gfx::FontList(), kMaxWidth, gfx::ELIDE_AT_END);
+	  gfx::ElideText(menu_text, gfx::FontList(), kMaxWidth, gfx::ELIDE_TAIL);
   return menu_text;
 }
 

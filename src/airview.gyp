@@ -15,7 +15,6 @@
         'destination': '<(PRODUCT_DIR)',
           'files': [
 					'binary/master_preferences',
-					'binary/gcswf32.dll',
                ]
                 },
               ],

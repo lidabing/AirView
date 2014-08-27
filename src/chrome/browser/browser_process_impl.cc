@@ -13,6 +13,7 @@
 #include "base/command_line.h"
 #include "base/debug/alias.h"
 #include "base/debug/leak_annotations.h"
+#include "base/files/file_path.h"
 #include "base/path_service.h"
 #include "base/prefs/json_pref_store.h"
 #include "base/prefs/pref_registry_simple.h"
@@ -20,6 +21,7 @@
 #include "base/synchronization/waitable_event.h"
 #include "base/threading/thread.h"
 #include "base/threading/thread_restrictions.h"
+#include "base/time/default_tick_clock.h"
 #include "chrome/browser/apps/chrome_apps_client.h"
 #include "chrome/browser/background/background_mode_manager.h"
 #include "chrome/browser/chrome_browser_main.h"
@@ -43,12 +45,10 @@
 #include "chrome/browser/intranet_redirect_detector.h"
 #include "chrome/browser/io_thread.h"
 #include "chrome/browser/lifetime/application_lifetime.h"
-#include "chrome/browser/metrics/metrics_service.h"
 #include "chrome/browser/metrics/metrics_services_manager.h"
 #include "chrome/browser/metrics/thread_watcher.h"
 #include "chrome/browser/net/chrome_net_log.h"
 #include "chrome/browser/net/crl_set_fetcher.h"
-#include "chrome/browser/net/sdch_dictionary_fetcher.h"
 #include "chrome/browser/notifications/notification_ui_manager.h"
 #include "chrome/browser/plugins/chrome_plugin_service_filter.h"
 #include "chrome/browser/plugins/plugin_finder.h"
@@ -74,6 +74,10 @@
 #include "chrome/common/switch_utils.h"
 #include "chrome/common/url_constants.h"
 #include "chrome/installer/util/google_update_constants.h"
+#include "chrome/installer/util/google_update_settings.h"
+#include "components/gcm_driver/gcm_driver.h"
+#include "components/metrics/metrics_service.h"
+#include "components/network_time/network_time_tracker.h"
 #include "components/policy/core/common/policy_service.h"
 #include "components/signin/core/common/profile_management_switches.h"
 #include "components/translate/core/browser/translate_download_manager.h"
@@ -83,18 +87,14 @@
 #include "content/public/browser/plugin_service.h"
 #include "content/public/browser/render_process_host.h"
 #include "content/public/browser/resource_dispatcher_host.h"
+#include "content/public/browser/service_worker_context.h"
+#include "content/public/browser/storage_partition.h"
 #include "extensions/common/constants.h"
 #include "extensions/common/extension_l10n_util.h"
 #include "net/socket/client_socket_pool_manager.h"
 #include "net/url_request/url_request_context_getter.h"
 #include "ui/base/l10n/l10n_util.h"
 #include "ui/message_center/message_center.h"
-
-#if defined(ENABLE_CONFIGURATION_POLICY)
-#include "components/policy/core/browser/browser_policy_connector.h"
-#else
-#include "components/policy/core/common/policy_service_stub.h"
-#endif  // defined(ENABLE_CONFIGURATION_POLICY)
 
 #if defined(OS_WIN)
 #include "base/win/windows_version.h"
@@ -103,14 +103,27 @@
 #include "chrome/browser/chrome_browser_main_mac.h"
 #endif
 
-#if defined(USE_AURA)
-#include "ui/aura/env.h"
+#if defined(OS_ANDROID)
+#include "components/gcm_driver/gcm_driver_android.h"
+#else
+#include "chrome/browser/services/gcm/gcm_desktop_utils.h"
+#include "components/gcm_driver/gcm_client_factory.h"
 #endif
 
 #if !defined(OS_ANDROID) && !defined(OS_IOS)
 #include "chrome/browser/media_galleries/media_file_system_registry.h"
 #include "components/storage_monitor/storage_monitor.h"
 #endif
+
+#if defined(USE_AURA)
+#include "ui/aura/env.h"
+#endif
+
+#if defined(ENABLE_CONFIGURATION_POLICY)
+#include "components/policy/core/browser/browser_policy_connector.h"
+#else
+#include "components/policy/core/common/policy_service_stub.h"
+#endif  // defined(ENABLE_CONFIGURATION_POLICY)
 
 #if defined(ENABLE_PLUGIN_INSTALLATION)
 #include "chrome/browser/plugins/plugins_resource_service.h"
@@ -174,7 +187,10 @@ BrowserProcessImpl::BrowserProcessImpl(
   InitIdleMonitor();
 #endif
 
+#if defined(ENABLE_EXTENSIONS)
   apps::AppsClient::Set(ChromeAppsClient::GetInstance());
+#endif
+
   extensions::ExtensionsClient::Set(
       extensions::ChromeExtensionsClient::GetInstance());
 
@@ -196,13 +212,6 @@ BrowserProcessImpl::~BrowserProcessImpl() {
 
 void BrowserProcessImpl::StartTearDown() {
     TRACE_EVENT0("shutdown", "BrowserProcessImpl::StartTearDown");
-  // We need to shutdown the SdchDictionaryFetcher as it regularly holds
-  // a pointer to a URLFetcher, and that URLFetcher (upon destruction) will do
-  // a PostDelayedTask onto the IO thread.  This shutdown call will both discard
-  // any pending URLFetchers, and avoid creating any more.
-  BrowserThread::PostTask(BrowserThread::IO, FROM_HERE,
-                          base::Bind(&SdchDictionaryFetcher::Shutdown));
-
   // We need to destroy the MetricsServicesManager, IntranetRedirectDetector,
   // PromoResourceService, and SafeBrowsing ClientSideDetectionService (owned by
   // the SafeBrowsingService) before the io_thread_ gets destroyed, since their
@@ -256,6 +265,10 @@ void BrowserProcessImpl::StartTearDown() {
   if (browser_policy_connector_)
     browser_policy_connector_->Shutdown();
 #endif
+
+  // The |gcm_driver_| must shut down while the IO thread is still alive.
+  if (gcm_driver_)
+    gcm_driver_->Shutdown();
 
   // Stop the watchdog thread before stopping other threads.
   watchdog_thread_.reset();
@@ -320,12 +333,24 @@ unsigned int BrowserProcessImpl::AddRefModule() {
   return module_ref_count_;
 }
 
+static void ShutdownServiceWorkerContext(content::StoragePartition* partition) {
+  partition->GetServiceWorkerContext()->Terminate();
+}
+
 unsigned int BrowserProcessImpl::ReleaseModule() {
   DCHECK(CalledOnValidThread());
   DCHECK_NE(0u, module_ref_count_);
   module_ref_count_--;
   if (0 == module_ref_count_) {
     release_last_reference_callstack_ = base::debug::StackTrace();
+
+    // Stop service workers
+    ProfileManager* pm = profile_manager();
+    std::vector<Profile*> profiles(pm->GetLoadedProfiles());
+    for (size_t i = 0; i < profiles.size(); ++i) {
+      content::BrowserContext::ForEachStoragePartition(
+          profiles[i], base::Bind(ShutdownServiceWorkerContext));
+    }
 
 #if defined(ENABLE_PRINTING)
     // Wait for the pending print jobs to finish. Don't do this later, since
@@ -368,7 +393,7 @@ void BrowserProcessImpl::EndSession() {
 #if !defined(OS_CHROMEOS)
     // MetricsService lazily writes to prefs, force it to write now.
     // On ChromeOS, chrome gets killed when hangs, so no need to
-    // commit prefs::kStabilitySessionEndCompleted change immediately.
+    // commit metrics::prefs::kStabilitySessionEndCompleted change immediately.
     local_state()->CommitPendingWrite();
 #endif
   }
@@ -404,6 +429,13 @@ void BrowserProcessImpl::EndSession() {
 #else
   NOTIMPLEMENTED();
 #endif
+}
+
+MetricsServicesManager* BrowserProcessImpl::GetMetricsServicesManager() {
+  DCHECK(CalledOnValidThread());
+  if (!metrics_services_manager_)
+    metrics_services_manager_.reset(new MetricsServicesManager(local_state()));
+  return metrics_services_manager_.get();
 }
 
 MetricsService* BrowserProcessImpl::metrics_service() {
@@ -615,6 +647,22 @@ WebRtcLogUploader* BrowserProcessImpl::webrtc_log_uploader() {
   return webrtc_log_uploader_.get();
 }
 #endif
+
+network_time::NetworkTimeTracker* BrowserProcessImpl::network_time_tracker() {
+  if (!network_time_tracker_) {
+    network_time_tracker_.reset(new network_time::NetworkTimeTracker(
+        scoped_ptr<base::TickClock>(new base::DefaultTickClock()),
+        local_state()));
+  }
+  return network_time_tracker_.get();
+}
+
+gcm::GCMDriver* BrowserProcessImpl::gcm_driver() {
+  DCHECK(CalledOnValidThread());
+  if (!gcm_driver_)
+    CreateGCMDriver();
+  return gcm_driver_.get();
+}
 
 // static
 void BrowserProcessImpl::RegisterPrefs(PrefRegistrySimple* registry) {
@@ -971,11 +1019,24 @@ void BrowserProcessImpl::CreateSafeBrowsingService() {
 #endif
 }
 
-MetricsServicesManager* BrowserProcessImpl::GetMetricsServicesManager() {
-  DCHECK(CalledOnValidThread());
-  if (!metrics_services_manager_)
-    metrics_services_manager_.reset(new MetricsServicesManager(local_state()));
-  return metrics_services_manager_.get();
+void BrowserProcessImpl::CreateGCMDriver() {
+  DCHECK(!gcm_driver_);
+
+#if defined(OS_ANDROID)
+  gcm_driver_.reset(new gcm::GCMDriverAndroid);
+#else
+  base::FilePath store_path;
+  CHECK(PathService::Get(chrome::DIR_GLOBAL_GCM_STORE, &store_path));
+  gcm_driver_ = gcm::CreateGCMDriverDesktop(
+      make_scoped_ptr(new gcm::GCMClientFactory),
+      store_path,
+      system_request_context());
+  // Sign-in is not required for device-level GCM usage. So we just call
+  // OnSignedIn to assume always signed-in. Note that GCM will not be started
+  // at this point since no one has asked for it yet.
+  // TODO(jianli): To be removed when sign-in enforcement is dropped.
+  gcm_driver_->OnSignedIn();
+#endif  // defined(OS_ANDROID)
 }
 
 void BrowserProcessImpl::ApplyDefaultBrowserPolicy() {

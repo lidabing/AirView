@@ -66,7 +66,7 @@
         ['use_x11==1', {
           'dependencies': [
             '../../build/linux/system.gyp:x11',
-            '../gfx/gfx.gyp:gfx_x11',
+            '../gfx/x/gfx_x11.gyp:gfx_x11',
           ],
         }],
       ],
@@ -120,58 +120,17 @@
         'gestures/gesture_recognizer.h',
         'gestures/gesture_recognizer_impl.cc',
         'gestures/gesture_recognizer_impl.h',
+        'gestures/gesture_recognizer_impl_mac.cc',
         'gestures/gesture_sequence.cc',
         'gestures/gesture_sequence.h',
         'gestures/gesture_types.h',
         'gestures/motion_event_aura.cc',
         'gestures/motion_event_aura.h',
+        'gestures/unified_gesture_detector_enabled.cc',
+        'gestures/unified_gesture_detector_enabled.h',
         'gestures/velocity_calculator.cc',
         'gestures/velocity_calculator.h',
-        'ozone/device/device_event.cc',
-        'ozone/device/device_event.h',
-        'ozone/device/device_event_observer.h',
-        'ozone/device/device_manager.cc',
-        'ozone/device/device_manager.h',
-        'ozone/device/device_manager_manual.cc',
-        'ozone/device/device_manager_manual.h',
-        'ozone/device/udev/device_manager_udev.cc',
-        'ozone/device/udev/device_manager_udev.h',
-        'ozone/device/udev/scoped_udev.h',
-        'ozone/evdev/libgestures_glue/event_reader_libevdev_cros.cc',
-        'ozone/evdev/libgestures_glue/event_reader_libevdev_cros.h',
-        'ozone/evdev/libgestures_glue/gesture_interpreter_libevdev_cros.cc',
-        'ozone/evdev/libgestures_glue/gesture_interpreter_libevdev_cros.h',
-        'ozone/evdev/libgestures_glue/gesture_logging.cc',
-        'ozone/evdev/libgestures_glue/gesture_logging.h',
-        'ozone/evdev/libgestures_glue/gesture_timer_provider.cc',
-        'ozone/evdev/libgestures_glue/gesture_timer_provider.h',
-        'ozone/evdev/event_converter_evdev.cc',
-        'ozone/evdev/event_converter_evdev.h',
-        'ozone/evdev/event_device_info.cc',
-        'ozone/evdev/event_device_info.h',
-        'ozone/evdev/event_factory_evdev.cc',
-        'ozone/evdev/event_factory_evdev.h',
-        'ozone/evdev/event_modifiers_evdev.cc',
-        'ozone/evdev/event_modifiers_evdev.h',
-        'ozone/evdev/key_event_converter_evdev.cc',
-        'ozone/evdev/key_event_converter_evdev.h',
-        'ozone/evdev/touch_event_converter_evdev.cc',
-        'ozone/evdev/touch_event_converter_evdev.h',
-        'ozone/event_factory_ozone.cc',
-        'ozone/event_factory_ozone.h',
         'ozone/events_ozone.cc',
-        'platform/platform_event_dispatcher.h',
-        'platform/platform_event_observer.h',
-        'platform/platform_event_source.cc',
-        'platform/platform_event_source.h',
-        'platform/platform_event_source_stub.cc',
-        'platform/platform_event_types.h',
-        'platform/scoped_event_dispatcher.cc',
-        'platform/scoped_event_dispatcher.h',
-        'platform/x11/x11_event_source.cc',
-        'platform/x11/x11_event_source.h',
-        'platform/x11/x11_event_source_glib.cc',
-        'platform/x11/x11_event_source_libevent.cc',
         'win/events_win.cc',
         'x/events_x.cc',
         'linux/text_edit_command_auralinux.cc',
@@ -211,54 +170,6 @@
             'linux/text_edit_command_auralinux.h',
             'linux/text_edit_key_bindings_delegate_auralinux.cc',
             'linux/text_edit_key_bindings_delegate_auralinux.h',
-          ],
-        }],
-        ['use_x11==1', {
-          'sources!': [
-            'platform/platform_event_source_stub.cc',
-          ],
-          'dependencies': [
-            '../../build/linux/system.gyp:x11',
-            '../gfx/gfx.gyp:gfx_x11',
-          ],
-        }],
-        ['use_glib==1', {
-          'dependencies': [
-            '../../build/linux/system.gyp:glib',
-          ],
-          'sources!': [
-            'platform/x11/x11_event_source_libevent.cc',
-          ],
-        }, {
-          # use_glib == 0
-          'sources!': [
-            'platform/x11/x11_event_source_glib.cc',
-          ],
-        }],
-        ['use_ozone_evdev==1', {
-          'defines': ['USE_OZONE_EVDEV=1'],
-        }],
-        ['use_ozone_evdev==1 and use_udev==1', {
-          'dependencies': [
-            '<(DEPTH)/build/linux/system.gyp:udev',
-          ],
-        }],
-        ['use_ozone_evdev==1 and use_evdev_gestures==1', {
-          'dependencies': [
-            '<(DEPTH)/build/linux/system.gyp:libgestures',
-            '<(DEPTH)/build/linux/system.gyp:libevdev-cros',
-          ],
-          'defines': [
-            'USE_EVDEV_GESTURES',
-          ],
-        }, {
-          'sources/': [
-            ['exclude', '^ozone/evdev/libgestures_glue/'],
-          ],
-        }],
-        ['use_udev==0', {
-          'sources/': [
-            ['exclude', '_udev\\.(h|cc)$'],
           ],
         }],
       ],
@@ -319,6 +230,7 @@
         '<(DEPTH)/skia/skia.gyp:skia',
         'events',
         'events_base',
+        'platform/events_platform.gyp:events_platform',
       ],
       'sources': [
         'test/cocoa_test_event_utils.h',
@@ -327,6 +239,8 @@
         'test/events_test_utils.h',
         'test/events_test_utils_x11.cc',
         'test/events_test_utils_x11.h',
+        'test/mock_motion_event.cc',
+        'test/mock_motion_event.h',
         'test/platform_event_waiter.cc',
         'test/platform_event_waiter.h',
         'test/test_event_handler.cc',
@@ -340,7 +254,7 @@
         ['use_x11==1', {
           'dependencies': [
             '../../build/linux/system.gyp:x11',
-            '../gfx/gfx.gyp:gfx_x11',
+            '../gfx/x/gfx_x11.gyp:gfx_x11',
           ],
         }],
         ['OS=="ios"', {
@@ -365,6 +279,7 @@
         'events_base',
         'events_test_support',
         'gesture_detection',
+        'platform/events_platform.gyp:events_platform',
       ],
       'sources': [
         'cocoa/events_mac_unittest.mm',
@@ -376,18 +291,24 @@
         'gestures/velocity_calculator_unittest.cc',
         'gesture_detection/bitset_32_unittest.cc',
         'gesture_detection/gesture_provider_unittest.cc',
-        'gesture_detection/mock_motion_event.h',
-        'gesture_detection/mock_motion_event.cc',
         'gesture_detection/velocity_tracker_unittest.cc',
         'gesture_detection/touch_disposition_gesture_filter_unittest.cc',
         'keycodes/dom4/keycode_converter_unittest.cc',
         'latency_info_unittest.cc',
-        'ozone/evdev/key_event_converter_evdev_unittest.cc',
-        'ozone/evdev/touch_event_converter_evdev_unittest.cc',
         'platform/platform_event_source_unittest.cc',
         'x/events_x_unittest.cc',
       ],
       'conditions': [
+        ['use_ozone==1', {
+          'sources': [
+            'ozone/evdev/key_event_converter_evdev_unittest.cc',
+            'ozone/evdev/touch_event_converter_evdev_unittest.cc',
+          ],
+          'dependencies': [
+            'ozone/events_ozone.gyp:events_ozone',
+            'ozone/events_ozone.gyp:events_ozone_evdev',
+          ]
+        }],
         ['use_aura==0', {
           'sources!': [
             'gestures/motion_event_aura_unittest.cc',
@@ -406,7 +327,7 @@
             'event_unittest.cc',
           ],
         }],
-        ['OS == "android" and gtest_target_type == "shared_library"', {
+        ['OS == "android"', {
           'dependencies': [
             '../../testing/android/native_test.gyp:native_test_native_code',
           ],
@@ -415,10 +336,7 @@
     },
   ],
   'conditions': [
-    # Special target to wrap a gtest_target_type==shared_library
-    # ui_unittests into an android apk for execution.
-    # See base.gyp for TODO(jrg)s about this strategy.
-    ['OS == "android" and gtest_target_type == "shared_library"', {
+    ['OS == "android"', {
       'targets': [
         {
           'target_name': 'events_unittests_apk',

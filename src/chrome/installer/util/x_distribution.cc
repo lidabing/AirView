@@ -19,6 +19,7 @@
 #include "base/win/windows_version.h"
 #include "chrome/common/chrome_icon_resources_win.h"
 #include "chrome/common/net/test_server_locations.h"
+#include "chrome/installer/util/app_registration_data.h"
 #include "chrome/installer/util/channel_info.h"
 #include "chrome/installer/util/google_update_constants.h"
 #include "chrome/installer/util/google_update_settings.h"
@@ -26,6 +27,7 @@
 #include "chrome/installer/util/install_util.h"
 #include "chrome/installer/util/l10n_string_util.h"
 #include "chrome/installer/util/uninstall_metrics.h"
+#include "chrome/installer/util/updating_app_registration_data.h"
 #include "chrome/installer/util/util_constants.h"
 #include "chrome/installer/util/wmi.h"
 #include "content/public/common/result_codes.h"
@@ -60,8 +62,14 @@ base::string16 GetUninstallSurveyUrl() {
 }  // namespace
 
 XDistribution::XDistribution()
-    : BrowserDistribution(CHROME_BROWSER),
-      product_guid_(kChromeGuid) {
+    : BrowserDistribution(CHROME_BROWSER,
+          make_scoped_ptr(
+              new UpdatingAppRegistrationData(kChromeGuid))) {
+}
+
+XDistribution::XDistribution(
+    scoped_ptr<AppRegistrationData> app_reg_data)
+    : BrowserDistribution(CHROME_BROWSER, app_reg_data.Pass()) {
 }
 
 void XDistribution::DoPostUninstallOperations(
@@ -117,10 +125,6 @@ base::string16 XDistribution::GetActiveSetupGuid() {
   return product_guid();
 }
 
-base::string16 XDistribution::GetAppGuid() {
-  return product_guid();
-}
-
 base::string16 XDistribution::GetBaseAppName() {
   // I'd really like to return L ## PRODUCT_FULLNAME_STRING; but that's no good
   // since it'd be "Chromium" in a non-Chrome build, which isn't at all what I
@@ -173,62 +177,12 @@ std::string XDistribution::GetSafeBrowsingName() {
   return "AirView";
 }
 
-base::string16 XDistribution::GetStateKey() {
-  base::string16 key(google_update::kRegPathClientState);
-  key.append(L"\\");
-  key.append(product_guid());
-  return key;
-}
-
-base::string16 XDistribution::GetStateMediumKey() {
-  base::string16 key(google_update::kRegPathClientStateMedium);
-  key.append(L"\\");
-  key.append(product_guid());
-  return key;
-}
-
 std::string XDistribution::GetNetworkStatsServer() const {
   return chrome_common_net::kEchoTestServerLocation;
 }
 
-std::string XDistribution::GetHttpPipeliningTestServer() const {
-  return chrome_common_net::kPipelineTestServerBaseUrl;
-}
-
 base::string16 XDistribution::GetDistributionData(HKEY root_key) {
-  base::string16 sub_key(google_update::kRegPathClientState);
-  sub_key.append(L"\\");
-  sub_key.append(product_guid());
-
-  base::win::RegKey client_state_key(root_key, sub_key.c_str(), KEY_READ);
-  base::string16 result;
-  base::string16 brand_value;
-  if (client_state_key.ReadValue(google_update::kRegRLZBrandField,
-                                 &brand_value) == ERROR_SUCCESS) {
-    result = google_update::kRegRLZBrandField;
-    result.append(L"=");
-    result.append(brand_value);
-    result.append(L"&");
-  }
-
-  base::string16 client_value;
-  if (client_state_key.ReadValue(google_update::kRegClientField,
-                                 &client_value) == ERROR_SUCCESS) {
-    result.append(google_update::kRegClientField);
-    result.append(L"=");
-    result.append(client_value);
-    result.append(L"&");
-  }
-
-  base::string16 ap_value;
-  // If we fail to read the ap key, send up "&ap=" anyway to indicate
-  // that this was probably a stable channel release.
-  client_state_key.ReadValue(google_update::kRegApField, &ap_value);
-  result.append(google_update::kRegApField);
-  result.append(L"=");
-  result.append(ap_value);
-
-  return result;
+	return base::string16();
 }
 
 base::string16 XDistribution::GetUninstallLinkName() {
@@ -242,20 +196,13 @@ base::string16 XDistribution::GetUninstallRegPath() {
          L"AirView";
 }
 
-base::string16 XDistribution::GetVersionKey() {
-	return L"Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\"
-		L"AirView";
-}
-
 base::string16 XDistribution::GetIconFilename() {
   return installer::kChromeExe;
 }
 
 bool XDistribution::GetCommandExecuteImplClsid(
     base::string16* handler_class_uuid) {
-  if (handler_class_uuid)
-    *handler_class_uuid = kCommandExecuteImplUuid;
-  return true;
+	return false;
 }
 
 bool XDistribution::AppHostIsSupported() {
@@ -273,6 +220,7 @@ bool XDistribution::AppHostIsSupported() {
 void XDistribution::UpdateInstallStatus(bool system_install,
     installer::ArchiveType archive_type,
     installer::InstallStatus install_status) {
+  
 }
 
 bool XDistribution::ShouldSetExperimentLabels() {

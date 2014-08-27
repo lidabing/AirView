@@ -32,10 +32,11 @@
 #include "chrome/browser/search/search.h"
 #include "chrome/browser/sessions/tab_restore_service.h"
 #include "chrome/browser/sessions/tab_restore_service_factory.h"
+#include "chrome/browser/signin/signin_header_helper.h"
 #include "chrome/browser/speech/tts_controller.h"
 #include "chrome/browser/themes/theme_properties.h"
 #include "chrome/browser/themes/theme_service_factory.h"
-#include "chrome/browser/translate/translate_tab_helper.h"
+#include "chrome/browser/translate/chrome_translate_client.h"
 #include "chrome/browser/ui/app_modal_dialogs/app_modal_dialog.h"
 #include "chrome/browser/ui/app_modal_dialogs/app_modal_dialog_queue.h"
 #include "chrome/browser/ui/bookmarks/bookmark_bar_constants.h"
@@ -100,6 +101,7 @@
 #include "chrome/common/url_constants.h"
 #include "components/password_manager/core/browser/password_manager.h"
 #include "components/signin/core/common/profile_management_switches.h"
+#include "components/translate/core/browser/language_state.h"
 #include "content/public/browser/download_manager.h"
 #include "content/public/browser/native_web_keyboard_event.h"
 #include "content/public/browser/notification_service.h"
@@ -394,7 +396,6 @@ BrowserView::BrowserView()
       infobar_container_(NULL),
       contents_web_view_(NULL),
       contents_container_(NULL),
-      devtools_window_(NULL),
       initialized_(false),
       in_process_fullscreen_(false),
 #if defined(OS_WIN)
@@ -488,7 +489,7 @@ void BrowserView::InitStatusBubble() {
 
 void BrowserView::InitPermissionBubbleView() {
   permission_bubble_view_.reset(new PermissionBubbleViewViews(
-      GetLocationBarView()->GetLocationIconView()));
+      GetLocationBarView()->location_icon_view()));
 }
 
 gfx::Rect BrowserView::GetToolbarBounds() const {
@@ -574,7 +575,8 @@ bool BrowserView::ShouldShowAvatar() const {
 #endif
 }
 
-bool BrowserView::GetAccelerator(int cmd_id, ui::Accelerator* accelerator) {
+bool BrowserView::GetAccelerator(int cmd_id,
+                                 ui::Accelerator* accelerator) const {
   // We retrieve the accelerator information for standard accelerators
   // for cut, copy and paste.
   if (chrome::GetStandardAcceleratorForCommandId(cmd_id, accelerator))
@@ -907,11 +909,10 @@ void BrowserView::UpdateFullscreenExitBubbleContent(
 }
 
 bool BrowserView::ShouldHideUIForFullscreen() const {
-#if defined(USE_ASH)
   // Immersive mode needs UI for the slide-down top panel.
   if (immersive_mode_controller_->IsEnabled())
     return false;
-#endif
+
   return IsFullscreen();
 }
 
@@ -1173,9 +1174,9 @@ void BrowserView::ShowTranslateBubble(content::WebContents* web_contents,
       return;
   }
 
-  TranslateTabHelper* translate_tab_helper =
-      TranslateTabHelper::FromWebContents(web_contents);
-  LanguageState& language_state = translate_tab_helper->GetLanguageState();
+  ChromeTranslateClient* chrome_translate_client =
+      ChromeTranslateClient::FromWebContents(web_contents);
+  LanguageState& language_state = chrome_translate_client->GetLanguageState();
   language_state.SetTranslateEnabled(true);
 
   TranslateBubbleView::ShowBubble(
@@ -1267,7 +1268,7 @@ void BrowserView::ShowWebsiteSettings(Profile* profile,
                                       const GURL& url,
                                       const content::SSLStatus& ssl) {
   WebsiteSettingsPopupView::ShowPopup(
-      GetLocationBarView()->GetLocationIconView(), profile,
+      GetLocationBarView()->location_icon_view(), profile,
       web_contents, url, ssl, browser_.get());
 }
 
@@ -1541,10 +1542,9 @@ views::View* BrowserView::GetInitiallyFocusedView() {
 }
 
 bool BrowserView::ShouldShowWindowTitle() const {
-  // For Ash only, app host windows do not show an icon, crbug.com/119411.
-  // Child windows (i.e. popups) do show an icon.
+  // For Ash only, trusted windows (apps and settings) do not show an icon,
+  // crbug.com/119411. Child windows (i.e. popups) do show an icon.
   if (browser_->host_desktop_type() == chrome::HOST_DESKTOP_TYPE_ASH &&
-      browser_->is_app() &&
       browser_->is_trusted_source())
     return false;
 
@@ -1571,10 +1571,9 @@ gfx::ImageSkia BrowserView::GetWindowIcon() {
 }
 
 bool BrowserView::ShouldShowWindowIcon() const {
-  // For Ash only, app host windows do not show an icon, crbug.com/119411.
-  // Child windows (i.e. popups) do show an icon.
+  // For Ash only, trusted windows (apps and settings) do not show an icon,
+  // crbug.com/119411. Child windows (i.e. popups) do show an icon.
   if (browser_->host_desktop_type() == chrome::HOST_DESKTOP_TYPE_ASH &&
-      browser_->is_app() &&
       browser_->is_trusted_source())
     return false;
 
@@ -1777,7 +1776,7 @@ int BrowserView::NonClientHitTest(const gfx::Point& point) {
   return GetBrowserViewLayout()->NonClientHitTest(point);
 }
 
-gfx::Size BrowserView::GetMinimumSize() {
+gfx::Size BrowserView::GetMinimumSize() const {
   return GetBrowserViewLayout()->GetMinimumSize();
 }
 
@@ -1798,16 +1797,17 @@ void BrowserView::Layout() {
   toolbar_->location_bar()->omnibox_view()->SetFocusable(IsToolbarVisible());
 }
 
-void BrowserView::PaintChildren(gfx::Canvas* canvas) {
+void BrowserView::PaintChildren(gfx::Canvas* canvas,
+                                const views::CullSet& cull_set) {
   // Paint the |infobar_container_| last so that it may paint its
   // overlapping tabs.
   for (int i = 0; i < child_count(); ++i) {
     View* child = child_at(i);
     if (child != infobar_container_ && !child->layer())
-      child->Paint(canvas);
+      child->Paint(canvas, cull_set);
   }
 
-  infobar_container_->Paint(canvas);
+  infobar_container_->Paint(canvas, cull_set);
 }
 
 void BrowserView::ViewHierarchyChanged(
@@ -1845,7 +1845,7 @@ bool BrowserView::AcceleratorPressed(const ui::Accelerator& accelerator) {
   // functionality.
   if (accelerator.key_code() == ui::VKEY_LWIN &&
       g_browser_process->local_state()->GetBoolean(
-          prefs::kSpokenFeedbackEnabled)) {
+          prefs::kAccessibilitySpokenFeedbackEnabled)) {
     TtsController::GetInstance()->Stop();
     return false;
   }
@@ -2103,18 +2103,11 @@ bool BrowserView::MaybeShowInfoBar(WebContents* contents) {
 
 void BrowserView::UpdateDevToolsForContents(
     WebContents* web_contents, bool update_devtools_web_contents) {
-  DevToolsWindow* new_devtools_window = web_contents ?
-      DevToolsWindow::GetDockedInstanceForInspectedTab(web_contents) : NULL;
+  DevToolsContentsResizingStrategy strategy;
+  WebContents* devtools = DevToolsWindow::GetInTabWebContents(
+      web_contents, &strategy);
 
-  // Replace devtools WebContents.
-  WebContents* new_contents = new_devtools_window ?
-      new_devtools_window->web_contents() : NULL;
-  if (devtools_web_view_->web_contents() != new_contents &&
-      update_devtools_web_contents) {
-    devtools_web_view_->SetWebContents(new_contents);
-  }
-
-  if (!devtools_window_ && new_devtools_window &&
+  if (!devtools_web_view_->web_contents() && devtools &&
       !devtools_focus_tracker_.get()) {
     // Install devtools focus tracker when dev tools window is shown for the
     // first time.
@@ -2124,18 +2117,21 @@ void BrowserView::UpdateDevToolsForContents(
   }
 
   // Restore focus to the last focused view when hiding devtools window.
-  if (devtools_window_ && !new_devtools_window &&
+  if (devtools_web_view_->web_contents() && !devtools &&
       devtools_focus_tracker_.get()) {
     devtools_focus_tracker_->FocusLastFocusedExternalView();
     devtools_focus_tracker_.reset();
   }
 
-  devtools_window_ = new_devtools_window;
-  if (devtools_window_) {
-    devtools_web_view_->SetPreferredSize(devtools_window_->GetMinimumSize());
+  // Replace devtools WebContents.
+  if (devtools_web_view_->web_contents() != devtools &&
+      update_devtools_web_contents) {
+    devtools_web_view_->SetWebContents(devtools);
+  }
+
+  if (devtools) {
     devtools_web_view_->SetVisible(true);
-    GetContentsLayoutManager()->SetContentsResizingStrategy(
-        devtools_window_->GetContentsResizingStrategy());
+    GetContentsLayoutManager()->SetContentsResizingStrategy(strategy);
   } else {
     devtools_web_view_->SetVisible(false);
     GetContentsLayoutManager()->SetContentsResizingStrategy(
@@ -2382,30 +2378,58 @@ void BrowserView::ShowAvatarBubble(WebContents* web_contents,
   views::View::ConvertPointToScreen(GetTabContentsContainerView(), &origin);
   gfx::Rect bounds(origin, rect.size());
 
-  AvatarMenuBubbleView::ShowBubble(this, views::BubbleBorder::TOP_RIGHT,
+  AvatarMenuBubbleView::ShowBubble(
+      this, views::BubbleBorder::TOP_RIGHT, views::BubbleBorder::PAINT_NORMAL,
       views::BubbleBorder::ALIGN_EDGE_TO_ANCHOR_EDGE, bounds, browser_.get());
 }
 
-void BrowserView::ShowAvatarBubbleFromAvatarButton(AvatarBubbleMode mode) {
+void BrowserView::ShowAvatarBubbleFromAvatarButton(
+    AvatarBubbleMode mode,
+    const signin::ManageAccountsParams& manage_accounts_params) {
+  views::BubbleBorder::Arrow arrow = views::BubbleBorder::TOP_RIGHT;
+  views::BubbleBorder::BubbleAlignment alignment =
+      views::BubbleBorder::ALIGN_ARROW_TO_MID_ANCHOR;
+  views::View* anchor_view = frame_->GetAvatarMenuButton();
+  if (!anchor_view)
+    anchor_view = toolbar_->app_menu();
+  else if (!frame_->GetAvatarMenuButton()->button_on_right())
+    arrow = views::BubbleBorder::TOP_LEFT;
+
   if (switches::IsNewAvatarMenu()) {
     NewAvatarButton* button = frame_->GetNewAvatarMenuButton();
     if (button) {
-      gfx::Point origin;
-      views::View::ConvertPointToScreen(button, &origin);
-      gfx::Rect bounds(origin, size());
-
-      ProfileChooserView::BubbleViewMode view_mode =
-          (mode == BrowserWindow::AVATAR_BUBBLE_MODE_ACCOUNT_MANAGEMENT) ?
-          ProfileChooserView::BUBBLE_VIEW_MODE_ACCOUNT_MANAGEMENT :
-          ProfileChooserView::BUBBLE_VIEW_MODE_PROFILE_CHOOSER;
-      ProfileChooserView::ShowBubble(
-          view_mode, button, views::BubbleBorder::TOP_RIGHT,
-          views::BubbleBorder::ALIGN_EDGE_TO_ANCHOR_EDGE, bounds, browser());
+      anchor_view = button;
+      arrow = views::BubbleBorder::TOP_RIGHT;
+      alignment = views::BubbleBorder::ALIGN_EDGE_TO_ANCHOR_EDGE;
     }
+
+    profiles::BubbleViewMode view_mode;
+    switch (mode) {
+      case AVATAR_BUBBLE_MODE_ACCOUNT_MANAGEMENT:
+        view_mode = profiles::BUBBLE_VIEW_MODE_ACCOUNT_MANAGEMENT;
+        break;
+      case AVATAR_BUBBLE_MODE_SIGNIN:
+        view_mode = profiles::BUBBLE_VIEW_MODE_GAIA_SIGNIN;
+        break;
+      case AVATAR_BUBBLE_MODE_REAUTH:
+        view_mode = profiles::BUBBLE_VIEW_MODE_GAIA_REAUTH;
+        break;
+      default:
+        view_mode = profiles::BUBBLE_VIEW_MODE_PROFILE_CHOOSER;
+        break;
+    }
+    ProfileChooserView::ShowBubble(view_mode, manage_accounts_params,
+        anchor_view, arrow, alignment, browser());
   } else {
-    AvatarMenuButton* button = frame_->GetAvatarMenuButton();
-    if (button)
-      button->ShowAvatarBubble();
+    gfx::Point origin;
+    views::View::ConvertPointToScreen(anchor_view, &origin);
+    gfx::Rect bounds(origin, anchor_view->size());
+    views::BubbleBorder::ArrowPaintType arrow_paint_type =
+        ShouldHideUIForFullscreen() ? views::BubbleBorder::PAINT_TRANSPARENT :
+                                      views::BubbleBorder::PAINT_NORMAL;
+    AvatarMenuBubbleView::ShowBubble(anchor_view, arrow, arrow_paint_type,
+                                     alignment, bounds, browser());
+    ProfileMetrics::LogProfileOpenMethod(ProfileMetrics::ICON_AVATAR_BUBBLE);
   }
 }
 
@@ -2477,12 +2501,9 @@ void BrowserView::DoCutCopyPaste(void (WebContents::*method)(),
   if (DoCutCopyPasteForWebContents(contents, method))
     return;
 
-  DevToolsWindow* devtools_window =
-      DevToolsWindow::GetDockedInstanceForInspectedTab(contents);
-  if (devtools_window &&
-      DoCutCopyPasteForWebContents(devtools_window->web_contents(), method)) {
+  WebContents* devtools = DevToolsWindow::GetInTabWebContents(contents, NULL);
+  if (devtools && DoCutCopyPasteForWebContents(devtools, method))
     return;
-  }
 
   views::FocusManager* focus_manager = GetFocusManager();
   views::View* focused = focus_manager->GetFocusedView();

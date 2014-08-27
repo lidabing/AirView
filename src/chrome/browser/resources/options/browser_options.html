@@ -29,9 +29,14 @@
   <include src="sync_section.html">
   <include src="startup_section.html">
 </if>
-    <!-- airview patch{ --->
+ <!-- airview patch{ --->
     <include src="x_browser_options.html">
-    <!-- } --->
+  <!-- } --->
+  <section id="proxy-section" hidden>
+    <h3 i18n-content="sectionTitleProxy"></h3>
+    <div id="proxy-section-content"></div>
+  </section>
+
   <section>
     <h3 i18n-content="sectionTitleAppearance"></h3>
     <div class="settings-row">
@@ -92,7 +97,7 @@
         </span>
       </span>
     </div>
-      <!--- airview patch{ ---->
+ <!--- airview patch{ ---->
       <div class="checkbox" guest-visibility="disabled">
           <label>
               <input id="toolbarShowRestoreButton" pref="x.show_restore_button"
@@ -108,17 +113,16 @@
           </label>
       </div>
       <!--- } ----------->
-          <if expr="is_posix and not chromeos and not is_macosx">
-              <div class="checkbox">
-                  <label>
-                      <input id="show-window-decorations" type="checkbox"
-                             pref="browser.custom_chrome_frame" metric="Options_CustomFrame"
-                             inverted_pref>
-                      <span i18n-content="showWindowDecorations"></span>
-                  </label>
-              </div>
-          </if>
-</section>
+
+<if expr="is_posix and not chromeos and not is_macosx">
+    <div class="checkbox"><label>
+        <input id="show-window-decorations" type="checkbox"
+            pref="browser.custom_chrome_frame" metric="Options_CustomFrame"
+            inverted_pref>
+        <span i18n-content="showWindowDecorations"></span>
+    </label></div>
+</if>
+  </section>
 <if expr="chromeos">
   <section>
     <h3 i18n-content="sectionTitleDevice"></h3>
@@ -317,16 +321,16 @@
       </div>
       <div class="checkbox">
         <span class="controlled-setting-with-label">
-          <input id="safe-browsing-download-feedback-enabled"
-              metric="Options_SafeBrowsingDownloadFeedbackCheckbox"
-              pref="safebrowsing.download_feedback_enabled"
+          <input id="safe-browsing-extended-reporting-enabled"
+              metric="Options_SafeBrowsingExtendedReportingCheckbox"
+              pref="safebrowsing.extended_reporting_enabled"
               type="checkbox">
           <span>
-            <label for="safe-browsing-download-feedback-enabled"
-                i18n-content="safeBrowsingEnableDownloadFeedback">
+            <label for="safe-browsing-extended-reporting-enabled"
+                i18n-content="safeBrowsingEnableExtendedReporting">
             </label>
             <span class="controlled-setting-indicator"
-                pref="safebrowsing.download_feedback_enabled">
+                pref="safebrowsing.extended_reporting_enabled">
             </span>
           </span>
         </span>
@@ -423,7 +427,7 @@
               <label for="hotword-search-enable"
                   i18n-values=".innerHTML:hotwordSearchEnable">
               </label>
-              <span id="controlled-setting-indicator"
+              <span id="hotword-search-setting-indicator"
                   pref="hotword.search_enabled_2" dialog-pref>
               </span>
             </span>
@@ -577,7 +581,9 @@
   <section id="network-section">
     <h3 i18n-content="advancedSectionTitleNetwork"></h3>
     <div>
-      <span id="proxiesLabel" class="settings-row"></span>
+      <span id="proxiesLabel"
+            class="settings-row"
+            i18n-content="proxiesLabelSystem"></span>
       <div class="settings-row">
         <button id="proxiesConfigureButton"
             i18n-content="proxiesConfigureButton"></button>
@@ -700,7 +706,7 @@
           <input id="local-discovery-notifications-enabled"
                  pref="local_discovery.notifications_enabled"
                  type="checkbox"
-                 metric="LocalDiscoveryNotificationsDisabled_Settings" />
+                 metric="LocalDiscoveryNotificationsDisabled_Settings">
           <span>
             <label for="local-discovery-notifications-enabled"
                    i18n-content="cloudPrintEnableNotificationsLabel">
@@ -721,14 +727,15 @@
     <div class="option-control-table">
       <p id="accessibility-explanation" class="settings-row">
         <span i18n-content="accessibilityExplanation"></span>
-        <a target="_blank" i18n-content="learnMore"
-            i18n-values="href:accessibilityLearnMoreURL"></a>
+        <a id="accessibility-learn-more" target="_blank"
+           i18n-content="learnMore"></a>
       </p>
       <div class="option-name">
         <div class="checkbox">
           <span class="controlled-setting-with-label">
             <input id="accessibility-should-always-show-menu"
-                pref="settings.a11y.enable_menu" type="checkbox">
+                   pref="settings.a11y.enable_menu" type="checkbox"
+                   metric="Options_AccessibilitySystemMenu">
             <span>
               <label for="accessibility-should-always-show-menu"
                   i18n-content="accessibilityAlwaysShowMenu">
@@ -743,7 +750,8 @@
         <div class="checkbox">
           <span class="controlled-setting-with-label">
             <input id="accessibility-large-cursor-check"
-                pref="settings.a11y.large_cursor_enabled" type="checkbox">
+                   pref="settings.a11y.large_cursor_enabled" type="checkbox"
+                   metric="Options_AccessibilityLargeMouseCursor">
             <span>
               <label for="accessibility-large-cursor-check"
                   i18n-content="accessibilityLargeCursor">
@@ -759,7 +767,8 @@
         <div class="checkbox">
           <span class="controlled-setting-with-label">
             <input id="accessibility-high-contrast-check"
-                pref="settings.a11y.high_contrast_enabled" type="checkbox">
+                   pref="settings.a11y.high_contrast_enabled" type="checkbox"
+                   metric="Options_AccessibilityHighContrastMode">
             <span>
               <label for="accessibility-high-contrast-check"
                   i18n-content="accessibilityHighContrast">
@@ -775,7 +784,8 @@
         <div class="checkbox">
           <span class="controlled-setting-with-label">
             <input id="accessibility-sticky-keys-check"
-                pref="settings.a11y.sticky_keys_enabled" type="checkbox">
+                   pref="settings.a11y.sticky_keys_enabled" type="checkbox"
+                   metric="Options_AccessibilityStickyKeys">
             <span>
               <label for="accessibility-sticky-keys-check"
                   i18n-content="accessibilityStickyKeys">
@@ -791,7 +801,8 @@
         <div class="checkbox">
           <span class="controlled-setting-with-label">
             <input id="accessibility-spoken-feedback-check"
-                pref="settings.accessibility" type="checkbox">
+                   pref="settings.accessibility" type="checkbox"
+                   metric="Options_AccessibilitySpokenFeedback">
             <span>
               <label for="accessibility-spoken-feedback-check"
                   i18n-content="accessibilitySpokenFeedback">
@@ -811,7 +822,8 @@
         <div class="checkbox">
           <span class="controlled-setting-with-label">
             <input id="accessibility-screen-magnifier-check"
-                pref="settings.a11y.screen_magnifier" type="checkbox">
+                   pref="settings.a11y.screen_magnifier" type="checkbox"
+                   metric="Options_AccessibilityScreenMagnifier">
             <span>
               <label for="accessibility-screen-magnifier-check"
                   i18n-content="accessibilityScreenMagnifier">
@@ -827,7 +839,8 @@
         <div class="checkbox">
           <label>
             <input id="accessibility-tap-dragging-check"
-                pref="settings.touchpad.enable_tap_dragging" type="checkbox">
+                   pref="settings.touchpad.enable_tap_dragging" type="checkbox"
+                   metric="Options_AccessibilityTapDragging">
             <span i18n-content="accessibilityTapDragging"></span>
           </label>
         </div>
@@ -876,7 +889,8 @@
         <div class="checkbox">
           <span class="controlled-setting-with-label">
             <input id="accessibility-virtual-keyboard-check"
-                pref="settings.a11y.virtual_keyboard" type="checkbox">
+                   pref="settings.a11y.virtual_keyboard" type="checkbox"
+                   metric="Options_AccessibilityOnScreenKeyboard">
             <span>
               <label for="accessibility-virtual-keyboard-check"
                   i18n-content="accessibilityVirtualKeyboard">

@@ -202,7 +202,6 @@ void OmniboxPopupContentsView::UpdatePopupAppearance() {
     // If the popup is currently closed, we need to create it.
     popup_ = (new AutocompletePopupWidget)->AsWeakPtr();
     views::Widget::InitParams params(views::Widget::InitParams::TYPE_POPUP);
-    params.can_activate = false;
     params.opacity = views::Widget::InitParams::TRANSLUCENT_WINDOW;
     params.parent = popup_parent;
     params.bounds = GetPopupBounds();
@@ -382,7 +381,7 @@ void OmniboxPopupContentsView::OnGestureEvent(ui::GestureEvent* event) {
 void OmniboxPopupContentsView::PaintResultViews(gfx::Canvas* canvas) {
   canvas->DrawColor(result_view_at(0)->GetColor(
       OmniboxResultView::NORMAL, OmniboxResultView::BACKGROUND));
-  View::PaintChildren(canvas);
+  View::PaintChildren(canvas, views::CullSet());
 }
 
 int OmniboxPopupContentsView::CalculatePopupHeight() {
@@ -445,7 +444,8 @@ void OmniboxPopupContentsView::OnPaint(gfx::Canvas* canvas) {
                        width(), bottom_shadow_->height());
 }
 
-void OmniboxPopupContentsView::PaintChildren(gfx::Canvas* canvas) {
+void OmniboxPopupContentsView::PaintChildren(gfx::Canvas* canvas,
+                                             const views::CullSet& cull_set) {
   // We paint our children inside OnPaint().
 }
 

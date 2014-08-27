@@ -1,4 +1,4 @@
-// Copyright (c) 2014 The AirView Authors. All rights reserved.
+// Copyright (c) 2012 The Chromium Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 //
@@ -15,6 +15,8 @@
 namespace base {
 class FilePath;
 }
+
+class AppRegistrationData;
 
 class XDistribution : public BrowserDistribution {
  public:
@@ -33,8 +35,6 @@ class XDistribution : public BrowserDistribution {
       const base::string16& distribution_data) OVERRIDE;
 
   virtual base::string16 GetActiveSetupGuid() OVERRIDE;
-
-  virtual base::string16 GetAppGuid() OVERRIDE;
 
   virtual base::string16 GetShortcutName(ShortcutType shortcut_type) OVERRIDE;
 
@@ -58,13 +58,7 @@ class XDistribution : public BrowserDistribution {
 
   virtual std::string GetSafeBrowsingName() OVERRIDE;
 
-  virtual base::string16 GetStateKey() OVERRIDE;
-
-  virtual base::string16 GetStateMediumKey() OVERRIDE;
-
   virtual std::string GetNetworkStatsServer() const OVERRIDE;
-
-  virtual std::string GetHttpPipeliningTestServer() const OVERRIDE;
 
   // This method reads data from the Google Update ClientState key for
   // potential use in the uninstall survey. It must be called before the
@@ -74,8 +68,6 @@ class XDistribution : public BrowserDistribution {
   virtual base::string16 GetUninstallLinkName() OVERRIDE;
 
   virtual base::string16 GetUninstallRegPath() OVERRIDE;
-
-  virtual base::string16 GetVersionKey() OVERRIDE;
 
   virtual bool GetCommandExecuteImplClsid(
       base::string16* handler_class_uuid) OVERRIDE;
@@ -91,19 +83,15 @@ class XDistribution : public BrowserDistribution {
 
   virtual bool HasUserExperiments() OVERRIDE;
 
-  const base::string16& product_guid() { return product_guid_; }
-
  protected:
-  void set_product_guid(const base::string16& guid) { product_guid_ = guid; }
-
   // Disallow construction from others.
-  XDistribution();
+	 XDistribution();
+
+	 explicit XDistribution(
+      scoped_ptr<AppRegistrationData> app_reg_data);
 
  private:
   friend class BrowserDistribution;
-
-  // The product ID for Google Update.
-  base::string16 product_guid_;
 };
 
 #endif  // CHROME_INSTALLER_UTIL_X_DISTRIBUTION_H_

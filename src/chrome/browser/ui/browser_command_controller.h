@@ -11,7 +11,6 @@
 #include "base/prefs/pref_member.h"
 #include "chrome/browser/command_updater.h"
 #include "chrome/browser/command_updater_delegate.h"
-#include "chrome/browser/profiles/profile_info_cache_observer.h"
 #include "chrome/browser/sessions/tab_restore_service_observer.h"
 #include "chrome/browser/ui/tabs/tab_strip_model_observer.h"
 #include "ui/base/window_open_disposition.h"
@@ -22,7 +21,6 @@
 class Browser;
 class BrowserWindow;
 class Profile;
-class ProfileManager;
 
 namespace content {
 struct NativeWebKeyboardEvent;
@@ -31,11 +29,10 @@ struct NativeWebKeyboardEvent;
 namespace chrome {
 
 class BrowserCommandController : public CommandUpdaterDelegate,
-                                 public ProfileInfoCacheObserver,
                                  public TabStripModelObserver,
                                  public TabRestoreServiceObserver {
  public:
-  BrowserCommandController(Browser* browser, ProfileManager* profile_manager);
+  explicit BrowserCommandController(Browser* browser);
   virtual ~BrowserCommandController();
 
   CommandUpdater* command_updater() { return &command_updater_; }
@@ -86,11 +83,6 @@ class BrowserCommandController : public CommandUpdaterDelegate,
   virtual void ExecuteCommandWithDisposition(
       int id,
       WindowOpenDisposition disposition) OVERRIDE;
-
-  // Overridden from ProfileInfoCacheObserver:
-  virtual void OnProfileAdded(const base::FilePath& profile_path) OVERRIDE;
-  virtual void OnProfileWasRemoved(const base::FilePath& profile_path,
-                                   const base::string16& profile_name) OVERRIDE;
 
   // Overridden from TabStripModelObserver:
   virtual void TabInsertedAt(content::WebContents* contents,
@@ -144,10 +136,6 @@ class BrowserCommandController : public CommandUpdaterDelegate,
   // window is in.
   void UpdateCommandsForFullscreenMode();
 
-  // Update commands whose state depends on whether multiple profiles are
-  // allowed.
-  void UpdateCommandsForMultipleProfiles();
-
   // Updates the printing command state.
   void UpdatePrintingState();
 
@@ -177,8 +165,6 @@ class BrowserCommandController : public CommandUpdaterDelegate,
   inline Profile* profile();
 
   Browser* browser_;
-
-  ProfileManager* profile_manager_;
 
   // The CommandUpdater that manages the browser window commands.
   CommandUpdater command_updater_;

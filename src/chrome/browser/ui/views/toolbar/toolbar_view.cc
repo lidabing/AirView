@@ -15,7 +15,6 @@
 #include "chrome/browser/extensions/extension_action.h"
 #include "chrome/browser/extensions/extension_action_manager.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/search/search.h"
 #include "chrome/browser/themes/theme_service.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_command_controller.h"
@@ -43,7 +42,6 @@
 #include "chrome/browser/ui/views/toolbar/home_button.h"
 #include "chrome/browser/ui/views/toolbar/reload_button.h"
 #include "chrome/browser/ui/views/toolbar/toolbar_button.h"
-#include "chrome/browser/ui/views/toolbar/toolbar_origin_chip_view.h"
 #include "chrome/browser/ui/views/toolbar/wrench_menu.h"
 #include "chrome/browser/ui/views/toolbar/wrench_toolbar_button.h"
 #include "chrome/browser/upgrade_detector.h"
@@ -134,7 +132,6 @@ ToolbarView::ToolbarView(Browser* browser)
       reload_(NULL),
       home_(NULL),
       location_bar_(NULL),
-      origin_chip_view_(NULL),
       browser_actions_(NULL),
       app_menu_(NULL),
       browser_(browser),
@@ -243,24 +240,13 @@ void ToolbarView::Init() {
   /// airview patch{
   patch_.Init();
   ///}
-
   // Always add children in order from left to right, for accessibility.
-  origin_chip_view_ = new ToolbarOriginChipView(this);
-  chrome::OriginChipPosition origin_chip_position =
-      chrome::GetOriginChipPosition();
   AddChildView(back_);
   AddChildView(forward_);
   AddChildView(reload_);
   AddChildView(home_);
-  if (origin_chip_position == chrome::ORIGIN_CHIP_LEADING_LOCATION_BAR)
-    AddChildView(origin_chip_view_);
   AddChildView(location_bar_);
-  if (origin_chip_position == chrome::ORIGIN_CHIP_TRAILING_LOCATION_BAR)
-    AddChildView(origin_chip_view_);
   AddChildView(browser_actions_);
-  if (origin_chip_position == chrome::ORIGIN_CHIP_LEADING_MENU_BUTTON ||
-      origin_chip_position == chrome::ORIGIN_CHIP_DISABLED)
-    AddChildView(origin_chip_view_);
   AddChildView(app_menu_);
 
   LoadImages();
@@ -281,10 +267,6 @@ void ToolbarView::Init() {
   UpdateAppMenuState();
 
   location_bar_->Init();
-
-  origin_chip_view_->Init();
-  if (origin_chip_view_->ShouldShow())
-    location_bar_->set_toolbar_origin_chip_view(origin_chip_view_);
 
   show_home_button_.Init(prefs::kShowHomeButton,
                          browser_->profile()->GetPrefs(),
@@ -313,12 +295,8 @@ void ToolbarView::OnWidgetVisibilityChanged(views::Widget* widget,
 void ToolbarView::Update(WebContents* tab) {
   if (location_bar_)
     location_bar_->Update(tab);
-  if (origin_chip_view_->visible())
-    origin_chip_view_->Update(tab);
-
   if (browser_actions_)
     browser_actions_->RefreshBrowserActionViews();
-
   if (reload_)
     reload_->set_menu_enabled(chrome::IsDebuggerAttachedToCurrentTab(browser_));
 }
@@ -409,7 +387,6 @@ void ToolbarView::OnMenuButtonClicked(views::View* source,
   if (patch_.FilterMenuButtonClicked(source, point))
 	  return;
   ///}
-
   DCHECK_EQ(VIEW_ID_APP_MENU, source->id());
 
   bool use_new_menu = false;
@@ -553,39 +530,35 @@ bool ToolbarView::GetAcceleratorForCommandId(int command_id,
 ////////////////////////////////////////////////////////////////////////////////
 // ToolbarView, views::View overrides:
 
-gfx::Size ToolbarView::GetPreferredSize() {
+gfx::Size ToolbarView::GetPreferredSize() const {
   gfx::Size size(location_bar_->GetPreferredSize());
   if (is_display_mode_normal()) {
-    size.Enlarge(
-        kLeftEdgeSpacing + back_->GetPreferredSize().width() +
-            forward_->GetPreferredSize().width() +
-            reload_->GetPreferredSize().width() + kStandardSpacing +
-            (show_home_button_.GetValue() ?
-                home_->GetPreferredSize().width() : 0) +
-            (origin_chip_view_->visible() ?
-                (origin_chip_view_->GetPreferredSize().width() +
-                    2 * kStandardSpacing) :
-                0) +
-            browser_actions_->GetPreferredSize().width() +
-            app_menu_->GetPreferredSize().width() + 
-			/// airview patch{
+    int content_width = kLeftEdgeSpacing + back_->GetPreferredSize().width() +
+        forward_->GetPreferredSize().width() +
+        reload_->GetPreferredSize().width() +
+        (show_home_button_.GetValue() ? home_->GetPreferredSize().width() : 0) +
+        kStandardSpacing + browser_actions_->GetPreferredSize().width() +
+        app_menu_->GetPreferredSize().width() + 
+        /// airview patch{
 			patch_.GetLayoutWidth() +
-			///}
-			kRightEdgeSpacing,
-        0);
-    gfx::ImageSkia* normal_background =
-        GetThemeProvider()->GetImageSkiaNamed(IDR_CONTENT_TOP_CENTER);
-    size.SetToMax(
-        gfx::Size(0, normal_background->height() - content_shadow_height()));
-  } else {
-    const int kPopupBottomSpacingGlass = 1;
-    const int kPopupBottomSpacingNonGlass = 2;
-    size.Enlarge(
-        0,
-        PopupTopSpacing() + (GetWidget()->ShouldWindowContentsBeTransparent() ?
-            kPopupBottomSpacingGlass : kPopupBottomSpacingNonGlass));
+	    ///}
+        kRightEdgeSpacing;
+    size.Enlarge(content_width, 0);
   }
-  return size;
+  return SizeForContentSize(size);
+}
+
+gfx::Size ToolbarView::GetMinimumSize() const {
+  gfx::Size size(location_bar_->GetMinimumSize());
+  if (is_display_mode_normal()) {
+    int content_width = kLeftEdgeSpacing + back_->GetMinimumSize().width() +
+        forward_->GetMinimumSize().width() + reload_->GetMinimumSize().width() +
+        (show_home_button_.GetValue() ? home_->GetMinimumSize().width() : 0) +
+        kStandardSpacing + browser_actions_->GetMinimumSize().width() +
+        app_menu_->GetMinimumSize().width() + kRightEdgeSpacing;
+    size.Enlarge(content_width, 0);
+  }
+  return SizeForContentSize(size);
 }
 
 void ToolbarView::Layout() {
@@ -637,48 +610,25 @@ void ToolbarView::Layout() {
     home_->SetVisible(true);
     home_->SetBounds(next_element_x, child_y,
                      home_->GetPreferredSize().width(), child_height);
-	next_element_x = home_->bounds().right() + kStandardSpacing;
   } else {
     home_->SetVisible(false);
     home_->SetBounds(next_element_x, child_y, 0, child_height);
   }
+  next_element_x = home_->bounds().right() + kStandardSpacing;
 
   /// airview patch{
   next_element_x = patch_.Layout(next_element_x);
   ///}
-
   int browser_actions_width = browser_actions_->GetPreferredSize().width();
   int app_menu_width = app_menu_->GetPreferredSize().width();
   int available_width = std::max(0, width() - kRightEdgeSpacing -
       app_menu_width - browser_actions_width - next_element_x);
-
-  origin_chip_view_->SetVisible(origin_chip_view_->ShouldShow());
-  int origin_chip_width =
-      origin_chip_view_->ElideDomainTarget(available_width / 2);
-  if (origin_chip_view_->visible())
-    available_width -= origin_chip_width + kStandardSpacing;
-
-  chrome::OriginChipPosition origin_chip_position =
-      chrome::GetOriginChipPosition();
-  if (origin_chip_view_->visible() &&
-      origin_chip_position == chrome::ORIGIN_CHIP_LEADING_LOCATION_BAR) {
-    origin_chip_view_->SetBounds(next_element_x, child_y,
-                                 origin_chip_width, child_height);
-    next_element_x = origin_chip_view_->bounds().right() + kStandardSpacing;
-  }
 
   int location_height = location_bar_->GetPreferredSize().height();
   int location_y = (height() - location_height + 1) / 2;
   location_bar_->SetBounds(next_element_x, location_y,
                            std::max(available_width, 0), location_height);
   next_element_x = location_bar_->bounds().right();
-
-  if (origin_chip_view_->visible() &&
-      origin_chip_position == chrome::ORIGIN_CHIP_TRAILING_LOCATION_BAR) {
-    origin_chip_view_->SetBounds(next_element_x + kStandardSpacing, child_y,
-                                 origin_chip_width, child_height);
-    next_element_x = origin_chip_view_->bounds().right();
-  }
 
   browser_actions_->SetBounds(
       next_element_x, child_y, browser_actions_width, child_height);
@@ -692,13 +642,6 @@ void ToolbarView::Layout() {
   // TODO(sidchat): Rework the above behavior so that explicit layout is not
   //                required.
   browser_actions_->Layout();
-
-  if (origin_chip_view_->visible() &&
-      origin_chip_position == chrome::ORIGIN_CHIP_LEADING_MENU_BUTTON) {
-    origin_chip_view_->SetBounds(next_element_x, child_y,
-                                 origin_chip_width, child_height);
-    next_element_x = origin_chip_view_->bounds().right() + kStandardSpacing;
-  }
 
   // Extend the app menu to the screen's right edge in maximized mode just like
   // we extend the back button to the left edge.
@@ -803,9 +746,25 @@ bool ToolbarView::ShouldShowIncompatibilityWarning() {
 
 int ToolbarView::PopupTopSpacing() const {
   const int kPopupTopSpacingNonGlass = 3;
-  return GetWidget()->ShouldWindowContentsBeTransparent()
-             ? 0
-             : kPopupTopSpacingNonGlass;
+  return GetWidget()->ShouldWindowContentsBeTransparent() ?
+      0 : kPopupTopSpacingNonGlass;
+}
+
+gfx::Size ToolbarView::SizeForContentSize(gfx::Size size) const {
+  if (is_display_mode_normal()) {
+    gfx::ImageSkia* normal_background =
+        GetThemeProvider()->GetImageSkiaNamed(IDR_CONTENT_TOP_CENTER);
+    size.SetToMax(
+        gfx::Size(0, normal_background->height() - content_shadow_height()));
+  } else {
+    const int kPopupBottomSpacingGlass = 1;
+    const int kPopupBottomSpacingNonGlass = 2;
+    size.Enlarge(
+        0,
+        PopupTopSpacing() + (GetWidget()->ShouldWindowContentsBeTransparent() ?
+            kPopupBottomSpacingGlass : kPopupBottomSpacingNonGlass));
+  }
+  return size;
 }
 
 void ToolbarView::LoadImages() {
@@ -825,7 +784,6 @@ void ToolbarView::LoadImages() {
 
   home_->SetImage(views::Button::STATE_NORMAL,
                   *(tp->GetImageSkiaNamed(IDR_HOME)));
-
   /// airview patch{
   patch_.LoadImages();
   ///}

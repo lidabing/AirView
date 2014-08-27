@@ -44,7 +44,6 @@ class VersionInfo {
 
   // Version number, e.g. "6.0.490.1".
   std::string Version() const;
-  
   ///airview patch{
   std::string RealVersion() const;
   ///}

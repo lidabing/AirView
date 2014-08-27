@@ -16,7 +16,6 @@
 #include "base/values.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/chrome_notification_types.h"
-#include "chrome/browser/google/google_util.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_commands.h"
 #include "chrome/browser/ui/browser_finder.h"
@@ -25,6 +24,7 @@
 #include "chrome/common/chrome_version_info.h"
 #include "chrome/common/pref_names.h"
 #include "chrome/common/url_constants.h"
+#include "components/google/core/browser/google_util.h"
 #include "content/public/browser/browser_thread.h"
 #include "content/public/browser/notification_service.h"
 #include "content/public/browser/web_ui.h"
@@ -46,7 +46,7 @@
 #include "base/i18n/time_formatting.h"
 #include "base/prefs/pref_service.h"
 #include "base/sys_info.h"
-#include "chrome/browser/chromeos/login/user_manager.h"
+#include "chrome/browser/chromeos/login/users/user_manager.h"
 #include "chrome/browser/chromeos/policy/browser_policy_connector_chromeos.h"
 #include "chrome/browser/chromeos/settings/cros_settings.h"
 #include "chrome/browser/profiles/profile.h"
@@ -85,9 +85,12 @@ base::string16 BuildBrowserVersionString() {
   browser_version += ")";
 #endif
 
+#if defined(ARCH_CPU_64_BITS)
+  browser_version += " (64-bit)";
+#endif
+
   return base::UTF8ToUTF16(browser_version);
 }
-
 ///airview patch{
 // Returns the browser version as a string.
 base::string16 BuildChromiumVersionString() {
@@ -109,7 +112,6 @@ base::string16 BuildChromiumVersionString() {
 	return base::UTF8ToUTF16(browser_version);
 }
 ///}
-
 #if defined(OS_CHROMEOS)
 
 // Returns message that informs user that for update it's better to
@@ -177,8 +179,7 @@ void HelpHandler::GetLocalizedValues(content::WebUIDataSource* source) {
   };
 
   static L10nResources resources[] = {
-    { "helpTitle", IDS_HELP_TITLE },
-    { "aboutTitle", IDS_ABOUT_TAB_TITLE },
+    { "aboutTitle", IDS_ABOUT_TITLE },
 #if defined(OS_CHROMEOS)
     { "aboutProductTitle", IDS_PRODUCT_OS_NAME },
 #else
