@@ -6,6 +6,9 @@
 
 ::@echo off
 
+:: 进入当前盘符
+%~d0
+
 cd %~dp0
 
 if /i "%1"=="help" goto help
