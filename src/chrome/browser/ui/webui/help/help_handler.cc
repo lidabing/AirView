@@ -261,10 +261,12 @@ void HelpHandler::GetLocalizedValues(content::WebUIDataSource* source) {
       "browserVersion",
       l10n_util::GetStringFUTF16(IDS_ABOUT_PRODUCT_VERSION,
                                  BuildBrowserVersionString()));
+  ///airview patch{
   source->AddString(
 	  "chromiumVersion",
 	  l10n_util::GetStringFUTF16(IDS_ABOUT_CHROMIUM_VERSION,
 	  BuildChromiumVersionString()));
+  ///}
 
   base::Time::Exploded exploded_time;
   base::Time::Now().LocalExplode(&exploded_time);
