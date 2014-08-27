@@ -22,6 +22,7 @@
 #include "chrome/browser/sessions/tab_restore_service_factory.h"
 #include "ui/aura/window.h"
 #include "ui/aura/window_tree_host.h"
+#include "chrome/browser/mouse_gesture/mouse_gesture_profile.h"
 
 #define DCHECK_UI_THREAD() \
   DCHECK(base::MessageLoop::current()->type() == base::MessageLoop::TYPE_UI)
@@ -59,16 +60,19 @@ void OpenDragDropUrl(Browser* browser,
                      content::WebContents* web_contents,
                      const GURL& url) {
   int index = browser->tab_strip_model()->active_index();
-  chrome::NavigateParams params(browser, url, content::PAGE_TRANSITION_LINK);
+  chrome::NavigateParams params(browser, url, content::/*PAGE_TRANSITION_LINK*/PAGE_TRANSITION_QUALIFIER_MASK);//临时用法，配合后面Navigate改回原值，用以判断是否由拖曳产生页面
   params.tabstrip_index = index + 1;  //+1默认当前标签(右边)→_→打开
   //[TODO](lidabing):config this
-  bool drop_before = true;
+  /*bool drop_before = true;
   if (drop_before) {
     params.disposition = NEW_FOREGROUND_TAB;
   } else {
     params.disposition = CURRENT_TAB;
     params.source_contents = web_contents;
-  }
+  }*/
+  bool background = MouseGestureProfile::GetInstance()->IsWebDragBackground();
+  params.disposition = background ? NEW_BACKGROUND_TAB : NEW_FOREGROUND_TAB;
+
   params.window_action = chrome::NavigateParams::SHOW_WINDOW;
   chrome::Navigate(&params);
 }

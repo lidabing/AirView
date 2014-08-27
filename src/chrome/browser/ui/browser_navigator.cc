@@ -516,6 +516,10 @@ void Navigate(NavigateParams* params) {
   else{
 	  //int dummy;
 	  //if (base::GetProcessKeyValue(process_key::LowPriorityKeybordInputKey,dummy)){ 
+	  //临时用法，过滤拖曳产生的页面
+	  if(content::PAGE_TRANSITION_QUALIFIER_MASK == params->transition){
+		  params->transition = content::PAGE_TRANSITION_LINK;
+	  } else {
 		  Profile* profile =
 			  params->browser ? params->browser->profile() : params->initiating_profile;
 		  bool forground = profile->GetPrefs()->GetBoolean(prefs::kXNewTabForeground);
@@ -524,7 +528,7 @@ void Navigate(NavigateParams* params) {
 
 		  if (!forground && params->disposition == NEW_FOREGROUND_TAB)
 			  params->disposition = NEW_BACKGROUND_TAB;
-
+	  }
 		//  base::ClearProcessKeyValue(process_key::LowPriorityKeybordInputKey);
 	  //}
   }

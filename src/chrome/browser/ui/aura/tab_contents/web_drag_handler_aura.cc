@@ -14,6 +14,7 @@
 #include "ui/base/dragdrop/drag_drop_types.h"
 #include "ui/base/dragdrop/os_exchange_data.h"
 #include "ui/base/dragdrop/drop_target_event.h"
+#include "chrome/browser/mouse_gesture/mouse_gesture_profile.h"
 
 WebDragHanlderAura::WebDragHanlderAura() : web_contents_(NULL) {
 }
@@ -51,7 +52,8 @@ int WebDragHanlderAura::OnPerformDrop(const ui::DropTargetEvent& event) {
   BrowserList* browser_list =
       BrowserList::GetInstance(chrome::GetActiveDesktop());
 
-  chrome::OpenDragDropUrl(browser_list->GetLastActive(), web_contents_, url);
+  if (MouseGestureProfile::GetInstance()->IsEnableWebDrag())
+	  chrome::OpenDragDropUrl(browser_list->GetLastActive(), web_contents_, url);
   /*
   chrome::NavigateParams params(browser_, url, content::PAGE_TRANSITION_LINK);
   params.tabstrip_index = index;

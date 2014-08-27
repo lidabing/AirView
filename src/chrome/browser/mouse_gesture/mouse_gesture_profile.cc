@@ -112,6 +112,14 @@ bool MouseGestureProfile::IsEnableMouseGesure() {
 	PrefService* prefs = GetLastUsedPrefService();
 	return prefs->GetBoolean(prefs::kXMouseGestureEnabled);
 }
+bool MouseGestureProfile::IsEnableWebDrag() {
+	PrefService* prefs = GetLastUsedPrefService();
+	return prefs->GetBoolean(prefs::kXSuperDragDropEnabled);
+}
+bool MouseGestureProfile::IsWebDragBackground() {
+	PrefService* prefs = GetLastUsedPrefService();
+	return prefs->GetBoolean(prefs::kXSuperDragDropOpenBackend);
+}
 gfx::NativeView MouseGestureProfile::CurrentTabWidgetWindow() {
   Browser* browser =
       BrowserList::GetInstance(chrome::GetActiveDesktop())->GetLastActive();

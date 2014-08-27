@@ -18,6 +18,8 @@ class MouseGestureProfile {
   ~MouseGestureProfile() {}
 
   bool IsEnableMouseGesure();
+  bool IsEnableWebDrag();
+  bool IsWebDragBackground();
   gfx::NativeView CurrentTabWidgetWindow();
   void OnMouseGestureAction(XMouseGestures& action);
 };
