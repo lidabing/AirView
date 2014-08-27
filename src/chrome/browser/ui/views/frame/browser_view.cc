@@ -405,6 +405,9 @@ BrowserView::BrowserView()
 #if defined(OS_CHROMEOS)
       scroll_end_effect_controller_(ScrollEndEffectController::Create()),
 #endif
+	  /// airview patch{
+	  X_PATCH_CLASS_INIT(BrowserView),
+	  ///}
       activate_modal_dialog_factory_(this) {
 }
 

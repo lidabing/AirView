@@ -14,6 +14,7 @@
 #include "chrome/browser/ui/browser_window.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_list.h"
+#include "chrome/browser/ui/views/frame/browser_view.h"
 
 base::LazyInstance<base::ThreadLocalPointer<BossKeyHandler> > lazy_tls_ptr =
     LAZY_INSTANCE_INITIALIZER;
@@ -107,16 +108,16 @@ void BossKeyHandler::OnBossKey() {
     //在这里隐藏所有窗口
     BrowserList::const_iterator iter = browser_list->begin();
     for (; iter != browser_list->end(); iter++) {
-      (*iter)->window()->Show();
-      // (*iter)->window()->OnBossKeyShow(false);
+	  BrowserView* view = (BrowserView*)(*iter)->window();
+	  view->patch_BrowserView()->OnBossKeyShow(false);
     }
   } else {
     all_browser_hide = false;
     //在这里显示所有窗口
     BrowserList::const_iterator iter = browser_list->begin();
     for (; iter != browser_list->end(); iter++) {
-      (*iter)->window()->Hide();
-      // (*iter)->window()->OnBossKeyShow(true);
+		BrowserView* view = (BrowserView*)(*iter)->window();
+		view->patch_BrowserView()->OnBossKeyShow(true);
     }
   }
 }
