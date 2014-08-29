@@ -122,7 +122,7 @@ void XDistribution::DoPostUninstallOperations(
 }
 
 base::string16 XDistribution::GetActiveSetupGuid() {
-  return product_guid();
+  return /*product_guid()*/base::string16();
 }
 
 base::string16 XDistribution::GetBaseAppName() {
