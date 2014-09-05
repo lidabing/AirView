@@ -50,6 +50,7 @@ locales\zh-CN.pak: %(VersionDir)s\Locales
 locales\zh-TW.pak: %(VersionDir)s\Locales
 locales\en-US.pak: %(VersionDir)s\Locales
 master_preferences: %(ChromeDir)s\
+fix_win8.bat: %(ChromeDir)s\
 
 [HIDPI]
 #chrome_200_percent.pak: %(VersionDir)s\
