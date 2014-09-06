@@ -12,4 +12,5 @@ const char kDefaultUseChromeLayout[] = "default-use-chrome-layout";
 const char kDefaultUseChromeSignin[] = "default-use-chrome-signin";
 const char kEnableSidebar[] = "enable-sidebar";
 const char kShowSigninLogo[] = "show-signin-logo";
+const char kUserGoogleWebStoreCrxInstall[] = "use-google-webstore-crx-install";
 }

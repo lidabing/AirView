@@ -15,6 +15,7 @@ extern const char kDefaultUseChromeLayout[];  //默认使用chrome的布局模式
 extern const char kDefaultUseChromeSignin[];  //使用chrome默认登录方式
 extern const char kEnableSidebar[];           //使用侧边栏
 extern const char kShowSigninLogo[];          //显示用户头像
+extern const char kAllowAllCrxInstall[];      //解除google对Crx安装限制
 }
 
 #endif
