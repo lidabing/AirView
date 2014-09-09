@@ -271,4 +271,7 @@
   <message name="IDS_X_SYNC_PLEASE_SIGN_IN" desc="xstring">
     Please sign in
   </message>
+  <message name="IDS_X_CLOSE_TAB_LEFT" desc="xstring">
+    close all tabs left of the current tab
+  </message>
 </grit-part>

@@ -472,12 +472,15 @@ void Home(Browser* browser, WindowOpenDisposition disposition) {
     url = extensions::AppLaunchInfo::GetLaunchWebURL(extension);
   }
 
+  ///airview patch{
+  //改为用新标签页打开
   OpenURLParams params(
-      url, Referrer(), disposition,
+      url, Referrer(), /*disposition*/NEW_FOREGROUND_TAB,
       content::PageTransitionFromInt(
           content::PAGE_TRANSITION_AUTO_BOOKMARK |
           content::PAGE_TRANSITION_HOME_PAGE),
       false);
+  ///}
   params.extra_headers = extra_headers;
   browser->OpenURL(params);
 }
